@@ -22,8 +22,13 @@ typedef TitleData =
 {
 	var titlex:Float;
 	var titley:Float;
+	#if mobile
+	var altstartx:Float;
+	var altstarty:Float;
+	#else
 	var startx:Float;
 	var starty:Float;
+	#end
 	var gfx:Float;
 	var gfy:Float;
 	var backgroundSprite:String;
@@ -108,7 +113,11 @@ class TitleState extends MusicBeatState
 	var logoBl:FlxSprite;
 	var gfDance:FlxSprite;
 	var danceLeft:Bool = false;
+	#if mobile
+	var altTitleText:FlxSprite;
+	#else
 	var titleText:FlxSprite;
+	#end
 	var swagShader:ColorSwap = null;
 
 	function startIntro()
@@ -153,8 +162,33 @@ class TitleState extends MusicBeatState
 
 
 		var animFrames:Array<FlxFrame> = [];
+		#if mobile
+		altTitleText = new FlxSprite(altEnterPosition.x, altEnterPosition.y);
+		altTitleText.frames = Paths.getSparrowAtlas('mobile/titleEnter');
+		#else
 		titleText = new FlxSprite(enterPosition.x, enterPosition.y);
 		titleText.frames = Paths.getSparrowAtlas('titleEnter');
+		#end
+		#if mobile
+		@:privateAccess
+		{
+			titleTextMobile.animation.findByPrefix(animFrames, "ENTER IDLE");
+			titleTextMobile.animation.findByPrefix(animFrames, "ENTER FREEZE");
+		}
+		
+		if (newTitle = animFrames.length > 0)
+		{
+			titleTextMobile.animation.addByPrefix('idle', "ENTER IDLE", 24);
+			titleTextMobile.animation.addByPrefix('press', ClientPrefs.data.flashing ? "ENTER PRESSED" : "ENTER FREEZE", 24);
+		}
+		else
+		{
+			titleTextMobile.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+			titleTextMobile.animation.addByPrefix('press', "ENTER PRESSED", 24);
+		}
+		titleTextMobile.animation.play('idle');
+		titleTextMobile.updateHitbox();
+		#else
 		@:privateAccess
 		{
 			titleText.animation.findByPrefix(animFrames, "ENTER IDLE");
@@ -173,6 +207,7 @@ class TitleState extends MusicBeatState
 		}
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
+		#end
 
 		blackScreen = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
 		blackScreen.scale.set(FlxG.width, FlxG.height);
@@ -192,7 +227,11 @@ class TitleState extends MusicBeatState
 
 		add(gfDance);
 		add(logoBl); //FNF Logo
+		#if mobile
+		add(altTitleText); // For mobile only
+		#else
 		add(titleText); //"Press Enter to Begin" text
+		#end
 		add(credGroup);
 		add(ngSpr);
 
@@ -210,7 +249,11 @@ class TitleState extends MusicBeatState
 
 	var gfPosition:FlxPoint = FlxPoint.get(512, 40);
 	var logoPosition:FlxPoint = FlxPoint.get(-150, -100);
+	#if mobile
+	var altEnterPosition:FlxPoint = FlxPoint.get(50, 590);
+	#else
 	var enterPosition:FlxPoint = FlxPoint.get(100, 576);
+	#end
 	
 	var useIdle:Bool = false;
 	var musicBPM:Float = 102;
@@ -229,7 +272,11 @@ class TitleState extends MusicBeatState
 					var titleJSON:TitleData = tjson.TJSON.parse(titleRaw);
 					gfPosition.set(titleJSON.gfx, titleJSON.gfy);
 					logoPosition.set(titleJSON.titlex, titleJSON.titley);
+					#if mobile
+					altEnterPosition.set(titleJSON.altstartx, titleJSON.altstarty);
+					#else
 					enterPosition.set(titleJSON.startx, titleJSON.starty);
+					#end
 					musicBPM = titleJSON.bpm;
 					
 					if(titleJSON.animation != null && titleJSON.animation.length > 0) animationName = titleJSON.animation;
@@ -314,16 +361,28 @@ class TitleState extends MusicBeatState
 				
 				timer = FlxEase.quadInOut(timer);
 				
+				#if mobile
+				altTitleText.color = FlxColor.interpolate(titleTextColors[0], titleTextColors[1], timer);
+				altTitleText.alpha = FlxMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
+				#else
 				titleText.color = FlxColor.interpolate(titleTextColors[0], titleTextColors[1], timer);
 				titleText.alpha = FlxMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
+				#end
 			}
 			
 			if(pressedEnter)
 			{
+				#if mobile
+				altTitleText.color = FlxColor.WHITE;
+				altTitleText.alpha = 1;
+				
+				if(altTitleText != null) altTitleText.animation.play('press');
+				#else
 				titleText.color = FlxColor.WHITE;
 				titleText.alpha = 1;
 				
 				if(titleText != null) titleText.animation.play('press');
+				#end
 
 				FlxG.camera.flash(ClientPrefs.data.flashing ? FlxColor.WHITE : 0x4CFFFFFF, 1);
 				FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
