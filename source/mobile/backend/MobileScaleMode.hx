@@ -26,13 +26,13 @@ import flixel.system.scaleModes.BaseScaleMode;
 
 /**
  * ...
- * @author: Karim Akra
+ * @author: Karim Akra (rework by Lenin)
  */
 class MobileScaleMode extends BaseScaleMode
 {
 	public static var allowWideScreen(default, set):Bool = true;
 	
-	// Base game resolution for mod compatibility
+	// Base game resolution
 	public static final BASE_GAME_WIDTH:Int = 1280;
 	public static final BASE_GAME_HEIGHT:Int = 720;
 	
