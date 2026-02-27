@@ -37,27 +37,16 @@ body:
         - "Desktop (Linux, Windows or Mac)"
         - "Android"
         - "iOS"
-        - "HashLink"
-        - "Flash/AIR"
         - "Other/Unknown/I don't know"
     validations:
       required: true
 
   - type: dropdown
-    id: psychver
+    id: scbver
     attributes:
-      label: "Which psych engine version you're on?"
+      label: "Which SCB engine version you're on?"
       options:
-        - "DevBuild"
-        - "1.0.4"
-        - "1.0.3"
-        - "1.0.2h"
-        - "1.0.2"
-        - "1.0.1"
-        - "1.0"
-        - "1.0 (Prerelease)"
-        - "0.7.x"
-        - "0.6.x or older"
+        - "1.0.27226"
     validations:
       required: true
 

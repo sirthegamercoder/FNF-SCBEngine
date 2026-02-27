@@ -120,6 +120,19 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		option.changeValue = 0.1;
 		option.decimals = 1;
 		addOption(option);
+
+		var option:Option = new Option('Win Icon',
+		    "If checked, the win icon will appear when the health bar is high (for the player) or low (for the opponent). Check this if your mod has win icons.",
+			'winIconSupport',
+			BOOL);
+		addOption(option);
+
+		var option:Option = new Option('Position Win Icon',
+		    "Which position is used for the win icon?\nMiddle = 0.7.1h\nRight = 0.6.3",
+			'positionWinIcon',
+			STRING,
+			['Middle', 'Right']);
+		addOption(option);
 		
 		var option:Option = new Option('FPS Counter',
 			'If unchecked, hides FPS Counter.',

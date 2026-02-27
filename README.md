@@ -7,30 +7,30 @@
 [![GitHub issues](https://img.shields.io/github/issues/sirthegamercoder/FNF-SCBEngine)](https://github.com/sirthegamercoder/FNF-SCBEngine/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/sirthegamercoder/FNF-SCBEngine)](https://github.com/sirthegamercoder/FNF-SCBEngine/pulls)
 
-A engine based on Psych 1.0.4 with assets optimized for low-end devices and compatible with hxcodec videos.
+A engine based on Psych 1.0.4 with assets optimized for low-end devices.
+
+> If you want to contribute to this engine, please fork this repository and make improvements, fixes, and additions, then open a pull request! Contributors are welcome.
 
 </div>
 
 # Features
-* Better Alphabet.
 * New touchpad Mobile images.
 * Multiple storage types on Mobile.
 * Reimplemented of Combo.
 * Win icon support (Needed to activate on Settings).
-* Fixed the icon didn't change on 80% health bar when `Change Character` event triggered.
 * And more features... *I don't know*
 
 ## Developer Credit:
 * sirtehagmercoder - Head of SCB Engine.
 
+## Original Credits:
+* Shadow Mario - Main Programmer and Head of Psych Engine.
+* Riveren - Main Artist/Animator of Psych Engine.
+
 ## Mobile Credits:
 * Homura - Head Porter of Psych Engine Mobile.
 * Karim - Second Porter of Psych Engine Mobile.
 * Moxie - Helper of Psych Engine Mobile.
-
-## Credits:
-* Shadow Mario - Main Programmer and Head of Psych Engine.
-* Riveren - Main Artist/Animator of Psych Engine.
 
 ### Psych Special Thanks
 * bbpanzu - Ex-Team Member (Programmer).

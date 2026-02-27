@@ -52,7 +52,7 @@ class EditorPlayState extends MusicBeatSubstate
 	var songLength:Float = 0;
 	var songSpeed:Float = 1;
 	
-	var showCombo:Bool = false;
+	var showCombo:Bool = true;
 	var showComboNum:Bool = true;
 	var showRating:Bool = true;
 

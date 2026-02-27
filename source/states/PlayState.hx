@@ -1942,6 +1942,46 @@ class PlayState extends MusicBeatState
 
 		iconP1.animation.curAnim.curFrame = (healthBar.percent < 20) ? 1 : 0; //If health is under 20%, change player icon to frame 1 (losing icon), otherwise, frame 0 (normal)
 		iconP2.animation.curAnim.curFrame = (healthBar.percent > 80) ? 1 : 0; //If health is over 80%, change opponent icon to frame 1 (losing icon), otherwise, frame 0 (normal)
+
+		if (ClientPrefs.data.winIconSupport && ClientPrefs.data.positionWinIcon == 'Middle')
+		{
+			if (healthBar.percent < 20)
+			{
+				iconP1.animation.curAnim.curFrame = 1;
+				iconP2.animation.curAnim.curFrame = iconP2.numFrames > 2 ? 2 : 0;
+			}
+			else if (healthBar.percent > 80)
+			{
+				iconP1.animation.curAnim.curFrame = iconP1.numFrames > 2 ? 2 : 0;
+				iconP2.animation.curAnim.curFrame = 1;
+			}
+
+			else
+			{
+				iconP1.animation.curAnim.curFrame = 0;
+				iconP2.animation.curAnim.curFrame = 0;
+			}
+		}
+
+		if (ClientPrefs.data.winIconSupport && ClientPrefs.data.positionWinIcon == 'Right')
+		{
+			if (healthBar.percent < 20)
+			{
+				iconP1.animation.curAnim.curFrame = 1;
+				iconP2.animation.curAnim.curFrame = iconP2.numFrames > 3 ? 3 : 0;
+			}
+			else if (healthBar.percent > 80)
+			{
+				iconP1.animation.curAnim.curFrame = iconP1.numFrames > 3 ? 3 : 0;
+				iconP2.animation.curAnim.curFrame = 1;
+			}
+
+			else
+			{
+				iconP1.animation.curAnim.curFrame = 0;
+				iconP2.animation.curAnim.curFrame = 0;
+			}
+		}
 		return health;
 	}
 
@@ -2560,7 +2600,7 @@ class PlayState extends MusicBeatState
 	public var totalPlayed:Int = 0;
 	public var totalNotesHit:Float = 0.0;
 
-	public var showCombo:Bool = false;
+	public var showCombo:Bool = true;
 	public var showComboNum:Bool = true;
 	public var showRating:Bool = true;
 
