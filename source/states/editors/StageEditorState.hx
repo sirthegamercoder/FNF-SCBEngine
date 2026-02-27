@@ -1751,36 +1751,20 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		{
 			fullPath = fullPath.replace('\\', '/');
 			var exePath = Sys.getCwd().replace('\\', '/');
-			#if android
-			var externalPath = StorageUtil.getExternalStorageDirectory();
-			#end
 			if(fullPath.startsWith(exePath))
 			{
 				fullPath = fullPath.substr(exePath.length);
 				if((fullPath.startsWith('assets/') #if MODS_ALLOWED || fullPath.startsWith('mods/') #end) && fullPath.contains('/images/'))
 				{
 					loadSprite(fullPath.substring(fullPath.indexOf('/images/') + '/images/'.length, fullPath.lastIndexOf('.')));
-					//trace('Inside Psych Engine Folder');
 					return;
 				}
 			}
-			#if android
-			else if(fullPath.startsWith(externalPath))
-			{
-				fullPath = fullPath.substr(externalPath.length);
-				if((fullPath.startsWith('assets/') #if MODS_ALLOWED || fullPath.startsWith('mods/') #end) && fullPath.contains('/images/'))
-				{
-					loadSprite(fullPath.substring(fullPath.indexOf('/images/') + '/images/'.length, fullPath.lastIndexOf('.')));
-					//trace('Inside Psych Engine Folder');
-					return;
-				}
-			}
-			#end
 
 			createPopup.visible = createPopup.active = false;
 			#if MODS_ALLOWED
 			var modFolder:String = (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0) ? Paths.mods('${Mods.currentModDirectory}/images/') : Paths.mods('images/');
-			openSubState(new BasePrompt(480, 160, 'This file is not inside Psych Engine.', function(state:BasePrompt)
+			openSubState(new BasePrompt(480, 160, 'This file is not inside SCB Engine.', function(state:BasePrompt)
 			{
 				var txt:FlxText = new FlxText(0, state.bg.y + 60, 460, 'Copy to: "$modFolder"?', 11);
 				txt.alignment = CENTER;

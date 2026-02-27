@@ -112,12 +112,9 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 		function addToList(path:Path, isFolder:Bool)
 		{
 			var exePath:String = Sys.getCwd().replace('\\', '/');
-			#if android
-			var externalPath = StorageUtil.getExternalStorageDirectory();
-			#end
-			if(path.dir.startsWith(exePath) #if android || path.dir.startsWith(externalPath) #end)
+			if(path.dir.startsWith(exePath))
 			{
-				var pathStr:String = #if android path.dir.startsWith(externalPath) ? path.dir.substr(externalPath.length) : path.dir.substr(exePath.length) #else path.dir.substr(exePath.length) #end;
+				var pathStr:String = path.dir.substr(exePath.length);
 				var split:Array<String> = pathStr.split('/');
 				switch(split[0])
 				{
@@ -149,7 +146,7 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 						showOutput('File must be inside assets/mods folder!', true);
 				}
 			}
-			else showOutput('File is not inside Psych Engine\'s folder!', true);
+			else showOutput('File is not inside SCB Engine\'s folder!', true);
 		}
 
 		#if !mobile
