@@ -105,9 +105,9 @@ class CopyState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (shouldCopy && copyLoop != null)
+		if (shouldCopy)
 		{
-			if (copyLoop.finished && canUpdate)
+			if (loopTimes >= maxLoopTimes && canUpdate)
 			{
 				if (failedFiles.length > 0)
 				{
@@ -123,12 +123,16 @@ class CopyState extends MusicBeatState
 				{
 					MusicBeatState.switchState(new TitleState());
 				};
+
+				canUpdate = false;
 			}
 
-			if (maxLoopTimes == 0)
+			if (loopTimes >= maxLoopTimes)
 				loadedText.text = "Completed!";
 			else
 				loadedText.text = '$loopTimes/$maxLoopTimes';
+
+			loadingBar.percent = Math.min((loopTimes / maxLoopTimes) * 100, 100);
 		}
 		super.update(elapsed);
 	}
