@@ -1,21 +1,27 @@
-![PsychionalEngineLogo](docs/img/PsychEngineMobileLogoTweak.png)
+![SCBEngineLogo](docs/img/SCBEngineLogo.png)
 
-Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
+<div align="center">
 
-## Customization:
+[![License](https://img.shields.io/github/license/sirthegamercoder/FNF-SCBEngine)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/sirthegamercoder/FNF-SCBEngine)](https://github.com/sirthegamercoder/FNF-SCBEngine/releases)
+[![GitHub issues](https://img.shields.io/github/issues/sirthegamercoder/FNF-SCBEngine)](https://github.com/sirthegamercoder/FNF-SCBEngine/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/sirthegamercoder/FNF-SCBEngine)](https://github.com/sirthegamercoder/FNF-SCBEngine/pulls)
 
-If you wish to disable things like *Lua Scripts* or *Video Cutscenes*, you can refer to the `Project.xml` file.
+A engine based on Psych 1.0.4 with assets optimized for low-end devices and compatible with hxcodec videos.
 
-Inside `Project.xml`, you will find several variables to customize Psych Engine to your liking.
+</div>
 
-To start you off, disabling *Video Cutscenes* should be simple, simply delete the line `"VIDEOS_ALLOWED"` or comment it out by wrapping the line in XML-like comments, like this: `<!-- YOUR_LINE_HERE -->`
+# Features
+* Better Alphabet.
+* New touchpad Mobile images.
+* Multiple storage types on Mobile.
+* Reimplemented of Combo.
+* Win icon support (Needed to activate on Settings).
+* Fixed the icon didn't change on 80% health bar when `Change Character` event triggered.
+* And more features... *I don't know*
 
-Same goes for *Lua Scripts*, comment out or delete the line with `LUA_ALLOWED`, this and other customization options are all available within the `Project.xml` file.
-
-## Softcoding (.lua/.hx)
-For this you can head over to [the wiki](https://shadowmario.github.io/psychengine.lua)
-
-There you can learn how to use the 212 PlayState funcions in your mod!
+## Developer Credit:
+* sirtehagmercoder - Head of SCB Engine.
 
 ## Mobile Credits:
 * Homura - Head Porter of Psych Engine Mobile.
@@ -44,7 +50,7 @@ There you can learn how to use the 212 PlayState funcions in your mod!
 
 ***
 
-# Features
+# Main Features
 
 ## Attractive animated dialogue boxes:
 
