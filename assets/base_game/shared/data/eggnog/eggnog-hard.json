@@ -2667,7 +2667,7 @@
 		"events": [],
 		"player3": null,
 		"song": "Eggnog",
-		"needsVoices": true,
+		"needsVoices": false,
 		"stage": "mall",
 		"format": "psych_v1_convert",
 		"speed": 1.9,

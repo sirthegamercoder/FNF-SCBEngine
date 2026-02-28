@@ -4280,7 +4280,7 @@
 		"gameOverChar": "bf-holding-gf-dead",
 		"song": "Stress",
 		"stage": "tank",
-		"needsVoices": true,
+		"needsVoices": false,
 		"validScore": true,
 		"format": "psych_v1_convert",
 		"bpm": 178,

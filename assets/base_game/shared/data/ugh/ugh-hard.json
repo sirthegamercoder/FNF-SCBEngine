@@ -2988,7 +2988,7 @@
 		"events": [],
 		"player3": null,
 		"song": "Ugh",
-		"needsVoices": true,
+		"needsVoices": false,
 		"stage": "tank",
 		"format": "psych_v1_convert",
 		"speed": 2.3,

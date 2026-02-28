@@ -1880,7 +1880,7 @@
 		],
 		"song": "Ridge",
 		"sections": 0,
-		"needsVoices": true,
+		"needsVoices": false,
 		"format": "psych_v1_convert",
 		"speed": 1.3,
 		"bpm": 145

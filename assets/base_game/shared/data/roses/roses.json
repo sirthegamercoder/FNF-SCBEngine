@@ -2042,7 +2042,7 @@
 		"events": [],
 		"player3": null,
 		"song": "Roses",
-		"needsVoices": true,
+		"needsVoices": false,
 		"stage": "school",
 		"format": "psych_v1_convert",
 		"speed": 1.3,

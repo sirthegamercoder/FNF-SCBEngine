@@ -2533,7 +2533,7 @@
 		"events": [],
 		"player3": null,
 		"song": "Thorns",
-		"needsVoices": true,
+		"needsVoices": false,
 		"stage": "schoolEvil",
 		"format": "psych_v1_convert",
 		"speed": 1.3,

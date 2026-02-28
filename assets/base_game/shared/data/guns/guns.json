@@ -4454,7 +4454,7 @@
 		"events": [],
 		"player3": null,
 		"song": "Guns",
-		"needsVoices": true,
+		"needsVoices": false,
 		"stage": "tank",
 		"format": "psych_v1_convert",
 		"speed": 2,

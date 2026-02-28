@@ -2682,7 +2682,7 @@
 		],
 		"player2": "monster",
 		"song": "Monster",
-		"needsVoices": true,
+		"needsVoices": false,
 		"bpm": 95,
 		"speed": 1.6,
 		"format": "psych_v1_convert"

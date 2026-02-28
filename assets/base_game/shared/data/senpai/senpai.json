@@ -2065,7 +2065,7 @@
 		"events": [],
 		"player3": null,
 		"song": "Senpai",
-		"needsVoices": true,
+		"needsVoices": false,
 		"stage": "school",
 		"format": "psych_v1_convert",
 		"speed": 1.2,

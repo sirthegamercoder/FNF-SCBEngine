@@ -8,6 +8,7 @@ class Spooky extends BaseStage
 	{
 		if(!ClientPrefs.data.lowQuality) {
 			halloweenBG = new BGSprite('halloween_bg', -200, -100, ['halloweem bg0', 'halloweem bg lightning strike']);
+			halloweenBG.scale.set(2, 2);
 		} else {
 			halloweenBG = new BGSprite('halloween_bg_low', -200, -100);
 		}
