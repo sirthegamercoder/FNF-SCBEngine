@@ -29,6 +29,7 @@ import states.TitleState;
 	public var middleScroll:Bool = false;
 	public var opponentStrums:Bool = true;
 	public var showFPS:Bool = true;
+	public var useOldFont:Bool = true;
 	public var flashing:Bool = true;
 	public var autoPause:Bool = false;
 	public var antialiasing:Bool = true;

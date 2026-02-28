@@ -296,6 +296,9 @@ class Paths
 
 	inline static public function font(key:String)
 	{
+		if(ClientPrefs.data.useOldFont && key == 'phantom.ttf')
+			key = 'vcr.ttf';
+		
 		var folderKey:String = Language.getFileTranslation('fonts/$key');
 		#if MODS_ALLOWED
 		var file:String = modFolders(folderKey);
@@ -500,7 +503,6 @@ class Paths
 		}
 		return #if mobile Sys.getCwd() + #end ('mods/' + key);
 	}
-	#end
 
 	#if linux
 	static function findFile(key:String):String {

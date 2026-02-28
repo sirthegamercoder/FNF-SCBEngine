@@ -197,10 +197,10 @@
 			<application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" />
 		</config:android>
 
-		<assets path="art/icons/android/res" rename="app/src/main/res" type="template" />
+		<assets path="art/icons/mobile/android/res" rename="app/src/main/res" type="template" />
 	</section>
 
 	<section if="ios">
-	    <assets path="art/icons/ios/AppIcon.appiconset" rename="Assets.xcassets/Images.xcassets/AppIcon.appiconset" />
+	    <assets path="art/icons/mobile/ios/AppIcon.appiconset" rename="Assets.xcassets/Images.xcassets/AppIcon.appiconset" />
 	</section>
 </project>

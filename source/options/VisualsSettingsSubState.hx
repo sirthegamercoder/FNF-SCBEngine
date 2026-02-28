@@ -148,6 +148,12 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		addOption(option);
 		option.onChange = onChangeFPSCounter;
 
+		var option:Option = new Option('Old Font',
+		    'If checked, the font will be changed to VCR.',
+			'useOldFont',
+			BOOL);
+		addOption(option);
+
 		#if native
 		var option:Option = new Option('VSync',
 			'If checked, Enables VSync fixing any screen tearing at the cost of capping the FPS to screen refresh rate.\n(Must restart the game to have an effect)',
