@@ -60,7 +60,7 @@ import states.TitleState;
 	public var healthBarAlpha:Float = 1;
 	public var winIconSupport:Bool = false;
 	public var positionWinIcon:String = 'Middle';
-	public var hitsoundVolume:Float = 0;
+	public var hitsoundVolume:Float = 0.3;
 	public var pauseMusic:String = 'Breakfast';
 	public var checkForUpdates:Bool = true;
 	public var comboStacking:Bool = false;
@@ -82,8 +82,7 @@ import states.TitleState;
 		'healthloss' => 1.0,
 		'instakill' => false,
 		'practice' => false,
-		'botplay' => false,
-		'opponentplay' => false
+		'botplay' => false
 	];
 
 	public var comboOffset:Array<Int> = [0, 0, 0, 0];
