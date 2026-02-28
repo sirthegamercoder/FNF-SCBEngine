@@ -553,13 +553,27 @@ class PlayState extends MusicBeatState
 		uiGroup.add(healthBar);
 
 		iconP1 = new HealthIcon(boyfriend.healthIcon, true);
-		iconP1.y = healthBar.y - 75;
+		if (ClientPrefs.data.iconBounceType == 'Old')
+		{
+			iconP1.y = healthBar.y - (iconP1.height / 2);
+		}
+		else
+		{
+			iconP1.y = healthBar.y - 75;
+		}
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
-		iconP2.y = healthBar.y - 75;
+		if (ClientPrefs.data.iconBounceType == 'Old')
+		{
+			iconP2.y = healthBar.y - (iconP2.height / 2);
+		}
+		else
+		{
+			iconP2.y = healthBar.y - 75;
+		}
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP2);
@@ -1902,6 +1916,21 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
+		if (ClientPrefs.data.iconBounceType == 'Old')
+		{
+			iconP1.setGraphicSize(Std.int(FlxMath.lerp(150, iconP1.width, 0.50)));
+			iconP2.setGraphicSize(Std.int(FlxMath.lerp(150, iconP2.width, 0.50)));
+
+			iconP1.updateHitbox();
+			iconP2.updateHitbox();
+		}
+
+		if (ClientPrefs.data.iconBounceType == 'MM')
+		{
+			iconP1.updateHitbox();
+			iconP2.updateHitbox();
+		}
+
 		setOnScripts('botPlay', cpuControlled);
 		callOnScripts('onUpdatePost', [elapsed]);
 	}
@@ -1909,13 +1938,27 @@ class PlayState extends MusicBeatState
 	// Health icon updaters
 	public dynamic function updateIconsScale(elapsed:Float)
 	{
-		var mult:Float = FlxMath.lerp(1, iconP1.scale.x, Math.exp(-elapsed * 9 * playbackRate));
-		iconP1.scale.set(mult, mult);
-		iconP1.updateHitbox();
+		if (ClientPrefs.data.iconBounceType == 'NF')
+		{
+			var mult:Float = FlxMath.lerp(1, iconP1.scale.x, FlxMath.bound((1 - (elapsed * 9 * playbackRate)) / 1.1, 0, 1));
+			iconP1.scale.set(mult, mult);
+			iconP1.updateHitbox();
 
-		var mult:Float = FlxMath.lerp(1, iconP2.scale.x, Math.exp(-elapsed * 9 * playbackRate));
-		iconP2.scale.set(mult, mult);
-		iconP2.updateHitbox();
+			var mult:Float = FlxMath.lerp(1, iconP2.scale.x, FlxMath.bound((1 - (elapsed * 9 * playbackRate)) / 1.1, 0, 1));
+			iconP2.scale.set(mult, mult);
+			iconP2.updateHitbox();
+		}
+
+		if (ClientPrefs.data.iconBounceType == 'Default')
+		{
+			var mult:Float = FlxMath.lerp(1, iconP1.scale.x, Math.exp(-elapsed * 9 * playbackRate));
+			iconP1.scale.set(mult, mult);
+			iconP1.updateHitbox();
+
+			var mult:Float = FlxMath.lerp(1, iconP2.scale.x, Math.exp(-elapsed * 9 * playbackRate));
+			iconP2.scale.set(mult, mult);
+			iconP2.updateHitbox();
+		}
 	}
 
 	public dynamic function updateIconsPosition()
@@ -3339,11 +3382,44 @@ class PlayState extends MusicBeatState
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
-		iconP1.scale.set(1.2, 1.2);
-		iconP2.scale.set(1.2, 1.2);
+		if (ClientPrefs.data.iconBounceType == 'Default')
+		{
+            iconP1.scale.set(1.2, 1.2);
+		    iconP2.scale.set(1.2, 1.2);
+			
+			iconP1.updateHitbox();
+		    iconP2.updateHitbox();
+		}
 
-		iconP1.updateHitbox();
-		iconP2.updateHitbox();
+		if (ClientPrefs.data.iconBounceType == 'NF')
+		{
+			iconP1.scale.set(1.3, 1.3);
+			iconP2.scale.set(1.3, 1.3);
+
+			iconP1.updateHitbox();
+			iconP2.updateHitbox();
+		}
+
+		if (ClientPrefs.data.iconBounceType == 'Old')
+		{
+			iconP1.setGraphicSize(Std.int(iconP1.width + 40));
+			iconP2.setGraphicSize(Std.int(iconP2.width + 40));
+
+			iconP1.updateHitbox();
+			iconP2.updateHitbox();
+		}
+
+		if (ClientPrefs.data.iconBounceType == 'MM')
+		{
+			iconP1.scale.x = 1.1;
+			iconP1.scale.y = 1.1;
+
+			iconP2.scale.x = 1.1;
+			iconP2.scale.y = 1.1;
+			
+			iconP1.updateHitbox();
+			iconP2.updateHitbox();
+		}
 
 		characterBopper(curBeat);
 

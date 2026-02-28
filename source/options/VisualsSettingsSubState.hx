@@ -133,6 +133,13 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			STRING,
 			['Middle', 'Right']);
 		addOption(option);
+
+		var option:Option = new Option('Icon Bounce',
+		    'Select the type of bounce icon you prefer. Default is Recommended.',
+			'iconBounceType',
+			STRING,
+			['Default', 'Old', 'NF', 'MM']);
+		addOption(option);
 		
 		var option:Option = new Option('FPS Counter',
 			'If unchecked, hides FPS Counter.',
