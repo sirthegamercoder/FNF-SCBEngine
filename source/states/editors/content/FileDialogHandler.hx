@@ -210,34 +210,6 @@ class FileReferenceCustom extends FileReference
 		openFileDialog.onSelect.add(openFileDialog_onSelect);
 		openFileDialog.browse(browseType, filter, defaultName, title);
 		return true;
-		#elseif (js && html5)
-		var filter = null;
-		if (typeFilter != null)
-		{
-			var filters = [];
-			for (type in typeFilter)
-			{
-				filters.push(StringTools.replace(StringTools.replace(type.extension, "*.", "."), ";", ","));
-			}
-			filter = filters.join(",");
-		}
-		if (filter != null)
-		{
-			__inputControl.setAttribute("accept", filter);
-		}
-		__inputControl.onchange = function()
-		{
-			var file = __inputControl.files[0];
-			modificationDate = Date.fromTime(file.lastModified);
-			creationDate = modificationDate;
-			size = file.size;
-			type = "." + Path.extension(file.name);
-			name = Path.withoutDirectory(file.name);
-			__path = file.name;
-			dispatchEvent(new Event(Event.SELECT));
-		}
-		__inputControl.click();
-		return true;
 		#end
 
 		return false;

@@ -9,9 +9,6 @@ import lime.media.openal.ALC;
 import lime.media.openal.ALContext;
 import lime.media.openal.ALDevice;
 import backend.ALSoftConfig;
-#if (js && html5)
-import js.Browser;
-#end
 
 #if !lime_debug
 @:fileXml('tags="haxe,release"')
@@ -49,7 +46,7 @@ class AudioManager
 
 			AudioManager.context = context;
 
-			#if (lime_cffi && !macro && lime_openal && (ios || tvos || mac))
+			#if (lime_cffi && !macro && lime_openal && (ios || mac))
 			var timer = new Timer(100);
 			timer.run = function()
 			{

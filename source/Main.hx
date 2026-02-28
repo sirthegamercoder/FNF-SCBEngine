@@ -167,18 +167,9 @@ class Main extends Sprite
 		Lib.current.stage.window.setIcon(icon);
 		#end
 
-		#if html5
-		FlxG.autoPause = false;
-		FlxG.mouse.visible = false;
-		#end
-
 		FlxG.fixedTimestep = false;
 		FlxG.game.focusLostFramerate = #if mobile 30 #else 60 #end;
-		#if web
-		FlxG.keys.preventDefaultKeys.push(TAB);
-		#else
 		FlxG.keys.preventDefaultKeys = [TAB];
-		#end
 
 		#if DISCORD_ALLOWED
 		DiscordClient.prepare();

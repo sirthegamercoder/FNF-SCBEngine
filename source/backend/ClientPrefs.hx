@@ -37,7 +37,7 @@ import states.TitleState;
 	public var splashAlpha:Float = 0.6;
 	public var lowQuality:Bool = false;
 	public var shaders:Bool = false;
-	public var cacheOnGPU:Bool = #if !switch false #else true #end; // GPU Caching made by Raltyro
+	public var cacheOnGPU:Bool = false
 	public var framerate:Int = 60;
 	public var camZooms:Bool = true;
 	public var hideHud:Bool = false;
@@ -221,7 +221,7 @@ class ClientPrefs {
 		if(Main.fpsVar != null)
 			Main.fpsVar.visible = data.showFPS;
 
-		#if (!html5 && !switch)
+		#if (!switch)
 		FlxG.autoPause = ClientPrefs.data.autoPause;
 
 		if(FlxG.save.data.framerate == null) {

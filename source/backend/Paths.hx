@@ -26,7 +26,7 @@ import backend.Mods;
 @:access(openfl.display.BitmapData)
 class Paths
 {
-	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
+	inline public static var SOUND_EXT = "ogg";
 	inline public static var VIDEO_EXT = "mp4";
 
 	public static function excludeAsset(key:String) {
@@ -80,7 +80,6 @@ class Paths
 		}
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
-		#if !html5 openfl.Assets.cache.clear("songs"); #end
 	}
 
 	public static function freeGraphicsFromMemory()
