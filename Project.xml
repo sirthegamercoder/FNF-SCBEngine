@@ -3,7 +3,7 @@
 	<!-- _________________________ Application Settings _________________________ -->
 
 	<app title="Friday Night Funkin': SCB Engine" file="SCBEngine" packageName="com.sirthegamercoder.scbengine" package="com.sirthegamercoder.scbengine" main="Main" version="1.0" company="sirthegamercoder" />
-	<app title="FNF: SCB Engine" if="mobile" />
+	<app title="FNF: SCB Engine" if="android || ios" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -199,8 +199,20 @@
 
 	<assets path='art/icons/iconOG.png' rename='icon.png' if="linux || mac" />
 	
-	<icon path="art/icons/icon16.png" size='16'/>
-	<icon path="art/icons/icon32.png" size='32'/>
-	<icon path="art/icons/icon64.png" size='64'/>
-	<icon path="art/icons/iconOG.png" />
+	<icon path="art/icons/icon16.png" size='16' unless="android"/>
+	<icon path="art/icons/icon32.png" size='32' unless="android"/>
+	<icon path="art/icons/icon64.png" size='64' unless="android"/>
+	<icon path="art/icons/iconOG.png" unless="android" />
+
+	<section if="android">
+		<config:android>
+			<application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" />
+		</config:android>
+
+		<assets path="art/icons/android/res" rename="app/src/main/res" type="template" />
+	</section>
+
+	<section if="ios">
+	    <assets path="art/icons/ios/AppIcon.appiconset" rename="Assets.xcassets/Images.xcassets/AppIcon.appiconset" />
+	</section>
 </project>

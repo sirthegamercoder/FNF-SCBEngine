@@ -295,7 +295,7 @@ jobs:
           cd export/release/ios/build/Release-iphoneos
           mkdir -p Payload
           cp -r *.app Payload/
-          zip -r PlusEngine-iOS-Unsigned.ipa Payload
+          zip -r PlusEngine-iOS.ipa Payload
           rm -rf Payload
       
       - name: Publish Artifact
