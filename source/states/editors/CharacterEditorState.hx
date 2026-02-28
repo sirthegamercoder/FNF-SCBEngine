@@ -8,7 +8,6 @@ import flixel.util.FlxDestroyUtil;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
-import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.utils.Assets;
 
@@ -168,13 +167,6 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 
 		addTouchPad('LEFT_FULL', 'CHARACTER_EDITOR');
 		addTouchPadCamera();
-
-		if (controls.mobileC)
-		{
-			FlxG.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
-			FlxG.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
-			FlxG.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseEvent);
-		}
 
 		if(ClientPrefs.data.cacheOnGPU) Paths.clearUnusedMemory();
 
@@ -1360,26 +1352,5 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			_file.save(data, '$_char.json');
 			#end
 		}
-	}
-
-	function onMouseEvent(e:MouseEvent):Void
-	{
-		if (touchPad != null && !touchPad.anyPressed([ANY]))
-			switch (e.type)
-			{
-				case MouseEvent.MOUSE_DOWN:
-					var mouse = new Point(e.stageX, e.stageY); // OpenFL mouse position
-					cameraPosition.x = FlxG.camera.scroll.x + mouse.x;
-					cameraPosition.y = FlxG.camera.scroll.y + mouse.y;
-					isDragging = true;
-
-				case MouseEvent.MOUSE_MOVE if (isDragging):
-					var mouse = new Point(e.stageX, e.stageY);
-					FlxG.camera.scroll.x = cameraPosition.x - mouse.x;
-					FlxG.camera.scroll.y = cameraPosition.y - mouse.y;
-
-				case MouseEvent.MOUSE_UP:
-					isDragging = false;
-			}
 	}
 }

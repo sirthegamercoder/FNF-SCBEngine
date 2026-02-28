@@ -14,13 +14,11 @@ class PsychUIDropDownMenu extends PsychUIInputText
 	public var selectedLabel(default, set):String = null;
 
 	var _curFilter:Array<String>;
-	var _itemWidth:Float = 0;
-	public function new(x:Float, y:Float, list:Array<String>, callback:Int->String->Void, ?width:Float = 100)
+	public function new(x:Float, y:Float, list:Array<String>, callback:Int->String->Void)
 	{
 		super(x, y);
 		if(list == null) list = [];
 
-		_itemWidth = width - 2;
 		setGraphicSize(width, 20);
 		updateHitbox();
 		textObj.y += 2;
@@ -37,7 +35,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 		{
 			if(old != cur)
 			{
-				_curFilter = this.list.filter(function(str:String) return str.startsWith(cur));
+				_curFilter = list.filter(function(str:String) return str.startsWith(cur));
 				showDropDown(true, 0, _curFilter);
 			}
 		}
@@ -108,47 +106,13 @@ class PsychUIDropDownMenu extends PsychUIInputText
 		else if(PsychUIInputText.focusOn == this)
 		{
 			var wheel:Int = FlxG.mouse.wheel;
+			#if mobile
+			if(FlxG.keys.justPressed.UP || SwipeUtil.swipedUp) wheel++;
+			if(FlxG.keys.justPressed.DOWN || SwipeUtil.swipedDown) wheel--;
+			#else
 			if(FlxG.keys.justPressed.UP) wheel++;
 			if(FlxG.keys.justPressed.DOWN) wheel--;
-			/*#if FLX_TOUCH
-			for (touch in FlxG.touches.list)
-			{
-				var moveY:Int = 0;
-				var addition:Int = 0;
-				var curY:Int = 0;
-				var prevY:Int = 0;
-
-				if (touch.pressed)
-				{
-					curY = touch.y;
-
-					// these might need to be swaped idk i can't test
-					if (curY > prevY)
-						addition++;
-					else
-						addition--;
-
-					// change the option every 10 pixels you move
-					if (addition >= 10 || addition <= 10)
-					{
-						// these here might also need to be swapped
-						if (addition >= 10)
-							moveY++
-						else
-							moveY--;
-
-						addition = 0;
-					}
-
-					prevY = curY;
-				}
-
-				wheel += moveY;
-
-				if (touch.justReleased)
-					moveY = addition = curY = prevY = 0;
-			}
-			#end*/
+			#end
 			if(wheel != 0) showDropDown(true, curScroll - wheel, _curFilter);
 		}
 	}
@@ -197,7 +161,6 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			for (num => item in _items)
 			{
 				if(!item.visible) continue;
-				item.x = behindText.x;
 				item.y = txtY;
 				txtY += item.height;
 				item.forceNextUpdate = true;
@@ -228,8 +191,9 @@ class PsychUIDropDownMenu extends PsychUIInputText
 	{
 		@:bypassAccessor list.push(option);
 		var curID:Int = list.length - 1;
-		var item:PsychUIDropDownItem = cast recycle(PsychUIDropDownItem, () -> new PsychUIDropDownItem(1, 1, this._itemWidth), true);
-		item.cameras = cameras;
+		var item:PsychUIDropDownItem = cast recycle(PsychUIDropDownItem);
+		item.x = 1;
+		item.y = 1;
 		item.label = option;
 		item.visible = item.active = false;
 		item.onClick = function() clickedOn(curID, option);
@@ -271,7 +235,7 @@ class PsychUIDropDownItem extends FlxSpriteGroup
 
 	public var bg:FlxSprite;
 	public var text:FlxText;
-	public function new(x:Float = 0, y:Float = 0, width:Float = 100)
+	public function new(x:Float = 0, y:Float = 0, width:Int = 100)
 	{
 		super(x, y);
 
