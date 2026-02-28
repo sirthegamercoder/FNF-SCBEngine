@@ -18,7 +18,6 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 * Multiple storage types on Mobile.
 * Reimplemented of Combo.
 * Win icon support (Needed to activate on Settings).
-* And more features... *I don't know*
 
 ## Developer Credit:
 * sirtehagmercoder - Head of SCB Engine.
@@ -32,7 +31,7 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 * Karim - Second Porter of Psych Engine Mobile.
 * Moxie - Helper of Psych Engine Mobile.
 
-### Psych Special Thanks
+## Special Thanks
 * bbpanzu - Ex-Team Member (Programmer).
 * crowplexus - HScript Iris, Input System v3, and Other PRs.
 * Kamizeta - Creator of Pessy, Psych Engine's mascot.

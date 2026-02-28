@@ -1,54 +1,305 @@
-name: Main
+name: Build
 
-on: workflow_dispatch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  APP_VERSION: 4.0.0-${{ github.run_id }}
 
 jobs:
-  Build:
-    name: ${{ matrix.name }}
-    strategy:
-      matrix:
-        include:
-          - name: Windows
-            os: windows-2022
-            buildArgs: windows
-            setupCommand: .\"setup/windows.bat"
-            artifactName: windowsBuild-x86_64
-            artifactPath: export\release\windows\bin\*
-          - name: Linux
-            os: ubuntu-22.04
-            buildArgs: linux
-            setupCommand: sh ./setup/unix.sh
-            artifactName: linuxBuild-x86_64
-            artifactPath: export/release/linux/bin/*
-          - name: macOS x86_64
-            os: macos-15
-            setupCommand: sh ./setup/unix.sh
-            buildArgs: "mac -64 -D HXCPP_M64"
-            artifactName: macOSBuild-x86_64
-            artifactPath: export/release/macos/bin/*
-          - name: macOS ARM64
-            os: macos-15
-            setupCommand: sh ./setup/unix.sh
-            buildArgs: "mac -arm64 -D HXCPP_ARM64"
-            artifactName: macOSBuild-arm64
-            artifactPath: export/release/macos/bin/*
-          - name: Android
-            os: macos-15
-            buildArgs: "android -ONLY_ARMV7"
-            setupCommand: sh ./setup/unix.sh
-            artifactName: androidBuild
-            artifactPath: "export/release/android/bin/app/build/outputs/apk/release/*.apk"
-          - name: iOS
-            os: macos-15
-            buildArgs: "ios -nosign"
-            setupCommand: sh ./setup/unix.sh
-            artifactName: iOSBuild
-            artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
-    uses: ./.github/workflows/build.yml
-    with:
-        name: ${{ matrix.name }}
-        os: ${{ matrix.os }}
-        buildArgs: ${{ matrix.buildArgs }}
-        setupCommand: ${{ matrix.setupCommand }}
-        artifactName: ${{ matrix.artifactName }}
-        artifactPath: ${{ matrix.artifactPath }}
+  targets:
+    runs-on: ubuntu-latest
+
+    outputs:
+      win: ${{ steps.set.outputs.win }}
+      mac: ${{ steps.set.outputs.mac }}
+      linux: ${{ steps.set.outputs.linux }}
+      android: ${{ steps.set.outputs.android }}
+      ios: ${{ steps.set.outputs.ios }}
+
+    steps:
+      - id: set
+        name: Resolve build targets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TRIGGER_TEXT="${{ github.event.head_commit.message }}"
+          if [ -z "$TRIGGER_TEXT" ]; then
+            TRIGGER_TEXT="${{ github.event.pull_request.title }}"
+          fi
+          if [ -z "$TRIGGER_TEXT" ]; then
+            TRIGGER_TEXT="${{ github.event.pull_request.body }}"
+          fi
+
+          text=$(echo "$TRIGGER_TEXT" | tr '[:upper:]' '[:lower:]')
+          echo "Trigger text: $text"
+
+          has() {
+            case "$text" in
+              *"$1"*) return 0 ;;
+              *) return 1 ;;
+            esac
+          }
+
+          do_all=false
+          if has "all"; then
+            do_all=true
+          fi
+
+          win=false
+          mac=false
+          linux=false
+          android=false
+          ios=false
+
+          if $do_all || has "win"; then
+            win=true
+          fi
+          if $do_all || has "mac"; then
+            mac=true
+          fi
+          if $do_all || has "linx" || has "linux"; then
+            linux=true
+          fi
+          if $do_all || has "andr" || has "android"; then
+            android=true
+          fi
+          if $do_all || has "ios"; then
+            ios=true
+          fi
+
+          echo "win=$win" >> "$GITHUB_OUTPUT"
+          echo "mac=$mac" >> "$GITHUB_OUTPUT"
+          echo "linux=$linux" >> "$GITHUB_OUTPUT"
+          echo "android=$android" >> "$GITHUB_OUTPUT"
+          echo "ios=$ios" >> "$GITHUB_OUTPUT"
+  
+  Windows:
+    if: needs.targets.outputs.win == 'true'
+    needs: [targets]
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.4
+      
+      - name: Install Haxelib
+        run: |
+          haxelib setup C:/haxelib
+          haxelib install hxcpp --quiet > nul
+          .\setup\windows-lib.bat
+        shell: cmd
+      
+      - name: Skip SScript setup mode
+        run: |
+          echo oy9:showMacroty8:loopCosti25y10:includeAllfg > %USERPROFILE%\settings.cocoa
+          type %USERPROFILE%\settings.cocoa
+        shell: cmd
+      
+      - name: Create Version Tag
+        run: echo "${{ github.run_id }}" > VERSION
+      
+      - name: Compile
+        run: haxelib run lime build windows --app-version="${{ env.APP_VERSION }}" -D officialBuild
+      
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: windowsBuild
+          path: export/release/windows/bin
+
+  Mac:
+    if: needs.targets.outputs.mac == 'true'
+    needs: [targets]
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.4
+      
+      - name: Install Haxelib
+        run: |
+          haxelib setup ~/haxelib
+          chmod +x ./setup/unish-lib.sh
+          sh ./setup/unish-lib.sh
+      
+      - name: Skip SScript setup mode
+        run: |
+          echo -n 'oy9:showMacroty8:loopCosti25y10:includeAllfg' > ~/settings.cocoa
+          cat ~/settings.cocoa
+      
+      - name: Create Version Tag
+        run: echo "${{ github.run_id }}" > VERSION
+      
+      - name: Compile
+        run: haxelib run lime build mac --app-version="${{ env.APP_VERSION }}" -D officialBuild
+      
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: macBuild
+          path: export/release/macos/bin
+
+  Linux:
+    if: needs.targets.outputs.linux == 'true'
+    needs: [targets]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.4
+      
+      - name: Install Haxelib
+        run: |
+          sudo apt-get update
+          sudo apt-get install libvlc-dev libvlccore-dev libasound2-dev libpulse-dev \
+            libx11-dev libxext-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev \
+            libgl1-mesa-dev libglu1-mesa-dev
+          haxelib setup ~/haxelib
+          haxelib install hxcpp > /dev/null --quiet
+          chmod +x ./setup/unish-lib.sh
+          sh ./setup/unish-lib.sh
+      
+      - name: Skip SScript setup mode
+        run: |
+          echo -n 'oy9:showMacroty8:loopCosti25y10:includeAllfg' > ~/settings.cocoa
+          cat ~/settings.cocoa
+      
+      - name: Create Version Tag
+        run: echo "${{ github.run_id }}" > VERSION
+      
+      - name: Compile
+        run: haxelib run lime build linux --app-version="${{ env.APP_VERSION }}" -D officialBuild
+      
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: linuxBuild
+          path: export/release/linux/bin
+
+  Android:
+    if: needs.targets.outputs.android == 'true'
+    needs: [targets]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.4
+      
+      - name: Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Install Android SDK 35 and NDK r27d
+        run: |
+          sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973" "cmdline-tools;latest"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> $GITHUB_ENV
+      
+      - name: Install Haxelib
+        run: |
+          sudo apt-get update
+          sudo apt-get install libasound2-dev libpulse-dev \
+            libx11-dev libxext-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev \
+            libgl1-mesa-dev libglu1-mesa-dev
+          haxelib setup ~/haxelib
+          haxelib install hxcpp > /dev/null --quiet
+          chmod +x ./setup/unish-lib.sh
+          sh ./setup/unish-lib.sh
+      
+      - name: Setup Lime for Android
+        run: |
+          haxelib run lime setup android
+          haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_SDK_ROOT/ndk/27.0.12077973
+          haxelib run lime config JAVA_HOME $JAVA_HOME
+
+      - name: Skip SScript setup mode
+        run: |
+          echo -n 'oy9:showMacroty8:loopCosti25y10:includeAllfg' > ~/settings.cocoa
+          cat ~/settings.cocoa
+      
+      - name: Create Version Tag
+        run: echo "${{ github.run_id }}" > VERSION
+      
+      - name: Clean old build artifacts only
+        run: |
+          rm -rf export
+          rm -rf build
+          rm -rf ~/.gradle
+      
+      - name: Compile
+        run: |
+          haxelib run lime build android --app-version="${{ env.APP_VERSION }}" -D officialBuild -D HXCPP_IGNORE_WARNINGS
+      
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: androidBuild
+          path: export/release/android/bin/app/build/outputs/apk/release/*.apk
+
+  iOS:
+    if: needs.targets.outputs.ios == 'true'
+    needs: [targets]
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.4
+      
+      - name: Install Haxelib
+        run: |
+          haxelib setup ~/haxelib
+          chmod +x ./setup/unish-lib.sh
+          sh ./setup/unish-lib.sh
+      
+      - name: Skip SScript setup mode
+        run: |
+          echo -n 'oy9:showMacroty8:loopCosti25y10:includeAllfg' > ~/settings.cocoa
+          cat ~/settings.cocoa
+      
+      - name: Create Version Tag
+        run: echo "${{ github.run_id }}" > VERSION
+      
+      - name: Compile
+        run: haxelib run lime build ios -nosign --app-version="${{ env.APP_VERSION }}" -D officialBuild
+      
+      - name: Create IPA Package
+        run: |
+          cd export/release/ios/build/Release-iphoneos
+          mkdir -p Payload
+          cp -r *.app Payload/
+          zip -r PlusEngine-iOS-Unsigned.ipa Payload
+          rm -rf Payload
+      
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: iOSBuild
+          path: export/release/ios/build/Release-iphoneos/*.ipa
