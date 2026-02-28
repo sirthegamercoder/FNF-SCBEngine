@@ -18,6 +18,12 @@ import objects.Bar;
 import states.editors.content.Prompt;
 import states.editors.content.PsychJsonPrinter;
 
+// Convert codename to psych format (only Desktop) 
+#if desktop
+import states.editors.content.FileDialogHandler;
+import states.editors.content.CodenameParse;
+#end
+
 class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler.PsychUIEvent
 {
 	var character:Character;
@@ -160,6 +166,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		FlxG.camera.zoom = 1;
 
 		makeUIMenu();
+		#if desktop
+		fileDialog = new FileDialogHandler();
+		add(fileDialog);
+		#end
 
 		updatePointerPos();
 		updateHealthBar();
@@ -270,7 +280,11 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 
 	function makeUIMenu()
 	{
+		#if desktop
+		UI_box = new PsychUIBox(FlxG.width - 275, 25, 250, 190, ['Ghost', 'Settings']);
+		#else
 		UI_box = new PsychUIBox(FlxG.width - 275, 25, 250, 120, ['Ghost', 'Settings']);
+		#end
 		UI_box.scrollFactor.set();
 		UI_box.cameras = [camHUD];
 
@@ -399,6 +413,122 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	{
 		var tab_group = UI_box.getTab('Settings').menu;
 
+		#if desktop
+		charDropDown = new PsychUIDropDownMenu(10, 30, [''], function(index:Int, intended:String)
+		{
+			if(intended == null || intended.length < 1) return;
+
+			var characterPath:String = 'characters/$intended.json';
+			var path:String = Paths.getPath(characterPath, TEXT, null, true);
+			#if MODS_ALLOWED
+			if (FileSystem.exists(path))
+			#else
+			if (Assets.exists(path))
+			#end
+			{
+				_char = intended;
+				check_player.checked = character.isPlayer;
+				addCharacter();
+				reloadCharacterOptions();
+				reloadCharacterDropDown();
+				updatePointerPos();
+			}
+			else
+			{
+				reloadCharacterDropDown();
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+			}
+		});
+		reloadCharacterDropDown();
+		charDropDown.selectedLabel = _char;
+
+		check_player = new PsychUICheckBox(10, 65, "Playable Character", 100);
+
+		var reloadCharacter:PsychUIButton = new PsychUIButton(10, 95, "Reload Char", function()
+		{
+			addCharacter(true);
+			updatePointerPos();
+			reloadCharacterOptions();
+			reloadCharacterDropDown();
+		});
+
+		var templateCharacter:PsychUIButton = new PsychUIButton(130, 95, "Load Template", function()
+		{
+			final _template:CharacterFile =
+			{
+				animations: [
+					newAnim('idle', 'BF idle dance'),
+					newAnim('singLEFT', 'BF NOTE LEFT0'),
+					newAnim('singDOWN', 'BF NOTE DOWN0'),
+					newAnim('singUP', 'BF NOTE UP0'),
+					newAnim('singRIGHT', 'BF NOTE RIGHT0')
+				],
+				no_antialiasing: false,
+				flip_x: false,
+				healthicon: 'face',
+				image: 'characters/BOYFRIEND',
+				sing_duration: 4,
+				scale: 1,
+				healthbar_colors: [161, 161, 161],
+				camera_position: [0, 0],
+				position: [0, 0],
+				vocals_file: null
+			};
+
+			character.loadCharacterFile(_template);
+			character.missingCharacter = false;
+			character.color = FlxColor.WHITE;
+			character.alpha = 1;
+			reloadAnimList();
+			reloadCharacterOptions();
+			updateCharacterPositions();
+			updatePointerPos();
+			reloadCharacterDropDown();
+			updateHealthBar();
+		});
+		templateCharacter.normalStyle.bgColor = FlxColor.RED;
+		templateCharacter.normalStyle.textColor = FlxColor.WHITE;
+
+		var importCodenameButton:PsychUIButton = new PsychUIButton(10, 130, "Import Codename XML", function()
+		{
+			if(!fileDialog.completed) return;
+			
+			fileDialog.open('character.xml', 'Open Codename Engine Character XML', [new flash.net.FileFilter('XML Files', '*.xml')], function()
+			{
+				try
+				{
+					var convertedChar:CharacterFile = CodenameParse.convertToPsych(fileDialog.data);
+					if(convertedChar == null)
+					{
+						FlxG.sound.play(Paths.sound('cancelMenu'));
+						trace('Error: Failed to convert Codename Engine character.');
+						return;
+					}
+
+					character.loadCharacterFile(convertedChar);
+					character.missingCharacter = false;
+					character.color = FlxColor.WHITE;
+					character.alpha = 1;
+					reloadAnimList();
+					reloadCharacterOptions();
+					updateCharacterPositions();
+					updatePointerPos();
+					reloadCharacterDropDown();
+					updateHealthBar();
+					
+					FlxG.sound.play(Paths.sound('confirmMenu'));
+					trace('Successfully imported Codename Engine character!');
+				}
+				catch(e:Dynamic)
+				{
+					FlxG.sound.play(Paths.sound('cancelMenu'));
+					trace('Error importing Codename Engine character: $e');
+				}
+			});
+		});
+		importCodenameButton.normalStyle.bgColor = FlxColor.PURPLE;
+		importCodenameButton.normalStyle.textColor = FlxColor.WHITE;
+		#else
 		check_player = new PsychUICheckBox(10, 60, "Playable Character", 100);
 		check_player.checked = character.isPlayer;
 		check_player.onClick = function()
@@ -454,7 +584,6 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		templateCharacter.normalStyle.bgColor = FlxColor.RED;
 		templateCharacter.normalStyle.textColor = FlxColor.WHITE;
 
-
 		charDropDown = new PsychUIDropDownMenu(10, 30, [''], function(index:Int, intended:String)
 		{
 			if(intended == null || intended.length < 1) return;
@@ -482,11 +611,15 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		});
 		reloadCharacterDropDown();
 		charDropDown.selectedLabel = _char;
+		#end
 
 		tab_group.add(new FlxText(charDropDown.x, charDropDown.y - 18, 80, 'Character:'));
 		tab_group.add(check_player);
 		tab_group.add(reloadCharacter);
 		tab_group.add(templateCharacter);
+		#if desktop
+		tab_group.add(importCodenameButton);
+		#end
 		tab_group.add(charDropDown);
 	}
 
