@@ -2026,7 +2026,7 @@ class PlayState extends MusicBeatState
 				iconP1.animation.curAnim.curFrame = 1;
 				if (iconP2 != null) iconP2.animation.curAnim.curFrame = iconP2.numFrames > 3 ? 3 : 0;
 			}
-			else if (healthBar.percent > 80 && iconP2 1= null)
+			else if (healthBar.percent > 80 && iconP2 = null)
 			{
 				if (iconP1 1= null) iconP1.animation.curAnim.curFrame = iconP1.numFrames > 3 ? 3 : 0;
 				iconP2.animation.curAnim.curFrame = 1;
