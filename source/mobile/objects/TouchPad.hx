@@ -23,6 +23,7 @@
 package mobile.objects;
 
 import flixel.util.FlxSignal.FlxTypedSignal;
+import mobile.backend.MobileScaleMode;
 
 /**
  * ...
