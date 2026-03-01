@@ -126,7 +126,25 @@ class TouchPad extends MobileInputManager implements IMobileControls
 		scrollFactor.set();
 		updateTrackedButtons();
 
+		applyWideScreenOffset();
+
 		instance = this;
+	}
+
+	function applyWideScreenOffset():Void
+	{
+		var offset:Float = MobileScaleMode.getVerticalOffset();
+		if (offset == 0) return;
+
+		for (fieldName in Reflect.fields(this))
+		{
+			var field = Reflect.field(this, fieldName);
+			if (Std.isOfType(field, TouchButton))
+			{
+				var button:TouchButton = cast field;
+				button.y += offset;
+			}
+		}
 	}
 
 	override public function destroy()
