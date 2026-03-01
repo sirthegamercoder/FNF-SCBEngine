@@ -54,6 +54,7 @@ class CopyState extends MusicBeatState
 	var shouldCopy:Bool = false;
 	var canUpdate:Bool = true;
 	var loopTimes:Int = 0;
+	var currentFile:String = '';
 
 	override function create()
 	{
@@ -91,6 +92,7 @@ class CopyState extends MusicBeatState
 		{
 			for (file in locatedFiles)
 			{
+				currentFile = file;
 				loopTimes++;
 				copyAsset(file);
 			}
@@ -130,14 +132,19 @@ class CopyState extends MusicBeatState
 			if (loopTimes >= maxLoopTimes)
 				loadedText.text = "Completed!";
 			else
+			{
+				var fileName:String = currentFile;
+				if (fileName.length > 50)
+						fileName = '...' + fileName.substr(fileName.length - 47);
 				loadedText.text = '$loopTimes/$maxLoopTimes';
+			}
 
 			loadingBar.percent = Math.min((loopTimes / maxLoopTimes) * 100, 100);
 		}
 		super.update(elapsed);
 	}
 
-	public function copyAsset()
+	public function copyAsset(file:String)
 	{
 		var file = locatedFiles[loopTimes];
 		loopTimes++;

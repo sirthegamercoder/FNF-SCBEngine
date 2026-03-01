@@ -1,6 +1,9 @@
 package backend.ui;
 
 import backend.ui.PsychUIBox.UIStyleData;
+#if mobile
+import mobile.backend.SwipeUtil
+#end
 
 class PsychUIDropDownMenu extends PsychUIInputText
 {

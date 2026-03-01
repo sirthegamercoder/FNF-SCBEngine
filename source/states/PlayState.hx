@@ -1996,7 +1996,7 @@ class PlayState extends MusicBeatState
 		if (iconP1 != null)
 		{
 			iconP1.animation.curAnim.curFrame = (healthBar.percent < 20) ? 1 : 0; //If health is under 20%, change player icon to frame 1 (losing icon), otherwise, frame 0 (normal)
-		    if (iconP2 != null) iconP2.animation.curAnim.curFrame = (healthBar.percent > 80) ? 1 : 0; //If health is over 80%, change opponent icon to frame 1 (losing icon), otherwise, frame 0 (normal)
+			if (iconP2 != null) iconP2.animation.curAnim.curFrame = (healthBar.percent > 80) ? 1 : 0; //If health is over 80%, change opponent icon to frame 1 (losing icon), otherwise, frame 0 (normal)
 		}
 
 		if (ClientPrefs.data.winIconSupport && ClientPrefs.data.positionWinIcon == 'Middle')
@@ -2011,7 +2011,6 @@ class PlayState extends MusicBeatState
 				if (iconP1 != null) iconP1.animation.curAnim.curFrame = iconP1.numFrames > 2 ? 2 : 0;
 				iconP2.animation.curAnim.curFrame = 1;
 			}
-
 			else
 			{
 				iconP1.animation.curAnim.curFrame = 0;
@@ -2021,17 +2020,16 @@ class PlayState extends MusicBeatState
 
 		if (ClientPrefs.data.winIconSupport && ClientPrefs.data.positionWinIcon == 'Right')
 		{
-			if (healthBar.percent < 20 & iconP1 != null)
+			if (healthBar.percent < 20 && iconP1 != null)
 			{
 				iconP1.animation.curAnim.curFrame = 1;
 				if (iconP2 != null) iconP2.animation.curAnim.curFrame = iconP2.numFrames > 3 ? 3 : 0;
 			}
-			else if (healthBar.percent > 80 && iconP2 = null)
+			else if (healthBar.percent > 80 && iconP2 != null)
 			{
-				if (iconP1 = null) iconP1.animation.curAnim.curFrame = iconP1.numFrames > 3 ? 3 : 0;
+				if (iconP1 != null) iconP1.animation.curAnim.curFrame = iconP1.numFrames > 3 ? 3 : 0;
 				iconP2.animation.curAnim.curFrame = 1;
 			}
-
 			else
 			{
 				iconP1.animation.curAnim.curFrame = 0;

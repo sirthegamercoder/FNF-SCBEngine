@@ -41,9 +41,6 @@ class FPSCounter extends TextField
 
 	public var os:String = '';
 
-	private var fpsHistory:Array<Int> = [];
-    private var maxHistorySize:Int = 5;
-
 	private var lastMemoryUpdate:Float = 0;
     private var cachedMemoryString:String = "";
 
@@ -85,10 +82,6 @@ class FPSCounter extends TextField
 		}
 
 		text = 'FPS: $currentFPS\nMemory: $cachedMemoryString$os';
-
-		fpsHistory.push(Math.ceil((framesCount * 1000) / elapsed));
-		if (fpsHistory.length > maxHistorySize) fpsHistory.shift();
-		currentFPS = Math.round(Std.int(fpsHistory.reduce((sum, v) -> sum + v, 0) / fpsHistory.length));
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.stage.window.frameRate * 0.5)
@@ -157,12 +150,6 @@ class FPSCounter extends TextField
 		scaleX = scaleY = #if android (scale > 1 ? scale : 1) #else (scale < 1 ? scale : 1) #end;
 		x = FlxG.game.x + X;
 		y = FlxG.game.y + Y;
-	}
-
-	public function destroy():Void {
-		times = null;
-		fpsHistory = null;
-		if (parent != null) parent.removeChild(this);
 	}
 
 	#if cpp

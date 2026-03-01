@@ -172,22 +172,22 @@ class TitleState extends MusicBeatState
 		#if mobile
 		@:privateAccess
 		{
-			titleTextMobile.animation.findByPrefix(animFrames, "ENTER IDLE");
-			titleTextMobile.animation.findByPrefix(animFrames, "ENTER FREEZE");
+			altTitleText.animation.findByPrefix(animFrames, "ENTER IDLE");
+			altTitleText.animation.findByPrefix(animFrames, "ENTER FREEZE");
 		}
 		
 		if (newTitle = animFrames.length > 0)
 		{
-			titleTextMobile.animation.addByPrefix('idle', "ENTER IDLE", 24);
-			titleTextMobile.animation.addByPrefix('press', ClientPrefs.data.flashing ? "ENTER PRESSED" : "ENTER FREEZE", 24);
+			altTitleText.animation.addByPrefix('idle', "ENTER IDLE", 24);
+			altTitleText.animation.addByPrefix('press', ClientPrefs.data.flashing ? "ENTER PRESSED" : "ENTER FREEZE", 24);
 		}
 		else
 		{
-			titleTextMobile.animation.addByPrefix('idle', "Press Enter to Begin", 24);
-			titleTextMobile.animation.addByPrefix('press', "ENTER PRESSED", 24);
+			altTitleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+			altTitleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		}
-		titleTextMobile.animation.play('idle');
-		titleTextMobile.updateHitbox();
+		altTitleText.animation.play('idle');
+		altTitleText.updateHitbox();
 		#else
 		@:privateAccess
 		{
