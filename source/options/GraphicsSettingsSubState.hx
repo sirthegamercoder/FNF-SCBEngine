@@ -57,7 +57,6 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		option.defaultValue = Std.int(FlxMath.bound(refreshRate, option.minValue, option.maxValue));
 		option.displayFormat = '%v FPS';
 		option.onChange = onChangeFramerate;
-		#end
 
 		var option:Option = new Option('Old Framerate UI',
 		    "If checked, it will restore the old UI framerate by adding OS under RAM. Check this box if you prefer the old UI framerate.",

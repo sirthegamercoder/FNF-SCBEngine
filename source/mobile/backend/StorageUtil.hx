@@ -104,7 +104,7 @@ class StorageUtil
 			if (!FileSystem.exists('saves'))
 				FileSystem.createDirectory('saves');
 
-			File.saveContent('$folder/$fileName', fileData);
+			File.saveContent('saves/$fileName', fileData);
 			if (alert)
 				CoolUtil.showPopUp(Language.getPhrase('file_save_success', '{1} has been saved.', [fileName]), Language.getPhrase('mobile_success', "Success!"));
 		}
@@ -145,7 +145,7 @@ class StorageUtil
 		catch (e:Dynamic)
 		{
 			CoolUtil.showPopUp(Language.getPhrase('create_directory_error', 'Please create directory to\n{1}\nPress OK to close the game', [StorageUtil.getStorageDirectory()]), Language.getPhrase('mobile_error', "Error!"));
-			limeSystem.exit(1);
+			LimeSystem.exit(1);
 		}
 	}
 
