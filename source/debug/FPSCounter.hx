@@ -132,13 +132,8 @@ class FPSCounter extends TextField
 		updateText();
 	}
 
-	inline function get_memoryMegas():Float {
-		#if cpp
-		return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE) / (1024 * 1024);
-		#else
-		return 0;
-		#end
-	}
+	inline function get_memoryMegas():Float
+		return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
 
 	public inline function positionFPS(X:Float, Y:Float, ?scale:Float = 1){
 		scaleX = scaleY = #if android (scale > 1 ? scale : 1) #else (scale < 1 ? scale : 1) #end;

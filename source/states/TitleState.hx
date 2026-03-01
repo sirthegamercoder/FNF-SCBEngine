@@ -98,15 +98,7 @@ class TitleState extends MusicBeatState
 		#elseif CHARTING
 		MusicBeatState.switchState(new ChartingState());
 		#else
-		if(FlxG.save.data.flashing == null)
-		{
-			controls.isInSubstate = false; //idfk what's wrong
-			FlxTransitionableState.skipNextTransIn = true;
-			FlxTransitionableState.skipNextTransOut = true;
-		}
-		else
-			startIntro();
-		#end
+		startIntro();
 	}
 
 	var logoBl:FlxSprite;
