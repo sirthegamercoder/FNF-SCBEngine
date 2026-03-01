@@ -41,9 +41,6 @@ class FPSCounter extends TextField
 
 	public var os:String = '';
 
-	private var lastMemoryUpdate:Float = 0;
-    private var cachedMemoryString:String = "";
-
 	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
 	{
 		super();
@@ -75,13 +72,10 @@ class FPSCounter extends TextField
 
 	public dynamic function updateText():Void // so people can override it in hscript
 	{
-		var now = Timer.stamp();
-		if (now - lastMemoryUpdate > 1.0) {
-			cachedMemoryString = flixel.util.FlxStringUtil.formatBytes(memoryMegas);
-			lastMemoryUpdate = now;
-		}
-
-		text = 'FPS: $currentFPS\nMemory: $cachedMemoryString$os';
+		text = 
+		'FPS: $currentFPS' + 
+		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}' +
+		os;
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.stage.window.frameRate * 0.5)
@@ -145,7 +139,7 @@ class FPSCounter extends TextField
 		return 0;
 		#end
 	}
-	
+
 	public inline function positionFPS(X:Float, Y:Float, ?scale:Float = 1){
 		scaleX = scaleY = #if android (scale > 1 ? scale : 1) #else (scale < 1 ? scale : 1) #end;
 		x = FlxG.game.x + X;

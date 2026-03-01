@@ -26,11 +26,9 @@ package states;
 import states.TitleState;
 import lime.utils.Assets as LimeAssets;
 import openfl.utils.Assets as OpenFLAssets;
+import flixel.addons.util.FlxAsyncLoop;
 import openfl.utils.ByteArray;
 import haxe.io.Path;
-import flixel.ui.FlxBar;
-import flixel.ui.FlxBar.FlxBarFillDirection;
-import lime.system.ThreadPool;
 
 /**
  * ...
@@ -45,16 +43,15 @@ class CopyState extends MusicBeatState
 	public static var maxLoopTimes:Int = 0;
 
 	public var loadingImage:FlxSprite;
-	public var loadingBar:FlxBar;
+	public var bottomBG:FlxSprite;
 	public var loadedText:FlxText;
-	public var thread:ThreadPool;
+	public var copyLoop:FlxAsyncLoop;
 
 	var failedFilesStack:Array<String> = [];
 	var failedFiles:Array<String> = [];
 	var shouldCopy:Bool = false;
 	var canUpdate:Bool = true;
 	var loopTimes:Int = 0;
-	var currentFile:String = '';
 
 	override function create()
 	{
@@ -67,7 +64,9 @@ class CopyState extends MusicBeatState
 			return;
 		}
 
+		#if (!ios || !iphoneos || !iphonesim)
 		CoolUtil.showPopUp("Seems like you have some missing files that are necessary to run the game\nPress OK to begin the copy process", Language.getPhrase('mobile_notice', 'Notice!'));
+		#end
 
 		shouldCopy = true;
 
@@ -79,37 +78,30 @@ class CopyState extends MusicBeatState
 		loadingImage.screenCenter();
 		add(loadingImage);
 
-		loadingBar = new FlxBar(0, FlxG.height - 26, FlxBarFillDirection.LEFT_TO_RIGHT, FlxG.width, 26);
-		loadingBar.setRange(0, maxLoopTimes);
-		add(loadingBar);
+		bottomBG = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000);
+		bottomBG.alpha = 0.6;
+		add(bottomBG);
 
-		loadedText = new FlxText(loadingBar.x, loadingBar.y + 4, FlxG.width, '', 16);
+		loadedText = new FlxText(bottomBG.x, bottomBG.y + 4, FlxG.width, '', 16);
 		loadedText.setFormat(Paths.font("phantom.ttf"), 16, FlxColor.WHITE, CENTER);
 		add(loadedText);
 
-		thread = new ThreadPool(0, CoolUtil.getCPUThreadsCount());
-		thread.doWork.add(function(poop)
-		{
-			for (file in locatedFiles)
-			{
-				currentFile = file;
-				loopTimes++;
-				copyAsset(file);
-			}
-		});
-		new FlxTimer().start(0.5, (tmr) ->
-		{
-			thread.queue({});
-		});
+		var ticks:Int = 15;
+		if (maxLoopTimes <= 15)
+			ticks = 1;
+
+		copyLoop = new FlxAsyncLoop(maxLoopTimes, copyAsset, ticks);
+		add(copyLoop);
+		copyLoop.start();
 
 		super.create();
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (shouldCopy)
+		if (shouldCopy && copyLoop != null)
 		{
-			if (loopTimes >= maxLoopTimes && canUpdate)
+			if (copyLoop.finished && canUpdate)
 			{
 				if (failedFiles.length > 0)
 				{
@@ -120,31 +112,22 @@ class CopyState extends MusicBeatState
 						FileSystem.createDirectory('logs');
 					File.saveContent('logs/' + Date.now().toString().replace(' ', '-').replace(':', "'") + '-CopyState' + '.txt', failedFilesStack.join('\n'));
 				}
-				
+				canUpdate = false;
 				FlxG.sound.play(Paths.sound('confirmMenu')).onComplete = () ->
 				{
 					MusicBeatState.switchState(new TitleState());
 				};
-
-				canUpdate = false;
 			}
 
-			if (loopTimes >= maxLoopTimes)
+			if (maxLoopTimes == 0)
 				loadedText.text = "Completed!";
 			else
-			{
-				var fileName:String = currentFile;
-				if (fileName.length > 50)
-						fileName = '...' + fileName.substr(fileName.length - 47);
 				loadedText.text = '$loopTimes/$maxLoopTimes';
-			}
-
-			loadingBar.percent = Math.min((loopTimes / maxLoopTimes) * 100, 100);
 		}
 		super.update(elapsed);
 	}
 
-	public function copyAsset(file:String)
+	public function copyAsset()
 	{
 		var file = locatedFiles[loopTimes];
 		loopTimes++;
@@ -198,7 +181,7 @@ class CopyState extends MusicBeatState
 
 	public function getFileBytes(file:String):ByteArray
 	{
-		switch (Path.extension(file).toLowerCase())
+		switch (Path.extension(file))
 		{
 			case 'otf' | 'ttf':
 				return ByteArray.fromFile(file);
