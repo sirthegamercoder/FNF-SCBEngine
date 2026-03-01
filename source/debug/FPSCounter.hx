@@ -41,6 +41,12 @@ class FPSCounter extends TextField
 
 	public var os:String = '';
 
+	private var fpsHistory:Array<Int> = [];
+    private var maxHistorySize:Int = 5;
+
+	private var lastMemoryUpdate:Float = 0;
+    private var cachedMemoryString:String = "";
+
 	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
 	{
 		super();
@@ -72,10 +78,17 @@ class FPSCounter extends TextField
 
 	public dynamic function updateText():Void // so people can override it in hscript
 	{
-		text = 
-		'FPS: $currentFPS' + 
-		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}' +
-		os;
+		var now = Timer.stamp();
+		if (now - lastMemoryUpdate > 1.0) {
+			cachedMemoryString = flixel.util.FlxStringUtil.formatBytes(memoryMegas);
+			lastMemoryUpdate = now;
+		}
+
+		text = 'FPS: $currentFPS\nMemory: $cachedMemoryString$os';
+
+		fpsHistory.push(Math.ceil((framesCount * 1000) / elapsed));
+		if (fpsHistory.length > maxHistorySize) fpsHistory.shift();
+		currentFPS = Math.round(Std.int(fpsHistory.reduce((sum, v) -> sum + v, 0) / fpsHistory.length));
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.stage.window.frameRate * 0.5)
@@ -132,13 +145,24 @@ class FPSCounter extends TextField
 		updateText();
 	}
 
-	inline function get_memoryMegas():Float
-		return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
-
+	inline function get_memoryMegas():Float {
+		#if cpp
+		return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE) / (1024 * 1024);
+		#else
+		return 0;
+		#end
+	}
+	
 	public inline function positionFPS(X:Float, Y:Float, ?scale:Float = 1){
 		scaleX = scaleY = #if android (scale > 1 ? scale : 1) #else (scale < 1 ? scale : 1) #end;
 		x = FlxG.game.x + X;
 		y = FlxG.game.y + Y;
+	}
+
+	public function destroy():Void {
+		times = null;
+		fpsHistory = null;
+		if (parent != null) parent.removeChild(this);
 	}
 
 	#if cpp
