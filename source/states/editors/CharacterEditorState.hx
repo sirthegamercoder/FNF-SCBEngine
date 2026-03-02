@@ -18,11 +18,8 @@ import objects.Bar;
 import states.editors.content.Prompt;
 import states.editors.content.PsychJsonPrinter;
 
-// Convert codename to psych format (only Desktop) 
-#if desktop
 import states.editors.content.FileDialogHandler;
 import states.editors.content.CodenameParse;
-#end
 
 class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler.PsychUIEvent
 {
