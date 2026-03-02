@@ -99,6 +99,7 @@ class TitleState extends MusicBeatState
 		MusicBeatState.switchState(new ChartingState());
 		#else
 		startIntro();
+		#end
 	}
 
 	var logoBl:FlxSprite;
