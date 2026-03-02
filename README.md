@@ -17,7 +17,7 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 * Multiple storage types on Mobile.
 * Reimplemented of Combo.
 * Win icon support (Needed to activate on Settings).
-* Convert Codename to Psych character (Only in Desktop). Also convert V-Slice to Psych character.
+* Convert V-Slice to Psych character.
 
 ## Developer Credit:
 * sirtehagmercoder - Head of SCB Engine.

@@ -18,9 +18,6 @@ import objects.Bar;
 import states.editors.content.Prompt;
 import states.editors.content.PsychJsonPrinter;
 
-import states.editors.content.FileDialogHandler;
-import states.editors.content.CodenameParse;
-
 class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler.PsychUIEvent
 {
 	var character:Character;
@@ -163,8 +160,6 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		FlxG.camera.zoom = 1;
 
 		makeUIMenu();
-		fileDialog = new FileDialogHandler();
-		add(fileDialog);
 
 		updatePointerPos();
 		updateHealthBar();
@@ -275,7 +270,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 
 	function makeUIMenu()
 	{
-		UI_box = new PsychUIBox(FlxG.width - 275, 25, 250, 190, ['Ghost', 'Settings']);
+		UI_box = new PsychUIBox(FlxG.width - 275, 25, 250, 120, ['Ghost', 'Settings']);
 		UI_box.scrollFactor.set();
 		UI_box.cameras = [camHUD];
 
@@ -404,37 +399,17 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	{
 		var tab_group = UI_box.getTab('Settings').menu;
 
-		charDropDown = new PsychUIDropDownMenu(10, 30, [''], function(index:Int, intended:String)
+		check_player = new PsychUICheckBox(10, 60, "Playable Character", 100);
+		check_player.checked = character.isPlayer;
+		check_player.onClick = function()
 		{
-			if(intended == null || intended.length < 1) return;
+			character.isPlayer = !character.isPlayer;
+			character.flipX = !character.flipX;
+			updateCharacterPositions();
+			updatePointerPos(false);
+		};
 
-			var characterPath:String = 'characters/$intended.json';
-			var path:String = Paths.getPath(characterPath, TEXT, null, true);
-			#if MODS_ALLOWED
-			if (FileSystem.exists(path))
-			#else
-			if (Assets.exists(path))
-			#end
-			{
-				_char = intended;
-				check_player.checked = character.isPlayer;
-				addCharacter();
-				reloadCharacterOptions();
-				reloadCharacterDropDown();
-				updatePointerPos();
-			}
-			else
-			{
-				reloadCharacterDropDown();
-				FlxG.sound.play(Paths.sound('cancelMenu'));
-			}
-		});
-		reloadCharacterDropDown();
-		charDropDown.selectedLabel = _char;
-
-		check_player = new PsychUICheckBox(10, 65, "Playable Character", 100);
-
-		var reloadCharacter:PsychUIButton = new PsychUIButton(10, 95, "Reload Char", function()
+		var reloadCharacter:PsychUIButton = new PsychUIButton(140, 20, "Reload Char", function()
 		{
 			addCharacter(true);
 			updatePointerPos();
@@ -442,7 +417,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			reloadCharacterDropDown();
 		});
 
-		var templateCharacter:PsychUIButton = new PsychUIButton(130, 95, "Load Template", function()
+		var templateCharacter:PsychUIButton = new PsychUIButton(140, 50, "Load Template", function()
 		{
 			final _template:CharacterFile =
 			{
@@ -479,51 +454,39 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		templateCharacter.normalStyle.bgColor = FlxColor.RED;
 		templateCharacter.normalStyle.textColor = FlxColor.WHITE;
 
-		var importCodenameButton:PsychUIButton = new PsychUIButton(10, 130, "Import Codename XML", function()
-		{
-			if(!fileDialog.completed) return;
-			
-			fileDialog.open('character.xml', 'Open Codename Engine Character XML', [new flash.net.FileFilter('XML Files', '*.xml')], function()
-			{
-				try
-				{
-					var convertedChar:CharacterFile = CodenameParse.convertToPsych(fileDialog.data);
-					if(convertedChar == null)
-					{
-						FlxG.sound.play(Paths.sound('cancelMenu'));
-						trace('Error: Failed to convert Codename Engine character.');
-						return;
-					}
 
-					character.loadCharacterFile(convertedChar);
-					character.missingCharacter = false;
-					character.color = FlxColor.WHITE;
-					character.alpha = 1;
-					reloadAnimList();
-					reloadCharacterOptions();
-					updateCharacterPositions();
-					updatePointerPos();
-					reloadCharacterDropDown();
-					updateHealthBar();
-					
-					FlxG.sound.play(Paths.sound('confirmMenu'));
-					trace('Successfully imported Codename Engine character!');
-				}
-				catch(e:Dynamic)
-				{
-					FlxG.sound.play(Paths.sound('cancelMenu'));
-					trace('Error importing Codename Engine character: $e');
-				}
-			});
+		charDropDown = new PsychUIDropDownMenu(10, 30, [''], function(index:Int, intended:String)
+		{
+			if(intended == null || intended.length < 1) return;
+
+			var characterPath:String = 'characters/$intended.json';
+			var path:String = Paths.getPath(characterPath, TEXT, null, true);
+			#if MODS_ALLOWED
+			if (FileSystem.exists(path))
+			#else
+			if (Assets.exists(path))
+			#end
+			{
+				_char = intended;
+				check_player.checked = character.isPlayer;
+				addCharacter();
+				reloadCharacterOptions();
+				reloadCharacterDropDown();
+				updatePointerPos();
+			}
+			else
+			{
+				reloadCharacterDropDown();
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+			}
 		});
-		importCodenameButton.normalStyle.bgColor = FlxColor.PURPLE;
-		importCodenameButton.normalStyle.textColor = FlxColor.WHITE;
+		reloadCharacterDropDown();
+		charDropDown.selectedLabel = _char;
 
 		tab_group.add(new FlxText(charDropDown.x, charDropDown.y - 18, 80, 'Character:'));
 		tab_group.add(check_player);
 		tab_group.add(reloadCharacter);
 		tab_group.add(templateCharacter);
-		tab_group.add(importCodenameButton);
 		tab_group.add(charDropDown);
 	}
 
