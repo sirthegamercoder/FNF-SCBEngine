@@ -27,7 +27,7 @@ class UpdateManager
 		if (customURL != null && customURL.length > 0)
 			updateURL = customURL;
 
-		currentVersion = MainMenuState.plusEngineVersion.trim();
+		currentVersion = MainMenuState.scbEngineVersion.trim();
 		hasUpdate = false;
 		latestVersion = currentVersion;
 		isChecking = true;
@@ -126,6 +126,7 @@ class UpdateManager
 
 	private static function getVersionType(version:String):String
 	{
+		var normalized = version.trim().toLowerCase();
 		if (normalized.indexOf("beta") != -1)
 			return "beta version";
 

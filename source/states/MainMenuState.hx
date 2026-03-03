@@ -6,7 +6,7 @@ import lime.app.Application;
 import states.editors.MasterEditorMenu;
 import options.OptionsState;
 
-#if funkin.vis
+#if BASE_GAME_FILES
 import funkin.vis.dsp.SpectralAnalyzer;
 #end
 
@@ -43,7 +43,7 @@ class MainMenuState extends MusicBeatState
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
-	#if funkin.vis
+	#if BASE_GAME_FILES
 	var _vizBars:FlxTypedGroup<FlxSprite>;
 	var _analyzer:SpectralAnalyzer = null;
 	var _analyzerLevels:Array<funkin.vis.dsp.SpectralAnalyzer.Bar> = null;
@@ -53,6 +53,8 @@ class MainMenuState extends MusicBeatState
 	#end
 
 	static var showOutdatedWarning:Bool = true;
+	static var updateWarningShown:Bool = false;
+	
 	override function create()
 	{
 		super.create();
@@ -135,10 +137,12 @@ class MainMenuState extends MusicBeatState
 		#end
 
 		#if CHECK_FOR_UPDATES
-		if (showOutdatedWarning && ClientPrefs.data.checkForUpdates && substates.OutdatedSubState.updateVersion != psychEngineVersion) {
-			persistentUpdate = false;
-			showOutdatedWarning = false;
-			openSubState(new substates.OutdatedSubState());
+		if (showOutdatedWarning && ClientPrefs.data.checkForUpdates && !updateWarningShown) {
+			if (CoolUtil.hasUpdate) {
+				persistentUpdate = false;
+				updateWarningShown = true;
+				openSubState(new substates.OutdatedSubState());
+			}
 		}
 		#end
 
@@ -170,7 +174,7 @@ class MainMenuState extends MusicBeatState
 		if (FlxG.sound.music.volume < 0.8)
 			FlxG.sound.music.volume = Math.min(FlxG.sound.music.volume + 0.5 * elapsed, 0.8);
 
-		#if funkin.vis
+		#if BASE_GAME_FILES
 		if(_needsAnalyzerInit && FlxG.sound.music != null && FlxG.sound.music.playing) {
 			@:privateAccess
 			if(FlxG.sound.music._channel != null && FlxG.sound.music._channel.__audioSource != null) {
@@ -376,10 +380,6 @@ class MainMenuState extends MusicBeatState
 								PlayState.SONG.splashSkin = null;
 								PlayState.stageUI = 'normal';
 							}
-						case 'donate':
-							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
-							selectedSomethin = false;
-							item.visible = true;
 						default:
 							trace('Menu Item ${option} doesn\'t do anything');
 							selectedSomethin = false;
@@ -434,7 +434,7 @@ class MainMenuState extends MusicBeatState
 	}
 
 	override function destroy():Void {
-		#if funkin.vis
+		#if BASE_GAME_FILES
 		_analyzer = null;
 		_analyzerLevels = null;
 		if(_vizBars != null) { _vizBars.destroy(); _vizBars = null; }
