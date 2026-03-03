@@ -18,6 +18,7 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 * Reimplemented of Combo.
 * Win icon support (Needed to activate on Settings).
 * Convert V-Slice to Psych character.
+* Audio Visualizer (Only in Main Menu).
 
 ## Developer Credit:
 * sirtehagmercoder - Head of SCB Engine.
