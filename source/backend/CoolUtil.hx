@@ -8,32 +8,22 @@ import lime.utils.Assets as LimeAssets;
 #end
 class CoolUtil
 {
-	public static function checkForUpdates(url:String = null):String {
-		if (url == null || url.length == 0)
-			url = "https://raw.githubusercontent.com/sirtehagmercoder/FNF-SCBEngine/main/gitVersion.txt";
-		var version:String = states.MainMenuState.psychEngineVersion.trim();
-		if(ClientPrefs.data.checkForUpdates) {
-			trace('checking for updates...');
-			var http = new haxe.Http(url);
-			http.onData = function (data:String)
-			{
-				var newVersion:String = data.split('\n')[0].trim();
-				trace('version online: $newVersion, your version: $version');
-				if(newVersion != version) {
-					trace('versions arent matching! please update');
-					version = newVersion;
-					http.onData = null;
-					http.onError = null;
-					http = null;
-				}
-			}
-			http.onError = function (error) {
-				trace('error: $error');
-			}
-			http.request();
-		}
-		return version;
+	public static var hasUpdate(get, never):Bool;
+	public static var latestVersion(get, never):String;
+	
+	static function get_hasUpdate():Bool return UpdateManager.hasUpdate;
+	static function get_latestVersion():String return UpdateManager.latestVersion;
+
+	public static function checkForUpdates(url:String = null, ?onComplete:Void->Void):String 
+	{
+		return UpdateManager.checkForUpdates(url, onComplete);
 	}
+
+	public static function executeUpdateCallback():Void 
+	{
+		UpdateManager.update();
+	}
+
 	inline public static function quantize(f:Float, snap:Float){
 		// changed so this actually works lol
 		var m:Float = Math.fround(f * snap);
@@ -43,6 +33,13 @@ class CoolUtil
 
 	inline public static function capitalize(text:String)
 		return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+
+	public static function boundTo(value:Float, min:Float, max:Float):Float {
+		var newValue:Float = value;
+		if(newValue < min) newValue = min;
+		else if(newValue > max) newValue = max;
+		return newValue;
+	}
 
 	inline public static function coolTextFile(path:String):Array<String>
 	{

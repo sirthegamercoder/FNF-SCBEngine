@@ -41,8 +41,6 @@ import android.os.BatteryManager as AndroidBatteryManager;
 #if sys
 import sys.*;
 import sys.io.*;
-#elseif js
-import js.html.*;
 #end
 
 import backend.Paths;

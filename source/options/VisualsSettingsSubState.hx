@@ -138,7 +138,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		    'Select the type of bounce icon you prefer. Default is Recommended.',
 			'iconBounceType',
 			STRING,
-			['Default', 'Old', 'NF', 'MM']);
+			['Default', 'Old', 'NF']);
 		addOption(option);
 		
 		var option:Option = new Option('FPS Counter',

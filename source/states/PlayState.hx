@@ -1918,15 +1918,9 @@ class PlayState extends MusicBeatState
 
 		if (ClientPrefs.data.iconBounceType == 'Old')
 		{
-			iconP1.setGraphicSize(Std.int(FlxMath.lerp(150, iconP1.width, 0.50)));
-			iconP2.setGraphicSize(Std.int(FlxMath.lerp(150, iconP2.width, 0.50)));
+			iconP1.setGraphicSize(Std.int(FlxMath.lerp(150, iconP1.width, CoolUtil.boundTo(1 - (elapsed * 30), 0, 1))));
+		    iconP2.setGraphicSize(Std.int(FlxMath.lerp(150, iconP2.width, CoolUtil.boundTo(1 - (elapsed * 30), 0, 1))));
 
-			iconP1.updateHitbox();
-			iconP2.updateHitbox();
-		}
-
-		if (ClientPrefs.data.iconBounceType == 'MM')
-		{
 			iconP1.updateHitbox();
 			iconP2.updateHitbox();
 		}
@@ -1964,8 +1958,17 @@ class PlayState extends MusicBeatState
 	public dynamic function updateIconsPosition()
 	{
 		var iconOffset:Int = 26;
-		iconP1.x = healthBar.barCenter + (150 * iconP1.scale.x - 150) / 2 - iconOffset;
-		iconP2.x = healthBar.barCenter - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
+		if (ClientPrefs.data.iconBounceType == 'Old')
+		{
+			iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - iconOffset);
+		    iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
+		}
+
+		if (ClientPrefs.data.iconBounceType == 'Default')
+		{
+			iconP1.x = healthBar.barCenter + (150 * iconP1.scale.x - 150) / 2 - iconOffset;
+		    iconP2.x = healthBar.barCenter - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
+		}
 	}
 
 	var iconsAnimations:Bool = true;
@@ -3400,21 +3403,9 @@ class PlayState extends MusicBeatState
 
 		if (ClientPrefs.data.iconBounceType == 'Old')
 		{
-			iconP1.setGraphicSize(Std.int(iconP1.width + 40));
-			iconP2.setGraphicSize(Std.int(iconP2.width + 40));
+			iconP1.setGraphicSize(Std.int(iconP1.width + 30));
+			iconP2.setGraphicSize(Std.int(iconP2.width + 30));
 
-			iconP1.updateHitbox();
-			iconP2.updateHitbox();
-		}
-
-		if (ClientPrefs.data.iconBounceType == 'MM')
-		{
-			iconP1.scale.x = 1.1;
-			iconP1.scale.y = 1.1;
-
-			iconP2.scale.x = 1.1;
-			iconP2.scale.y = 1.1;
-			
 			iconP1.updateHitbox();
 			iconP2.updateHitbox();
 		}

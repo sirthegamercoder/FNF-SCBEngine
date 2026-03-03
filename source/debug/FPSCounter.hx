@@ -69,13 +69,21 @@ class FPSCounter extends TextField
 		updateTime = prevTime + 500;
 	}
 
-
 	public dynamic function updateText():Void // so people can override it in hscript
 	{
-		text = 
-		'FPS: $currentFPS' + 
-		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}' +
-		os;
+		if (ClientPrefs.data.oldFramerate)
+		{
+			text = 
+			'FPS: $currentFPS' + 
+			'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}' +
+			os;
+		} 
+		else
+		{
+			text = 
+			'FPS: $currentFPS' + 
+			'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
+		}
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.stage.window.frameRate * 0.5)
