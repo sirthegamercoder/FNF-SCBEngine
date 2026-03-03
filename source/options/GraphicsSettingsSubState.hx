@@ -58,12 +58,6 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		option.displayFormat = '%v FPS';
 		option.onChange = onChangeFramerate;
 
-		var option:Option = new Option('Old Framerate UI',
-		    "If checked, it will restore the old UI framerate by adding OS under RAM. Check this box if you prefer the old UI framerate.",
-			'oldFramerate',
-			BOOL);
-		addOption(option);
-
 		var option:Option = new Option('FPS Rework',
 			"If checked, this works around the game becoming \"slow\" and \"smooth\" when the current FPS is lower than the FPS cap.",
 			'fpsRework',
