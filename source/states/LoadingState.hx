@@ -40,6 +40,16 @@ class LoadingState extends MusicBeatState
 	static var mutex:Mutex;
 	static var threadPool:FixedThreadPool = null;
 
+	public static var returnState:FlxState = null;
+	var loadingTimer:Float = 0;
+	#if mobile
+	var timeoutWarningMobile:FlxText;
+	#else
+	var timeoutWarning:FlxText;
+	#end
+	var canEscape:Bool = false;
+	static final TIMEOUT_DURATION:Float = 5.0;
+
 	function new(target:FlxState, stopMusic:Bool)
 	{
 		this.target = target;
@@ -171,6 +181,23 @@ class LoadingState extends MusicBeatState
 		funkay.updateHitbox();
 		addBehindBar(funkay);
 		#end
+
+		#if mobile
+		timeoutWarningMobile = new FlxText(0, FlxG.height - 100, FlxG.width, "", 24);
+		timeoutWarningMobile.setFormat(Paths.font("phantom.ttf"), 24, FlxColor.RED, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		timeoutWarningMobile.borderSize = 2;
+		timeoutWarningMobile.visible = false;
+		add(timeoutWarningMobile);
+		#else
+		timeoutWarning = new FlxText(0, FlxG.height - 100, FlxG.width, "", 24);
+		timeoutWarning.setFormat(Paths.font("phantom.ttf"), 24, FlxColor.RED, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		timeoutWarning.borderSize = 2;
+		timeoutWarning.visible = false;
+		add(timeoutWarning);
+		#end
+
+		addTouchPad('NONE'. 'B');
+
 		super.create();
 
 		if (stateChangeDelay <= 0 && checkLoaded())
@@ -190,6 +217,46 @@ class LoadingState extends MusicBeatState
 	{
 		super.update(elapsed);
 		if (dontUpdate) return;
+
+		if (!transitioning && !finishedLoading)
+		{
+			loadingTimer += elapsed;
+
+			if (loadingTimer >= TIMEOUT_DURATION && !canEscape)
+			{
+				canEscape = true;
+				#if mobile
+				timeoutWarningMobile.text = Language.getPhrase('loading_timeout_mobile', 'Loading is taking too long...\nPress B to return', []);
+				timeoutWarningMobile.visible = true;
+				#else
+				timeoutWarning.text = Language.getPhrase('loading_timeout', 'Loading is taking too long...\nPress ESC to return', []);
+				timeoutWarning.visible = true;
+				#end
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+			}
+
+			if (canEscape && (FlxG.keys.justPressed.ESCAPE || (touchPad != null && touchPad.buttonB.justPressed)))
+			{
+				transitioning = true;
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+
+				if (threadPool != null)
+				{
+					threadPool.shutdown();
+					threadPool = null;
+				}
+
+				var targetState:FlxState = (returnState != null) ? returnState : new states.MainMenuState();
+				
+				if (stopMusic && FlxG.sound.music != null)
+					FlxG.sound.music.stop();
+				
+				FlxG.camera.fade(FlxColor.BLACK, 0.3, false, function() {
+					MusicBeatState.switchState(targetState);
+				});
+				return;
+			}
+		}
 
 		if (!transitioning)
 		{

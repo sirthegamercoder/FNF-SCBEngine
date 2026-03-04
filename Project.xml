@@ -187,10 +187,10 @@
 
 	<assets path='art/icons/iconOG.png' rename='icon.png' if="linux || mac" />
 	
-	<icon path="art/icons/icon16.png" size='16' unless="android"/>
-	<icon path="art/icons/icon32.png" size='32' unless="android"/>
-	<icon path="art/icons/icon64.png" size='64' unless="android"/>
-	<icon path="art/icons/iconOG.png" unless="android" />
+	<icon path="art/icons/icon16.png" size='16' unless="android || ios"/>
+	<icon path="art/icons/icon32.png" size='32' unless="android || ios"/>
+	<icon path="art/icons/icon64.png" size='64' unless="android || ios"/>
+	<icon path="art/icons/iconOG.png" unless="android || ios" />
 
 	<section if="android">
 		<config:android>
@@ -201,6 +201,7 @@
 	</section>
 
 	<section if="ios">
-	    <assets path="art/icons/mobile/ios/AppIcon.appiconset" rename="Assets.xcassets/Images.xcassets/AppIcon.appiconset" />
+	    <icon path="art/icons/mobile/ios/AppIcon.appiconset/Icon-App-60x60@2x.png" rename="AppIcon60x60@2x" size='120'/>
+		<icon path="art/icons/mobile/ios/AppIcon.appiconset/Icon-App-76x76@2x.png" rename="AppIcon76x76@2x~ipad" size='152'/>
 	</section>
 </project>
