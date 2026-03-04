@@ -39,7 +39,9 @@ class FPSCounter extends TextField
 	@:noCompletion private var framesCount:Int;
 	@:noCompletion private var prevTime:Int;
 
+	#if mobile
 	public var os:String = '';
+	#end
 
 	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
 	{
@@ -78,7 +80,7 @@ class FPSCounter extends TextField
 		#else
 		text =
 		'FPS: $currentFPS' + 
-		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}'
+		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
 		#end
 
 		textColor = 0xFFFFFFFF;
