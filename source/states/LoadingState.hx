@@ -196,7 +196,7 @@ class LoadingState extends MusicBeatState
 		add(timeoutWarning);
 		#end
 
-		addTouchPad('NONE'. 'B');
+		addTouchPad('NONE', 'B');
 
 		super.create();
 
