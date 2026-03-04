@@ -48,8 +48,8 @@ class MainMenuState extends MusicBeatState
 	var _analyzer:SpectralAnalyzer = null;
 	var _analyzerLevels:Array<funkin.vis.dsp.SpectralAnalyzer.Bar> = null;
 	var _needsAnalyzerInit:Bool = false;
-	static inline var VIZ_BAR_COUNT:Int = 128;
-	static inline var VIZ_BAR_MAX_H:Int = 120;
+	static inline var VIZ_BAR_COUNT:Int = 256;
+	static inline var VIZ_BAR_MAX_H:Int = 240;
 	#end
 
 	static var showOutdatedWarning:Bool = true;
@@ -178,7 +178,11 @@ class MainMenuState extends MusicBeatState
 		if(_needsAnalyzerInit && FlxG.sound.music != null && FlxG.sound.music.playing) {
 			@:privateAccess
 			if(FlxG.sound.music._channel != null && FlxG.sound.music._channel.__audioSource != null) {
-				_analyzer = new SpectralAnalyzer(FlxG.sound.music._channel.__audioSource, VIZ_BAR_COUNT, 0.1, 40);
+				_analyzer = new SpectralAnalyzer(FlxG.sound.music._channel.__audioSource, VIZ_BAR_COUNT, 0.08, 25);
+				_analyzer.minFreq = 40;
+				_analyzer.maxFreq = 18000;
+				_analyzer.minDb = -80;
+				_analyzer.maxDb = -15;
 				_needsAnalyzerInit = false;
 			}
 		}
