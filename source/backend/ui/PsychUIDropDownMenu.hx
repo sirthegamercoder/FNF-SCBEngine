@@ -1,9 +1,6 @@
 package backend.ui;
 
 import backend.ui.PsychUIBox.UIStyleData;
-#if mobile
-import mobile.backend.SwipeUtil;
-#end
 
 class PsychUIDropDownMenu extends PsychUIInputText
 {
@@ -109,13 +106,8 @@ class PsychUIDropDownMenu extends PsychUIInputText
 		else if(PsychUIInputText.focusOn == this)
 		{
 			var wheel:Int = FlxG.mouse.wheel;
-			#if mobile
 			if(FlxG.keys.justPressed.UP || SwipeUtil.swipedUp) wheel++;
 			if(FlxG.keys.justPressed.DOWN || SwipeUtil.swipedDown) wheel--;
-			#else
-			if(FlxG.keys.justPressed.UP) wheel++;
-			if(FlxG.keys.justPressed.DOWN) wheel--;
-			#end
 			if(wheel != 0) showDropDown(true, curScroll - wheel, _curFilter);
 		}
 	}

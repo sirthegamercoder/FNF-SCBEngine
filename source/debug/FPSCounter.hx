@@ -45,10 +45,12 @@ class FPSCounter extends TextField
 	{
 		super();
 
+		#if mobile
 		if (LimeSystem.platformName == LimeSystem.platformVersion || LimeSystem.platformVersion == null)
 			os = '\nOS: ${LimeSystem.platformName}' #if cpp + ' ${getArch() != 'Unknown' ? getArch() : ''}' #end;
 		else
 			os = '\nOS: ${LimeSystem.platformName}' #if cpp + ' ${getArch() != 'Unknown' ? getArch() : ''}' #end + ' - ${LimeSystem.platformVersion}';
+		#end
 
 		positionFPS(x, y);
 
@@ -68,10 +70,16 @@ class FPSCounter extends TextField
 
 	public dynamic function updateText():Void // so people can override it in hscript
 	{
+		#if mobile
 		text = 
 		'FPS: $currentFPS' + 
 		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}' +
 		os;
+		#else
+		text =
+		'FPS: $currentFPS' + 
+		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}'
+		#end
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.stage.window.frameRate * 0.5)
