@@ -14,13 +14,13 @@ class PsychUIDropDownMenu extends PsychUIInputText
 	public var selectedLabel(default, set):String = null;
 
 	var _curFilter:Array<String>;
-	var _dropDownOpen:Bool = false;
-
-	public function new(x:Float, y:Float, list:Array<String>, callback:Int->String->Void)
+	var _itemWidth:Float = 0;
+	public function new(x:Float, y:Float, list:Array<String>, callback:Int->String->Void, ?width:Float = 100)
 	{
 		super(x, y);
 		if(list == null) list = [];
 
+		_itemWidth = width - 2;
 		setGraphicSize(width, 20);
 		updateHitbox();
 		textObj.y += 2;
@@ -37,7 +37,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 		{
 			if(old != cur)
 			{
-				_curFilter = list.filter(function(str:String) return str.startsWith(cur));
+				_curFilter = this.list.filter(function(str:String) return str.startsWith(cur));
 				showDropDown(true, 0, _curFilter);
 			}
 		}
@@ -84,17 +84,14 @@ class PsychUIDropDownMenu extends PsychUIInputText
 
 	var _items:Array<PsychUIDropDownItem> = [];
 	public var curScroll:Int = 0;
-
 	override function update(elapsed:Float)
 	{
 		var lastFocus = PsychUIInputText.focusOn;
-		var buttonPressed = false;
-
+		super.update(elapsed);
 		if(FlxG.mouse.justPressed)
 		{
 			if(FlxG.mouse.overlaps(button, camera))
 			{
-				buttonPressed = true;
 				button.animation.play('pressed', true);
 				if(lastFocus != this)
 					PsychUIInputText.focusOn = this;
@@ -102,15 +99,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 					PsychUIInputText.focusOn = null;
 			}
 		}
-		else if(FlxG.mouse.released && button.animation.curAnim != null && button.animation.curAnim.name != 'normal')
-			button.animation.play('normal', true);
-
-		super.update(elapsed);
-
-		if(_dropDownOpen && PsychUIInputText.focusOn == null && !buttonPressed)
-		{
-			PsychUIInputText.focusOn = this;
-		}
+		else if(FlxG.mouse.released && button.animation.curAnim != null && button.animation.curAnim.name != 'normal') button.animation.play('normal', true);
 
 		if(lastFocus != PsychUIInputText.focusOn)
 		{
@@ -119,8 +108,49 @@ class PsychUIDropDownMenu extends PsychUIInputText
 		else if(PsychUIInputText.focusOn == this)
 		{
 			var wheel:Int = FlxG.mouse.wheel;
-			if(FlxG.keys.justPressed.UP || SwipeUtil.swipedUp) wheel++;
-			if(FlxG.keys.justPressed.DOWN || SwipeUtil.swipedDown) wheel--;
+			if(FlxG.keys.justPressed.UP) wheel++;
+			if(FlxG.keys.justPressed.DOWN) wheel--;
+			#if FLX_TOUCH
+			var touchScrollData:Map<Int, {prevY:Int, addition:Int}> = new Map();
+
+			for (touch in FlxG.touches.list)
+			{
+				var data = touchScrollData.get(touch.touchPointID);
+				if (data == null)
+				{
+					data = {prevY: 0, addition: 0};
+					touchScrollData.set(touch.touchPointID, data);
+				}
+
+				if (touch.pressed)
+				{
+					var curY:Int = touch.y;
+					
+					if (data.prevY != 0)
+					{
+						if (curY > data.prevY)
+							data.addition++;
+						else if (curY < data.prevY)
+							data.addition--;
+						
+						if (data.addition >= 10 || data.addition <= -10)
+						{
+							if (data.addition >= 10)
+								wheel++;
+							else if (data.addition <= -10)
+								wheel--;
+							
+							data.addition = 0;
+						}
+					}
+					
+					data.prevY = curY;
+				}
+				
+				if (touch.justReleased)
+					touchScrollData.remove(touch.touchPointID);
+			}
+			#end
 			if(wheel != 0) showDropDown(true, curScroll - wheel, _curFilter);
 		}
 	}
@@ -129,7 +159,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 	{
 		if(FlxG.mouse.justPressed)
 		{
-			for (item in _items)
+			for (item in _items) //extra update to fix a little bug where it wouldnt click on any option if another input text was behind the drop down
 				if(item != null && item.active && item.visible)
 					item.update(0);
 		}
@@ -169,6 +199,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			for (num => item in _items)
 			{
 				if(!item.visible) continue;
+				item.x = behindText.x;
 				item.y = txtY;
 				txtY += item.height;
 				item.forceNextUpdate = true;
@@ -184,8 +215,6 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			bg.scale.y = 20;
 			bg.updateHitbox();
 		}
-
-		_dropDownOpen = vis;
 	}
 
 	public var broadcastDropDownEvent:Bool = true;
@@ -201,9 +230,8 @@ class PsychUIDropDownMenu extends PsychUIInputText
 	{
 		@:bypassAccessor list.push(option);
 		var curID:Int = list.length - 1;
-		var item:PsychUIDropDownItem = cast recycle(PsychUIDropDownItem);
-		item.x = 1;
-		item.y = 1;
+		var item:PsychUIDropDownItem = cast recycle(PsychUIDropDownItem, () -> new PsychUIDropDownItem(1, 1, this._itemWidth), true);
+		item.cameras = cameras;
 		item.label = option;
 		item.visible = item.active = false;
 		item.onClick = function() clickedOn(curID, option);
@@ -226,6 +254,69 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			addOption(option);
 
 		if(selectedLabel != null) selectedLabel = selected;
+		return v;
+	}
+}
+
+class PsychUIDropDownItem extends FlxSpriteGroup
+{
+	public var hoverStyle:UIStyleData = {
+		bgColor: 0xFF0066FF,
+		textColor: FlxColor.WHITE,
+		bgAlpha: 1
+	};
+	public var normalStyle:UIStyleData = {
+		bgColor: FlxColor.WHITE,
+		textColor: FlxColor.BLACK,
+		bgAlpha: 1
+	};
+
+	public var bg:FlxSprite;
+	public var text:FlxText;
+	public function new(x:Float = 0, y:Float = 0, width:Float = 100)
+	{
+		super(x, y);
+
+		bg = new FlxSprite().makeGraphic(1, 1, FlxColor.WHITE);
+		bg.setGraphicSize(width, 20);
+		bg.updateHitbox();
+		add(bg);
+
+		text = new FlxText(0, 0, width, 8);
+		text.color = FlxColor.BLACK;
+		add(text);
+	}
+
+	public var onClick:Void->Void;
+	public var forceNextUpdate:Bool = false;
+	override function update(elapsed:Float)
+	{
+		super.update(elapsed);
+		if(FlxG.mouse.justMoved || FlxG.mouse.justPressed || forceNextUpdate)
+		{
+			var overlapped:Bool = (FlxG.mouse.overlaps(bg, camera));
+
+			var style = overlapped ? hoverStyle : normalStyle;
+			bg.color = style.bgColor;
+			text.color = style.textColor;
+			bg.alpha = style.bgAlpha;
+			forceNextUpdate = false;
+
+			if(overlapped && FlxG.mouse.justPressed)
+				onClick();
+		}
+		
+		text.x = bg.x;
+		text.y = bg.y + bg.height/2 - text.height/2;
+	}
+
+	public var label(default, set):String;
+	function set_label(v:String)
+	{
+		label = v;
+		text.text = v;
+		bg.scale.y = text.height + 6;
+		bg.updateHitbox();
 		return v;
 	}
 }
