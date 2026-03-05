@@ -557,10 +557,8 @@ class PlayState extends MusicBeatState
 		{
 			iconP1.y = healthBar.y - (iconP1.height / 2);
 		}
-		else
-		{
-			iconP1.y = healthBar.y - 75;
-		}
+
+		iconP1.y = healthBar.y - 75;
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP1);
@@ -570,10 +568,8 @@ class PlayState extends MusicBeatState
 		{
 			iconP2.y = healthBar.y - (iconP2.height / 2);
 		}
-		else
-		{
-			iconP2.y = healthBar.y - 75;
-		}
+		
+		iconP2.y = healthBar.y - 75;
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP2);

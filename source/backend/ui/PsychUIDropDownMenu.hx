@@ -14,6 +14,8 @@ class PsychUIDropDownMenu extends PsychUIInputText
 	public var selectedLabel(default, set):String = null;
 
 	var _curFilter:Array<String>;
+	var _dropDownOpen:Bool = false;
+
 	public function new(x:Float, y:Float, list:Array<String>, callback:Int->String->Void)
 	{
 		super(x, y);
@@ -82,14 +84,17 @@ class PsychUIDropDownMenu extends PsychUIInputText
 
 	var _items:Array<PsychUIDropDownItem> = [];
 	public var curScroll:Int = 0;
+
 	override function update(elapsed:Float)
 	{
 		var lastFocus = PsychUIInputText.focusOn;
-		super.update(elapsed);
+		var buttonPressed = false;
+
 		if(FlxG.mouse.justPressed)
 		{
 			if(FlxG.mouse.overlaps(button, camera))
 			{
+				buttonPressed = true;
 				button.animation.play('pressed', true);
 				if(lastFocus != this)
 					PsychUIInputText.focusOn = this;
@@ -97,7 +102,15 @@ class PsychUIDropDownMenu extends PsychUIInputText
 					PsychUIInputText.focusOn = null;
 			}
 		}
-		else if(FlxG.mouse.released && button.animation.curAnim != null && button.animation.curAnim.name != 'normal') button.animation.play('normal', true);
+		else if(FlxG.mouse.released && button.animation.curAnim != null && button.animation.curAnim.name != 'normal')
+			button.animation.play('normal', true);
+
+		super.update(elapsed);
+
+		if(_dropDownOpen && PsychUIInputText.focusOn == null && !buttonPressed)
+		{
+			PsychUIInputText.focusOn = this;
+		}
 
 		if(lastFocus != PsychUIInputText.focusOn)
 		{
@@ -116,7 +129,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 	{
 		if(FlxG.mouse.justPressed)
 		{
-			for (item in _items) //extra update to fix a little bug where it wouldnt click on any option if another input text was behind the drop down
+			for (item in _items)
 				if(item != null && item.active && item.visible)
 					item.update(0);
 		}
@@ -171,6 +184,8 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			bg.scale.y = 20;
 			bg.updateHitbox();
 		}
+
+		_dropDownOpen = vis;
 	}
 
 	public var broadcastDropDownEvent:Bool = true;
@@ -211,69 +226,6 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			addOption(option);
 
 		if(selectedLabel != null) selectedLabel = selected;
-		return v;
-	}
-}
-
-class PsychUIDropDownItem extends FlxSpriteGroup
-{
-	public var hoverStyle:UIStyleData = {
-		bgColor: 0xFF0066FF,
-		textColor: FlxColor.WHITE,
-		bgAlpha: 1
-	};
-	public var normalStyle:UIStyleData = {
-		bgColor: FlxColor.WHITE,
-		textColor: FlxColor.BLACK,
-		bgAlpha: 1
-	};
-
-	public var bg:FlxSprite;
-	public var text:FlxText;
-	public function new(x:Float = 0, y:Float = 0, width:Int = 100)
-	{
-		super(x, y);
-
-		bg = new FlxSprite().makeGraphic(1, 1, FlxColor.WHITE);
-		bg.setGraphicSize(width, 20);
-		bg.updateHitbox();
-		add(bg);
-
-		text = new FlxText(0, 0, width, 8);
-		text.color = FlxColor.BLACK;
-		add(text);
-	}
-
-	public var onClick:Void->Void;
-	public var forceNextUpdate:Bool = false;
-	override function update(elapsed:Float)
-	{
-		super.update(elapsed);
-		if(FlxG.mouse.justMoved || FlxG.mouse.justPressed || forceNextUpdate)
-		{
-			var overlapped:Bool = (FlxG.mouse.overlaps(bg, camera));
-
-			var style = overlapped ? hoverStyle : normalStyle;
-			bg.color = style.bgColor;
-			text.color = style.textColor;
-			bg.alpha = style.bgAlpha;
-			forceNextUpdate = false;
-
-			if(overlapped && FlxG.mouse.justPressed)
-				onClick();
-		}
-		
-		text.x = bg.x;
-		text.y = bg.y + bg.height/2 - text.height/2;
-	}
-
-	public var label(default, set):String;
-	function set_label(v:String)
-	{
-		label = v;
-		text.text = v;
-		bg.scale.y = text.height + 6;
-		bg.updateHitbox();
 		return v;
 	}
 }
