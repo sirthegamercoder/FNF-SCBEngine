@@ -111,44 +111,42 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			if(FlxG.keys.justPressed.UP) wheel++;
 			if(FlxG.keys.justPressed.DOWN) wheel--;
 			#if FLX_TOUCH
-			var touchScrollData:Map<Int, {prevY:Int, addition:Int}> = new Map();
-
 			for (touch in FlxG.touches.list)
 			{
-				var data = touchScrollData.get(touch.touchPointID);
-				if (data == null)
-				{
-					data = {prevY: 0, addition: 0};
-					touchScrollData.set(touch.touchPointID, data);
-				}
+				var moveY:Int = 0;
+				var addition:Int = 0;
+				var curY:Int = 0;
+				var prevY:Int = 0;
 
 				if (touch.pressed)
 				{
-					var curY:Int = touch.y;
-					
-					if (data.prevY != 0)
+					curY = touch.y;
+
+					// these might need to be swaped idk i can't test
+					if (curY > prevY)
+						addition++;
+					else
+						addition--;
+
+					// change the option every 10 pixels you move
+					if (addition >= 10 || addition <= 10)
 					{
-						if (curY > data.prevY)
-							data.addition++;
-						else if (curY < data.prevY)
-							data.addition--;
-						
-						if (data.addition >= 10 || data.addition <= -10)
-						{
-							if (data.addition >= 10)
-								wheel++;
-							else if (data.addition <= -10)
-								wheel--;
-							
-							data.addition = 0;
-						}
+						// these here might also need to be swapped
+						if (addition >= 10)
+							moveY++
+						else
+							moveY--;
+
+						addition = 0;
 					}
-					
-					data.prevY = curY;
+
+					prevY = curY;
 				}
-				
+
+				wheel += moveY;
+
 				if (touch.justReleased)
-					touchScrollData.remove(touch.touchPointID);
+					moveY = addition = curY = prevY = 0;
 			}
 			#end
 			if(wheel != 0) showDropDown(true, curScroll - wheel, _curFilter);

@@ -183,7 +183,7 @@ class MainMenuState extends MusicBeatState
 				_analyzer.maxFreq = 18000;
 				_analyzer.minDb = -80;
 				_analyzer.maxDb = -15;
-				_needsAnalyzerInit = false;
+				_analyzer.fftN = 512;
 			}
 		}
 		if(_vizBars != null) {
