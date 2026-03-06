@@ -19,12 +19,29 @@ class MasterEditorMenu extends MusicBeatState
 		'Dialogue Portrait Editor',
 		'Note Splash Editor'
 	];
-	private var grpTexts:FlxTypedGroup<Alphabet>;
+
+	var iconNames:Array<String> = [
+		'chart',
+		'character',
+		'stage',
+		'week',
+		'menuChar',
+		'dialogue',
+		'portrait',
+		'noteSplash'
+	];
+	
+	private var grpItems:FlxTypedGroup<FlxSpriteGroup>;
 	private var directories:Array<String> = [null];
 
 	private var curSelected = 0;
 	private var curDirectory = 0;
 	private var directoryTxt:FlxText;
+	
+	private var itemWidth:Float = 250;
+	private var itemSpacing:Float = 20;
+	private var startX:Float;
+	private var centerY:Float = 360;
 
 	override function create()
 	{
@@ -39,16 +56,44 @@ class MasterEditorMenu extends MusicBeatState
 		bg.color = 0xFF353535;
 		add(bg);
 
-		grpTexts = new FlxTypedGroup<Alphabet>();
-		add(grpTexts);
+		grpItems = new FlxTypedGroup<FlxSpriteGroup>();
+		add(grpItems);
+
+		var totalWidth = (options.length * itemWidth) + ((options.length - 1) * itemSpacing);
+		startX = (FlxG.width - totalWidth) / 2 + (itemWidth / 2);
 
 		for (i in 0...options.length)
 		{
-			var leText:Alphabet = new Alphabet(90, 320, options[i], true);
-			leText.isMenuItem = true;
-			leText.targetY = i;
-			grpTexts.add(leText);
-			leText.snapToPosition();
+			var itemGroup:FlxSpriteGroup = new FlxSpriteGroup();
+			itemGroup.x = startX + (i * (itemWidth + itemSpacing));
+			itemGroup.y = centerY;
+
+			var iconBg:FlxSprite = new FlxSprite().makeGraphic(150, 150, FlxColor.WHITE);
+			iconBg.setGraphicSize(120, 120);
+			iconBg.updateHitbox();
+			iconBg.screenCenter(XY);
+			iconBg.x = (itemWidth / 2) - (iconBg.width / 2);
+			iconBg.y = -30;
+			iconBg.alpha = 0.2;
+			iconBg.antialiasing = ClientPrefs.data.antialiasing;
+			itemGroup.add(iconBg);
+
+			var icon:FlxSprite = new FlxSprite().loadGraphic(Paths.image('editors/menuIcons' + iconNames[i]));
+			icon.setGraphicSize(100, 100);
+			icon.updateHitbox();
+			icon.screenCenter(XY);
+			icon.x = (itemWidth / 2) - (icon.width / 2);
+			icon.y = -20;
+			icon.antialiasing = ClientPrefs.data.antialiasing;
+			itemGroup.add(icon);
+
+			var leText:Alphabet = new Alphabet(0, 70, options[i], true);
+			leText.screenCenter(X);
+			leText.x = (itemWidth / 2) - (leText.width / 2);
+			leText.alpha = 0.6;
+			itemGroup.add(leText);
+			
+			grpItems.add(itemGroup);
 		}
 		
 		#if MODS_ALLOWED
@@ -70,31 +115,33 @@ class MasterEditorMenu extends MusicBeatState
 		if(found > -1) curDirectory = found;
 		changeDirectory();
 		#end
+		
 		changeSelection();
 
 		FlxG.mouse.visible = false;
 
-		addTouchPad(#if MODS_ALLOWED 'LEFT_FULL' #else 'UP_DOWN' #end, 'A_B');
+		addTouchPad('FULL', 'A_B');
 
 		super.create();
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (controls.UI_UP_P)
+		if (controls.UI_LEFT_P)
 		{
 			changeSelection(-1);
 		}
-		if (controls.UI_DOWN_P)
+		if (controls.UI_RIGHT_P)
 		{
 			changeSelection(1);
 		}
+
 		#if MODS_ALLOWED
-		if(controls.UI_LEFT_P)
+		if(controls.UI_UP_P)
 		{
 			changeDirectory(-1);
 		}
-		if(controls.UI_RIGHT_P)
+		if(controls.UI_DOWN_P)
 		{
 			changeDirectory(1);
 		}
@@ -108,7 +155,7 @@ class MasterEditorMenu extends MusicBeatState
 		if (controls.ACCEPT)
 		{
 			switch(options[curSelected]) {
-				case 'Chart Editor'://felt it would be cool maybe
+				case 'Chart Editor':
 					LoadingState.loadAndSwitchState(new ChartingState(), false);
 				case 'Character Editor':
 					LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
@@ -128,14 +175,34 @@ class MasterEditorMenu extends MusicBeatState
 			FlxG.sound.music.volume = 0;
 			FreeplayState.destroyFreeplayVocals();
 		}
-		
-		for (num => item in grpTexts.members)
+
+		for (i => item in grpItems.members)
 		{
-			item.targetY = num - curSelected;
-			item.alpha = 0.6;
-			if (item.targetY == 0)
-				item.alpha = 1;
+			var distance = Math.abs(i - curSelected);
+			var scale = 1.0;
+			var alpha = 0.6;
+			
+			if (i == curSelected)
+			{
+				scale = 1.2;
+				alpha = 1.0;
+			}
+			else if (distance == 1)
+			{
+				scale = 1.0;
+				alpha = 0.8;
+			}
+			
+			item.scale.set(scale, scale);
+			item.alpha = alpha;
+
+			var textItem:Alphabet = cast item.members[2];
+			if (textItem != null)
+			{
+				textItem.alpha = alpha;
+			}
 		}
+		
 		super.update(elapsed);
 	}
 
