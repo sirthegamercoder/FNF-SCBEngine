@@ -120,7 +120,7 @@ class MasterEditorMenu extends MusicBeatState
 
 		FlxG.mouse.visible = false;
 
-		addTouchPad('FULL', 'A_B');
+		addTouchPad('LEFT_FULL', 'A_B');
 
 		super.create();
 	}
