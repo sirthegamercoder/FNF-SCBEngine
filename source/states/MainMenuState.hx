@@ -80,6 +80,24 @@ class MainMenuState extends MusicBeatState
 		bg.screenCenter();
 		add(bg);
 
+		#if funkin.vis
+		_vizBars = new FlxTypedGroup<FlxSprite>();
+		var vizBarW:Int = Std.int(FlxG.width / VIZ_BAR_COUNT);
+		for(i in 0...VIZ_BAR_COUNT) {
+			var vbar = new FlxSprite();
+			vbar.makeGraphic(vizBarW - 1, VIZ_BAR_MAX_H, FlxColor.WHITE);
+			vbar.setGraphicSize(vizBarW - 1, 2);
+			vbar.updateHitbox();
+			vbar.x = i * vizBarW;
+			vbar.y = FlxG.height - 2;
+			vbar.alpha = 0.0;
+			vbar.scrollFactor.set();
+			_vizBars.add(vbar);
+		}
+		add(_vizBars);
+		_needsAnalyzerInit = true;
+		#end
+
 		camFollow = new FlxObject(0, 0, 1, 1);
 		add(camFollow);
 
@@ -184,6 +202,7 @@ class MainMenuState extends MusicBeatState
 				_analyzer.minDb = -80;
 				_analyzer.maxDb = -15;
 				_analyzer.fftN = 512;
+				_needsAnalyzerInit = false;
 			}
 		}
 		if(_vizBars != null) {
