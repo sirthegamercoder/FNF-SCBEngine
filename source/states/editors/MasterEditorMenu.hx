@@ -39,9 +39,10 @@ class MasterEditorMenu extends MusicBeatState
 	private var directoryTxt:FlxText;
 	
 	private var itemWidth:Float = 250;
+	private var itemHeight:Float = 180;
 	private var itemSpacing:Float = 20;
-	private var startX:Float;
-	private var centerY:Float = 360;
+	private var startX:Float = FlxG.width / 2;
+	private var startY:Float = 200;
 
 	override function create()
 	{
@@ -59,14 +60,14 @@ class MasterEditorMenu extends MusicBeatState
 		grpItems = new FlxTypedGroup<FlxSpriteGroup>();
 		add(grpItems);
 
-		var totalWidth = (options.length * itemWidth) + ((options.length - 1) * itemSpacing);
-		startX = (FlxG.width - totalWidth) / 2 + (itemWidth / 2);
+		var totalHeight = (options.length * itemHeight) + ((options.length - 1) * itemSpacing);
+		startY = (FlxG.height - totalHeight) / 2;
 
 		for (i in 0...options.length)
 		{
 			var itemGroup:FlxSpriteGroup = new FlxSpriteGroup();
-			itemGroup.x = startX + (i * (itemWidth + itemSpacing));
-			itemGroup.y = centerY;
+			itemGroup.x = startX - (itemWidth / 2);
+			itemGroup.y = startY + (i * (itemHeight + itemSpacing));
 
 			var iconBg:FlxSprite = new FlxSprite().makeGraphic(150, 150, FlxColor.WHITE);
 			iconBg.setGraphicSize(120, 120);
@@ -78,7 +79,7 @@ class MasterEditorMenu extends MusicBeatState
 			iconBg.antialiasing = ClientPrefs.data.antialiasing;
 			itemGroup.add(iconBg);
 
-			var icon:FlxSprite = new FlxSprite().loadGraphic(Paths.image('editors/menuIcons' + iconNames[i]));
+			var icon:FlxSprite = new FlxSprite().loadGraphic(Paths.image('editors/menuIcons/' + iconNames[i]));
 			icon.setGraphicSize(100, 100);
 			icon.updateHitbox();
 			icon.screenCenter(XY);
@@ -127,21 +128,21 @@ class MasterEditorMenu extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (controls.UI_LEFT_P)
+		if (controls.UI_UP_P)
 		{
 			changeSelection(-1);
 		}
-		if (controls.UI_RIGHT_P)
+		if (controls.UI_DOWN_P)
 		{
 			changeSelection(1);
 		}
 
 		#if MODS_ALLOWED
-		if(controls.UI_UP_P)
+		if(controls.UI_LEFT_P)
 		{
 			changeDirectory(-1);
 		}
-		if(controls.UI_DOWN_P)
+		if(controls.UI_RIGHT_P)
 		{
 			changeDirectory(1);
 		}
@@ -209,7 +210,13 @@ class MasterEditorMenu extends MusicBeatState
 	function changeSelection(change:Int = 0)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
+
+		curSelected += change;
+
+		if(curSelected < 0)
+			curSelected = options.length - 1;
+		else if(curSelected >= options.length)
+			curSelected = 0;
 	}
 
 	#if MODS_ALLOWED
