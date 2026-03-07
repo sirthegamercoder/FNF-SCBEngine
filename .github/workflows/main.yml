@@ -8,13 +8,8 @@ on:
   workflow_dispatch:
     inputs:
       build_targets:
-        description: 'Platforms to build (comma-separated: win, mac, linux, android, ios, all)'
-        required: false
-        default: ''
-        type: string
-      custom_message:
-        description: 'Custom trigger message for platform detection'
-        required: false
+        description: 'Platforms to build'
+        required: true
         default: ''
         type: string
 
@@ -41,14 +36,9 @@ jobs:
 
           TRIGGER_TEXT=""
 
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            if [[ -n "${{ github.event.inputs.custom_message }}" ]]; then
-              TRIGGER_TEXT="${{ github.event.inputs.custom_message }}"
-              echo "Using custom message from workflow_dispatch: $TRIGGER_TEXT"
-            elif [[ -n "${{ github.event.inputs.build_targets }}" ]]; then
-              TRIGGER_TEXT="${{ github.event.inputs.build_targets }}"
-              echo "Using build_targets from workflow_dispatch: $TRIGGER_TEXT"
-            fi
+          if [[ -n "${{ github.event.inputs.build_targets }}" ]]; then
+            TRIGGER_TEXT="${{ github.event.inputs.build_targets }}"
+            echo "Using build_targets from workflow_dispatch: $TRIGGER_TEXT"
           fi
 
           if [ -z "$TRIGGER_TEXT" ]; then
