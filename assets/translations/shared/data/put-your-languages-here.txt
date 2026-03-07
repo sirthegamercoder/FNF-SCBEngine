@@ -1,1 +1,0 @@
-Your .lang file must "your-language-code-name.lang"

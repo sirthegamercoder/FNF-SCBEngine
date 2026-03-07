@@ -1,6 +1,0 @@
-You can put your translated images of language here (If any)
-
-Examples:
-your-language-code-name\Menu_Tracks.png
-your-language-code-name\mainmenu
-your-language-code-name\menudifficulties
