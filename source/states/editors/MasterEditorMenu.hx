@@ -47,7 +47,6 @@ class MasterEditorMenu extends MusicBeatState
 	{
 		FlxG.camera.bgColor = FlxColor.BLACK;
 		#if DISCORD_ALLOWED
-		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Editors Main Menu", null);
 		#end
 
@@ -60,38 +59,54 @@ class MasterEditorMenu extends MusicBeatState
 		add(grpItems);
 
 		var totalWidth = (options.length * itemWidth) + ((options.length - 1) * itemSpacing);
-		startX = (FlxG.width - totalWidth) / 2 + (itemWidth / 2);
+
+		startX = (FlxG.width - totalWidth) / 2;
+		
+		centerY = FlxG.height / 2 - 50;
 
 		for (i in 0...options.length)
 		{
 			var itemGroup:FlxSpriteGroup = new FlxSpriteGroup();
+
 			itemGroup.x = startX + (i * (itemWidth + itemSpacing));
 			itemGroup.y = centerY;
 
 			var iconBg:FlxSprite = new FlxSprite().makeGraphic(150, 150, FlxColor.WHITE);
 			iconBg.setGraphicSize(120, 120);
 			iconBg.updateHitbox();
-			iconBg.screenCenter(XY);
-			iconBg.x = (itemWidth / 2) - (iconBg.width / 2);
+			iconBg.x = (itemWidth - iconBg.width) / 2;
 			iconBg.y = -30;
 			iconBg.alpha = 0.2;
 			iconBg.antialiasing = ClientPrefs.data.antialiasing;
 			itemGroup.add(iconBg);
 
-			var icon:FlxSprite = new FlxSprite().loadGraphic(Paths.image('editors/menuIcons' + iconNames[i]));
+			var icon:FlxSprite;
+			var iconPath:String = 'editors/menuIcons/' + iconNames[i];
+			
+			if (Paths.fileExists('images/' + iconPath + '.png', IMAGE))
+			{
+				icon = new FlxSprite().loadGraphic(Paths.image(iconPath));
+			}
+			else
+			{
+				icon = new FlxSprite().makeGraphic(100, 100, FlxColor.GRAY);
+			}
+			
 			icon.setGraphicSize(100, 100);
 			icon.updateHitbox();
-			icon.screenCenter(XY);
-			icon.x = (itemWidth / 2) - (icon.width / 2);
+			icon.x = (itemWidth - icon.width) / 2;
 			icon.y = -20;
 			icon.antialiasing = ClientPrefs.data.antialiasing;
 			itemGroup.add(icon);
 
 			var leText:Alphabet = new Alphabet(0, 70, options[i], true);
 			leText.screenCenter(X);
-			leText.x = (itemWidth / 2) - (leText.width / 2);
+			leText.x = (itemWidth - leText.width) / 2;
 			leText.alpha = 0.6;
 			itemGroup.add(leText);
+
+			itemGroup.setGraphicSize(itemWidth, 250);
+			itemGroup.updateHitbox();
 			
 			grpItems.add(itemGroup);
 		}
@@ -117,6 +132,9 @@ class MasterEditorMenu extends MusicBeatState
 		#end
 		
 		changeSelection();
+
+		var firstItem = grpItems.members[0];
+        FlxG.camera.scroll.x = firstItem.x + (firstItem.width / 2) - (FlxG.width / 2);
 
 		FlxG.mouse.visible = false;
 
@@ -209,7 +227,21 @@ class MasterEditorMenu extends MusicBeatState
 	function changeSelection(change:Int = 0)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		
+		var oldSelected = curSelected;
 		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
+
+		if (oldSelected != curSelected)
+		{
+			var selectedItem = grpItems.members[curSelected];
+
+			var targetX = selectedItem.x + (selectedItem.width / 2) - (FlxG.width / 2);
+			
+			FlxTween.tween(FlxG.camera, {scroll: {x: targetX}}, 0.4, {
+				ease: FlxEase.cubeOut,
+				startDelay: 0.05
+			});
+		}
 	}
 
 	#if MODS_ALLOWED
