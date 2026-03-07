@@ -1960,7 +1960,7 @@ class PlayState extends MusicBeatState
 		    iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
 		}
 
-		if (ClientPrefs.data.iconBounceType == 'Default')
+		if (ClientPrefs.data.iconBounceType == 'Default' || 'NF')
 		{
 			iconP1.x = healthBar.barCenter + (150 * iconP1.scale.x - 150) / 2 - iconOffset;
 		    iconP2.x = healthBar.barCenter - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
