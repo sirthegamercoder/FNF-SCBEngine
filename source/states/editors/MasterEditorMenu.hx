@@ -44,6 +44,9 @@ class MasterEditorMenu extends MusicBeatState
 	private var startX:Float = FlxG.width / 2;
 	private var startY:Float = 200;
 
+	private var camFollow:FlxObject;
+	private static var defaultCamZoom:Float = 1;
+
 	override function create()
 	{
 		FlxG.camera.bgColor = FlxColor.BLACK;
@@ -62,6 +65,10 @@ class MasterEditorMenu extends MusicBeatState
 
 		var totalHeight = (options.length * itemHeight) + ((options.length - 1) * itemSpacing);
 		startY = (FlxG.height - totalHeight) / 2;
+
+		if (totalHeight > FlxG.height) {
+			startY = 50;
+		}
 
 		for (i in 0...options.length)
 		{
@@ -116,6 +123,10 @@ class MasterEditorMenu extends MusicBeatState
 		if(found > -1) curDirectory = found;
 		changeDirectory();
 		#end
+		
+		camFollow = new FlxObject(0, 0, 1, 1);
+		add(camFollow);
+		FlxG.camera.follow(camFollow, LOCKON, 0.06);
 		
 		changeSelection();
 
@@ -203,6 +214,13 @@ class MasterEditorMenu extends MusicBeatState
 				textItem.alpha = alpha;
 			}
 		}
+
+		if (grpItems.members[curSelected] != null)
+		{
+			var selectedItem = grpItems.members[curSelected];
+			camFollow.y = selectedItem.y + (selectedItem.height / 2);
+			camFollow.x = FlxG.width / 2;
+		}
 		
 		super.update(elapsed);
 	}
@@ -210,13 +228,8 @@ class MasterEditorMenu extends MusicBeatState
 	function changeSelection(change:Int = 0)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-
-		curSelected += change;
-
-		if(curSelected < 0)
-			curSelected = options.length - 1;
-		else if(curSelected >= options.length)
-			curSelected = 0;
+		
+		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
 	}
 
 	#if MODS_ALLOWED
