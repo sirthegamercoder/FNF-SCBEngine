@@ -38,7 +38,7 @@ body:
     attributes:
       label: "Which SCB engine version you're on?"
       options:
-        - "1.0.27226"
+        - "1.0.0"
     validations:
       required: true
 
