@@ -3,6 +3,7 @@ package states.editors;
 import backend.WeekData;
 
 import objects.Character;
+import flixel.FlxObject;
 
 import states.MainMenuState;
 import states.FreeplayState;
