@@ -19,8 +19,6 @@ import haxe.Json;
 
 #if funkin.vis
 import funkin.vis.dsp.SpectralAnalyzer;
-import funkin.vis.graph.FrequencyGraph;
-import funkin.vis.graph.FrequencyBarGraph;
 #end
 
 class FreeplayState extends MusicBeatState
@@ -60,7 +58,6 @@ class FreeplayState extends MusicBeatState
 	
 	#if funkin.vis
 	var visualizerBg:FlxSprite;
-	var frequencyGraph:FrequencyGraph;
 	var spectralAnalyzer:SpectralAnalyzer;
 	var visualizerActive:Bool = false;
 	var visualizerTimer:Float = 0;
@@ -228,23 +225,7 @@ class FreeplayState extends MusicBeatState
 		spectralAnalyzer = new SpectralAnalyzer();
 		spectralAnalyzer.fftSize = 512;
 
-		frequencyGraph = new FrequencyBarGraph(0, FlxG.height * 0.7, FlxG.width, Std.int(FlxG.height * 0.3));
-		frequencyGraph.spectralAnalyzer = spectralAnalyzer;
-
-		frequencyGraph.setFrequencyRange(20, 20000);
-		frequencygraph.minFrequency = 40;
-		frequencygraph.maxFrequency = 18000;
-		frequencygraph.numBands = 32;
-		frequencygraph.decay = 0.95;
-
-		frequencygraph.setColors(
-			FlxColor.WHITE,
-			songs[curSelected].color,
-			0x40FFFFFF
-		);
-		
-		frequencygraph.alpha = 0;
-		add(frequencygraph);
+		add(spectralAnalyzer);
 	}
 
 	function updateVisualizer(elapsed:Float)
