@@ -42,18 +42,11 @@ class MasterEditorMenu extends MusicBeatState
 	private var itemWidth:Float = 250;
 	private var itemHeight:Float = 180;
 	private var itemSpacing:Float = 20;
-	private var startX:Float = FlxG.width / 2;
-	private var startY:Float = 200;
-
-	private var totalHeight:Float = 0;
-
-	private var camFollow:FlxObject;
 
 	override function create()
 	{
 		FlxG.camera.bgColor = FlxColor.BLACK;
 		#if DISCORD_ALLOWED
-		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Editors Main Menu", null);
 		#end
 
@@ -65,18 +58,14 @@ class MasterEditorMenu extends MusicBeatState
 		grpItems = new FlxTypedGroup<FlxSpriteGroup>();
 		add(grpItems);
 
-		totalHeight = (options.length * itemHeight) + ((options.length - 1) * itemSpacing);
-		startY = (FlxG.height - totalHeight) / 2;
-
-		if (totalHeight > FlxG.height) {
-			startY = 50;
-		}
+		var centerX:Float = (FlxG.width - itemWidth) / 2;
+		var centerY:Float = (FlxG.height - itemHeight) / 2;
 
 		for (i in 0...options.length)
 		{
 			var itemGroup:FlxSpriteGroup = new FlxSpriteGroup();
-			itemGroup.x = startX - (itemWidth / 2);
-			itemGroup.y = startY + (i * (itemHeight + itemSpacing));
+			itemGroup.x = centerX;
+			itemGroup.y = centerY;
 
 			var iconBg:FlxSprite = new FlxSprite().makeGraphic(150, 150, FlxColor.WHITE);
 			iconBg.setGraphicSize(120, 120);
@@ -104,11 +93,11 @@ class MasterEditorMenu extends MusicBeatState
 			itemGroup.add(leText);
 			
 			grpItems.add(itemGroup);
+			itemGroup.visible = false;
 		}
 
-		camFollow = new FlxObject(FlxG.width / 2, FlxG.height / 2, 1, 1);
-		add(camFollow);
-		
+		if (grpItems.length > 0) grpItems.members[0].visible = true;
+
 		#if MODS_ALLOWED
 		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 42).makeGraphic(FlxG.width, 42, 0xFF000000);
 		textBG.alpha = 0.6;
@@ -129,8 +118,6 @@ class MasterEditorMenu extends MusicBeatState
 		changeDirectory();
 		#end
 		
-		changeSelection();
-
 		FlxG.mouse.visible = false;
 
 		addTouchPad('LEFT_FULL', 'A_B');
@@ -140,21 +127,21 @@ class MasterEditorMenu extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (controls.UI_UP_P)
+		if (controls.UI_LEFT_P)
 		{
 			changeSelection(-1);
 		}
-		if (controls.UI_DOWN_P)
+		if (controls.UI_RIGHT_P)
 		{
 			changeSelection(1);
 		}
 
 		#if MODS_ALLOWED
-		if(controls.UI_LEFT_P)
+		if(controls.UI_UP_P)
 		{
 			changeDirectory(-1);
 		}
-		if(controls.UI_RIGHT_P)
+		if(controls.UI_DOWN_P)
 		{
 			changeDirectory(1);
 		}
@@ -188,33 +175,6 @@ class MasterEditorMenu extends MusicBeatState
 			FlxG.sound.music.volume = 0;
 			FreeplayState.destroyFreeplayVocals();
 		}
-
-		for (i => item in grpItems.members)
-		{
-			var distance = Math.abs(i - curSelected);
-			var scale = 1.0;
-			var alpha = 0.6;
-			
-			if (i == curSelected)
-			{
-				scale = 1.2;
-				alpha = 1.0;
-			}
-			else if (distance == 1)
-			{
-				scale = 1.0;
-				alpha = 0.8;
-			}
-			
-			item.scale.set(scale, scale);
-			item.alpha = alpha;
-
-			var textItem:Alphabet = cast item.members[2];
-			if (textItem != null)
-			{
-				textItem.alpha = alpha;
-			}
-		}
 		
 		super.update(elapsed);
 	}
@@ -222,33 +182,14 @@ class MasterEditorMenu extends MusicBeatState
 	function changeSelection(change:Int = 0)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-		
-		var oldSelected = curSelected;
+
+		if (grpItems.members[curSelected] != null)
+			grpItems.members[curSelected].visible = false;
+
 		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
 
 		if (grpItems.members[curSelected] != null)
-		{
-			var selectedItem = grpItems.members[curSelected];
-			var targetY:Float;
-
-			if (change > 0 && curSelected == options.length - 1)
-			{
-				targetY = selectedItem.y + (selectedItem.height / 2) - (FlxG.height / 4);
-				targetY = Math.min(totalHeight - 200, targetY);
-			}
-			else if (change < 0 && curSelected == 0)
-			{
-				targetY = selectedItem.y + (selectedItem.height / 2) - (FlxG.height / 4);
-				targetY = Math.max(100, targetY);
-			}
-			else
-			{
-				targetY = selectedItem.y + (selectedItem.height / 2) - (FlxG.height / 3);
-				targetY = Math.max(100, Math.min(totalHeight - 200, targetY));
-			}
-			
-			camFollow.x = FlxG.width / 2;
-		}
+			grpItems.members[curSelected].visible = true;
 	}
 
 	#if MODS_ALLOWED
