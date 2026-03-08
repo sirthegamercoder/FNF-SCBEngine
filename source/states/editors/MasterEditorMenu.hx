@@ -105,6 +105,9 @@ class MasterEditorMenu extends MusicBeatState
 			
 			grpItems.add(itemGroup);
 		}
+
+		camFollow = new FlxObject(FlxG.width / 2, FlxG.height / 2, 1, 1);
+		add(camFollow);
 		
 		#if MODS_ALLOWED
 		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 42).makeGraphic(FlxG.width, 42, 0xFF000000);
