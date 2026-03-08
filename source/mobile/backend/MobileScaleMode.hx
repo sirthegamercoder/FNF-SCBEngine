@@ -26,24 +26,18 @@ import flixel.system.scaleModes.BaseScaleMode;
 
 /**
  * ...
- * @author: Karim Akra (rework by Lenin)
+ * @author: Karim Akra
  */
 class MobileScaleMode extends BaseScaleMode
 {
 	public static var allowWideScreen(default, set):Bool = true;
-	
-	// Base game resolution
+
 	public static final BASE_GAME_WIDTH:Int = 1280;
 	public static final BASE_GAME_HEIGHT:Int = 720;
-	
-	// Track screen dimensions for offset calculations
+
 	static var screenWidth:Float = 0;
 	static var screenHeight:Float = 0;
-	
-	/**
-	 * Calculate vertical offset for wide screen mode
-	 * @return Offset in pixels to center controls on extended screen
-	 */
+
 	public static function getVerticalOffset():Float
 	{
 		if (!ClientPrefs.data.wideScreen || !allowWideScreen)
@@ -51,19 +45,15 @@ class MobileScaleMode extends BaseScaleMode
 		
 		if (screenWidth == 0 || screenHeight == 0)
 			return 0;
-			
-		// Calculate how much the screen extends beyond 16:9
+
 		var screenRatio:Float = screenWidth / screenHeight;
-		var targetRatio:Float = BASE_GAME_WIDTH / BASE_GAME_HEIGHT; // ~1.777 (16:9)
+		var targetRatio:Float = BASE_GAME_WIDTH / BASE_GAME_HEIGHT;
 		
 		if (screenRatio >= targetRatio)
 		{
-			// Screen is wider or equal to 16:9 - no vertical extension
 			return 0;
 		}
-		
-		// Screen is taller than 16:9
-		// Calculate the extended height in game coordinates
+
 		var scaledHeight:Float = FlxG.height;
 		var baseHeightAtCurrentScale:Float = (screenWidth / FlxG.width) * BASE_GAME_HEIGHT;
 		var extraHeight:Float = scaledHeight - baseHeightAtCurrentScale;
@@ -78,12 +68,10 @@ class MobileScaleMode extends BaseScaleMode
 		
 		if (ClientPrefs.data.wideScreen && allowWideScreen)
 		{
-			// This will letterbox/pillarbox and center automatically
 			super.updateGameSize(Width, Height);
 		}
 		else
 		{
-			// Standard 16:9 locked mode
 			var ratio:Float = FlxG.width / FlxG.height;
 			var realRatio:Float = Width / Height;
 
@@ -104,7 +92,6 @@ class MobileScaleMode extends BaseScaleMode
 
 	override function updateGamePosition():Void
 	{
-		// Always center the game
 		super.updateGamePosition();
 	}
 

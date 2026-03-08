@@ -17,10 +17,6 @@ import openfl.utils.Assets;
 
 import haxe.Json;
 
-#if funkin.vis
-import funkin.vis.dsp.SpectralAnalyzer;
-#end
-
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
@@ -55,14 +51,6 @@ class FreeplayState extends MusicBeatState
 	var bottomBG:FlxSprite;
 
 	var player:MusicPlayer;
-	
-	#if funkin.vis
-	var visualizerBg:FlxSprite;
-	var spectralAnalyzer:SpectralAnalyzer;
-	var visualizerActive:Bool = false;
-	var visualizerTimer:Float = 0;
-	var visualizerFadeTime:Float = 2.0;
-	#end
 
 	override function create()
 	{
@@ -123,10 +111,6 @@ class FreeplayState extends MusicBeatState
 		add(bg);
 		bg.screenCenter();
 
-		#if funkin.vis
-		createVisualizer();
-		#end
-
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
 
@@ -143,6 +127,7 @@ class FreeplayState extends MusicBeatState
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
 			icon.sprTracker = songText;
 
+			
 			// too laggy with a lot of songs, so i had to recode the logic for it
 			songText.visible = songText.active = songText.isMenuItem = false;
 			icon.visible = icon.active = false;
@@ -169,6 +154,7 @@ class FreeplayState extends MusicBeatState
 		add(diffText);
 
 		add(scoreText);
+
 
 		missingTextBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		missingTextBG.alpha = 0.6;
@@ -214,54 +200,6 @@ class FreeplayState extends MusicBeatState
 		super.create();
 	}
 
-	#if funkin.vis
-	function createVisualizer()
-	{
-		visualizerBg = new FlxSprite(0, FlxG.height * 0.7).makeGraphic(FlxG.width, Std.int(FlxG.height * 0.3), 0x80000000);
-		visualizerBg.scrollFactor.set();
-		visualizerBg.alpha = 0;
-		add(visualizerBg);
-
-		spectralAnalyzer = new SpectralAnalyzer();
-		spectralAnalyzer.fftSize = 512;
-
-		add(spectralAnalyzer);
-	}
-
-	function updateVisualizer(elapsed:Float)
-	{
-		if (!visualizerActive)
-		{
-			visualizerTimer -= elapsed;
-			if (visualizerTimer <= 0)
-			{
-				visualizerBg.alpha = FlxMath.lerp(0, visualizerBg.alpha, Math.exp(-elapsed * 10));
-				frequencygraph.alpha = visualizerBg.alpha;
-			}
-			return;
-		}
-
-		if (player.playingMusic && FlxG.sound.music != null && FlxG.sound.music.playing)
-		{
-			spectralAnalyzer.inputData = FlxG.sound.music.amplitudeLeft;
-
-			visualizerTimer = visualizerFadeTime;
-			visualizerBg.alpha = FlxMath.lerp(0.6, visualizerBg.alpha, Math.exp(-elapsed * 10));
-			frequencygraph.alpha = visualizerBg.alpha;
-
-			frequencygraph.setColors(
-				FlxColor.WHITE,
-				songs[curSelected].color,
-				0x40FFFFFF
-			);
-		}
-		else
-		{
-			visualizerActive = false;
-		}
-	}
-	#end
-
 	override function closeSubState()
 	{
 		changeSelection(0, false);
@@ -295,11 +233,6 @@ class FreeplayState extends MusicBeatState
 
 		if (FlxG.sound.music.volume < 0.7)
 			FlxG.sound.music.volume += 0.5 * elapsed;
-
-		#if funkin.vis
-		visualizerActive = (player.playingMusic && FlxG.sound.music != null && FlxG.sound.music.playing);
-		updateVisualizer(elapsed);
-		#end
 
 		lerpScore = Math.floor(FlxMath.lerp(intendedScore, lerpScore, Math.exp(-elapsed * 24)));
 		lerpRating = FlxMath.lerp(intendedRating, lerpRating, Math.exp(-elapsed * 12));
@@ -392,10 +325,6 @@ class FreeplayState extends MusicBeatState
 
 				FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
 				FlxTween.tween(FlxG.sound.music, {volume: 1}, 1);
-				
-				#if funkin.vis
-				visualizerActive = false;
-				#end
 			}
 			else 
 			{
@@ -480,11 +409,6 @@ class FreeplayState extends MusicBeatState
 				player.curTime = 0;
 				player.switchPlayMusic();
 				player.pauseOrResume(true);
-				
-				#if funkin.vis
-				visualizerActive = true;
-				visualizerTimer = visualizerFadeTime;
-				#end
 			}
 			else if (instPlaying == curSelected && player.playingMusic)
 			{
@@ -641,17 +565,6 @@ class FreeplayState extends MusicBeatState
 
 		changeDiff();
 		_updateSongLastDifficulty();
-		
-		#if funkin.vis
-		if (frequencyGraph != null)
-		{
-			frequencyGraph.setColors(
-				FlxColor.WHITE,
-				songs[curSelected].color,
-				0x40FFFFFF
-			);
-		}
-		#end
 	}
 
 	inline private function _updateSongLastDifficulty()
@@ -700,13 +613,6 @@ class FreeplayState extends MusicBeatState
 		FlxG.autoPause = ClientPrefs.data.autoPause;
 		if (!FlxG.sound.music.playing && !stopMusicPlay)
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-			
-		#if funkin.vis
-		if (spectralAnalyzer != null)
-		{
-			spectralAnalyzer = null;
-		}
-		#end
 	}	
 }
 
