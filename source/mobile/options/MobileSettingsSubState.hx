@@ -68,7 +68,7 @@ class MobileSettingsSubState extends BaseOptionsMenu
 		addOption(option);
 
 		option = new Option('Wide Screen Mode',
-			'If checked, The game will fill your whole screen.',
+			'If checked, it will extend your screen to widescreen and the controls will automatically adjust.',
 			'wideScreen', BOOL);
 		option.onChange = () -> FlxG.scaleMode = new MobileScaleMode();
 		addOption(option);
@@ -91,7 +91,7 @@ class MobileSettingsSubState extends BaseOptionsMenu
 
 		#if android
 		option = new Option('Storage Type', 
-		    'Which folder SCB Engine should use?\n(Require to restart the game!)', 'storageType', STRING,
+		    'Which type of storage would you prefer?\n(You must restart the game to apply the changes!)', 'storageType', STRING,
 			storageTypes);
 		addOption(option);
 		#end

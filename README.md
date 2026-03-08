@@ -17,9 +17,10 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 * Multiple storage types on Mobile.
 * Restored FPS Counter with `OS` below `RAM` (Mobile only)
 * Reimplemented of Combo.
-* Win icon support (Needed to activate on Settings).
+* Win icon support.
 * Convert V-Slice to Psych character.
-* Audio Visualizer (Only main menu).
+* Audio Visualizer.
+* Video Lua.
 
 ## Developer Credit:
 * sirtehagmercoder - Head of SCB Engine.

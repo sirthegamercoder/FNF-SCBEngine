@@ -1569,6 +1569,7 @@ class FunkinLua {
 		DeprecatedFunctions.implement(this);
 		MobileFunctions.implement(this);
 		#if android AndroidFunctions.implement(this); #end
+		LuaVideo.implement(this);
 
 		for (name => func in customFunctions)
 		{

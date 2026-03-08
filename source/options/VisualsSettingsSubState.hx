@@ -126,20 +126,6 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			'winIconSupport',
 			BOOL);
 		addOption(option);
-
-		var option:Option = new Option('Position Win Icon',
-		    "Which position is used for the win icon?\nMiddle = 0.7.1h\nRight = 0.6.3",
-			'positionWinIcon',
-			STRING,
-			['Middle', 'Right']);
-		addOption(option);
-
-		var option:Option = new Option('Icon Bounce',
-		    'Select the type of bounce icon you prefer. Default is Recommended.',
-			'iconBounceType',
-			STRING,
-			['Default', 'Old', 'NF']);
-		addOption(option);
 		
 		var option:Option = new Option('FPS Counter',
 			'If unchecked, hides FPS Counter.',

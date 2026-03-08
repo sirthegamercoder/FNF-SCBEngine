@@ -44,6 +44,7 @@ import states.stages.objects.*;
 
 #if LUA_ALLOWED
 import psychlua.*;
+import psychlua.LuaVideo;
 #else
 import psychlua.LuaUtils;
 import psychlua.HScript;
@@ -721,6 +722,9 @@ class PlayState extends MusicBeatState
 		Conductor.safeZoneOffset = (ClientPrefs.data.safeFrames / 60) * 1000 * value;
 		#if VIDEOS_ALLOWED
 		if(videoCutscene != null && videoCutscene.videoSprite != null) videoCutscene.videoSprite.bitmap.rate = value;
+		#if LUA_ALLOWED
+		psychlua.LuaVideo.setAllVideosRate(playbackRate);
+		#end
 		#end
 		setOnScripts('playbackRate', playbackRate);
 		#else
@@ -1612,6 +1616,9 @@ class PlayState extends MusicBeatState
 
 	override function openSubState(SubState:FlxSubState)
 	{
+		#if VIDEOS_ALLOWED
+		if (videoCutscene != null) videoCutscene.pause();
+		#end
 		stagesFunc(function(stage:BaseStage) stage.openSubState(SubState));
 		if (paused)
 		{
@@ -1633,6 +1640,9 @@ class PlayState extends MusicBeatState
 	{
 		super.closeSubState();
 		
+		#if VIDEOS_ALLOWED
+		if (videoCutscene != null) videoCutscene.pause();
+		#end
 		stagesFunc(function(stage:BaseStage) stage.closeSubState());
 		if (paused)
 		{
@@ -1644,6 +1654,11 @@ class PlayState extends MusicBeatState
 			FlxTween.globalManager.forEach(function(twn:FlxTween) if(!twn.finished) twn.active = true);
 
 			paused = false;
+
+			#if (LUA_ALLOWED && VIDEOS_ALLOWED)
+			LuaVideo.resumeAll();
+			#end
+
 			callOnScripts('onResume');
 			resetRPC(startTimer != null && startTimer.finished);
 			runSongSyncThread();
@@ -1735,6 +1750,13 @@ class PlayState extends MusicBeatState
 		callOnScripts('onUpdate', [elapsed]);
 
 		super.update(elapsed);
+
+		#if VIDEOS_ALLOWED
+		if(videoCutscene != null && videoCutscene.videoSprite != null && videoCutscene.videoSprite.bitmap != null)
+		{
+			videoCutscene.videoSprite.bitmap.rate = paused ? 0 : playbackRate;
+		}
+		#end
 
 		setOnScripts('curDecStep', curDecStep);
 		setOnScripts('curDecBeat', curDecBeat);
@@ -2054,6 +2076,11 @@ class PlayState extends MusicBeatState
 			vocals.pause();
 			opponentVocals.pause();
 		}
+
+		#if (LUA_ALLOWED && VIDEOS_ALLOWED)
+		LuaVideo.pauseAll();
+		#end
+
 		if(!cpuControlled)
 		{
 			for (note in playerStrums)
@@ -3304,6 +3331,11 @@ class PlayState extends MusicBeatState
 	}
 
 	override function destroy() {
+
+		#if (LUA_ALLOWED && VIDEOS_ALLOWED)
+		LuaVideo.clearAll();
+		#end
+		
 		if (psychlua.CustomSubstate.instance != null)
 		{
 			closeSubState();

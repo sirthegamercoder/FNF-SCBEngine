@@ -268,6 +268,13 @@ class PauseSubState extends MusicBeatSubstate
 				case "Resume":
 					Paths.clearUnusedMemory();
 					close();
+
+				#if VIDEOS_ALLOWED
+				case 'Skip Video':
+					if(PlayState.instance.videoCutscene != null && PlayState.instance.videoCutscene.onSkip != null)
+						PlayState.instance.videoCutscene.onSkip();
+					close();
+				#end
 				case 'Change Difficulty':
 					menuItems = difficultyChoices;
 					deleteSkipTimeText();
