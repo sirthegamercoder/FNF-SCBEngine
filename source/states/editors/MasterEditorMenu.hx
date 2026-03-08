@@ -45,6 +45,8 @@ class MasterEditorMenu extends MusicBeatState
 	private var startX:Float = FlxG.width / 2;
 	private var startY:Float = 200;
 
+	private var totalHeight:Float = 0;
+
 	private var camFollow:FlxObject;
 	private static var defaultCamZoom:Float = 1;
 
@@ -64,7 +66,7 @@ class MasterEditorMenu extends MusicBeatState
 		grpItems = new FlxTypedGroup<FlxSpriteGroup>();
 		add(grpItems);
 
-		var totalHeight = (options.length * itemHeight) + ((options.length - 1) * itemSpacing);
+		totalHeight = (options.length * itemHeight) + ((options.length - 1) * itemSpacing);
 		startY = (FlxG.height - totalHeight) / 2;
 
 		if (totalHeight > FlxG.height) {
