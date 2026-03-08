@@ -124,10 +124,11 @@ class MasterEditorMenu extends MusicBeatState
 		if(found > -1) curDirectory = found;
 		changeDirectory();
 		#end
-		
-		camFollow = new FlxObject(0, 0, 1, 1);
-		add(camFollow);
+
+		camFollow = new FlxObject(FlxG.width / 2, FlxG.height / 2, 1, 1);
+
 		FlxG.camera.follow(camFollow, LOCKON, 0.06);
+		FlxG.camera.setScrollBounds(0, FlxG.width, -100, totalHeight + 200);
 		
 		changeSelection();
 
@@ -219,7 +220,10 @@ class MasterEditorMenu extends MusicBeatState
 		if (grpItems.members[curSelected] != null)
 		{
 			var selectedItem = grpItems.members[curSelected];
-			camFollow.y = selectedItem.y + (selectedItem.height / 2);
+			var targetY = selectedItem.y + (selectedItem.height / 2) - (FlxG.height / 3);
+			targetY = Math.max(100, Math.min(totalHeight - 200, targetY));
+			
+			camFollow.y = targetY;
 			camFollow.x = FlxG.width / 2;
 		}
 		
