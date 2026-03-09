@@ -469,7 +469,7 @@ class TitleState extends MusicBeatState
 				case 2:
 					createCoolText(['Psych Engine by\n Shadow Mario'], -30);
 				case 4:
-					addMoreText('SCB Engine\nby sirthegamercoder', 150);
+					addMoreText('SCB Engine by\n sirthegamercoder', 90);
 				case 5:
 					deleteCoolText();
 				case 6:
