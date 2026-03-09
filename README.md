@@ -21,7 +21,7 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 * Convert V-Slice to Psych character.
 * Audio Visualizer (Only main menu).
 * Video Lua.
-* Rework MasterEditorMenu.hx.
+* Rework MasterEditorMenu.hx
 ![Rework Master Editor Menu](docs/img/RevampMasterEditorMenu.gif)
 
 ## Developer Credit:
