@@ -17,7 +17,8 @@ class UpdateManager
 		"windows" => "SCBEngine-Windows.zip",
 		"linux" => "SCBEngine-Linux.zip",
 		"mac" => "SCBEngine-macOS.zip",
-		"android" => "SCBEngine-Android.apk"
+		"android" => "SCBEngine-Android.apk",
+		"ios" => "SCBEngine-iOS.ipa"
 	];
 
 	private static var updateCheckCallback:Void->Void = null;
