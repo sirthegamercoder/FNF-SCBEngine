@@ -23,7 +23,7 @@
 package mobile.objects;
 
 import flixel.util.FlxSignal.FlxTypedSignal;
-import mobile.backend.MobileScaleMode;
+import flixel.system.scaleModes.MobileScaleMode;
 
 /**
  * ...
@@ -114,11 +114,11 @@ class TouchPad extends MobileInputManager implements IMobileControls
 		switch (Extra)
 		{
 			case SINGLE:
-				add(buttonExtra = createButton(0, FlxG.height - 137, 's', 0xFF0066FF));
+				add(buttonExtra = createButton(0, MobileScaleMode.getSafeHeight() - 137, 's', 0xFF0066FF));
 				setExtrasPos();
 			case DOUBLE:
-				add(buttonExtra = createButton(0, FlxG.height - 137, 's', 0xFF0066FF));
-				add(buttonExtra2 = createButton(FlxG.width - 132, FlxG.height - 137, 'g', 0xA6FF00));
+				add(buttonExtra = createButton(0, MobileScaleMode.getSafeHeight() - 137, 's', 0xFF0066FF));
+				add(buttonExtra2 = createButton(MobileScaleMode.getSafeWidth() - 132, MobileScaleMode.getSafeHeight() - 137, 'g', 0xA6FF00));
 				setExtrasPos();
 			case NONE: // nothing
 		}
@@ -134,8 +134,10 @@ class TouchPad extends MobileInputManager implements IMobileControls
 
 	function applyWideScreenOffset():Void
 	{
-		var offset:Float = MobileScaleMode.getVerticalOffset();
-		if (offset == 0) return;
+		var offsetX:Float = MobileScaleMode.getHorizontalOffset();
+		var offsetY:Float = MobileScaleMode.getVerticalOffset();
+		
+		if (offsetX == 0 && offsetY == 0) return;
 
 		for (fieldName in Reflect.fields(this))
 		{
@@ -143,7 +145,8 @@ class TouchPad extends MobileInputManager implements IMobileControls
 			if (Std.isOfType(field, TouchButton))
 			{
 				var button:TouchButton = cast field;
-				button.y += offset;
+				button.x += offsetX;
+				button.y += offsetY;
 			}
 		}
 	}
