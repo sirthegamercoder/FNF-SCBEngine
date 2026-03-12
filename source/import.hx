@@ -24,7 +24,6 @@ import mobile.input.MobileInputID;
 import mobile.backend.MobileData;
 import mobile.input.MobileInputManager;
 import mobile.backend.TouchUtil;
-import flixel.system.scaleModes.MobileScaleMode;
 
 // Android
 #if android

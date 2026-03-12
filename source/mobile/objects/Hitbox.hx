@@ -27,7 +27,7 @@ import openfl.display.Shape;
 import flixel.graphics.FlxGraphic;
 import flixel.util.FlxSignal.FlxTypedSignal;
 import openfl.geom.Matrix;
-import flixel.system.scaleModes.MobileScaleMode;
+import mobile.backend.MobileScaleMode;
 
 /**
  * A zone with 4 hint's (A hitbox).
@@ -37,8 +37,8 @@ import flixel.system.scaleModes.MobileScaleMode;
  */
 class Hitbox extends MobileInputManager implements IMobileControls
 {
-	final offsetFir:Int = (ClientPrefs.data.hitboxPos ? Std.int(MobileScaleMode.getSafeHeight() / 4) * 3 : 0);
-	final offsetSec:Int = (ClientPrefs.data.hitboxPos ? 0 : Std.int(MobileScaleMode.getSafeHeight() / 4));
+	final offsetFir:Int = (ClientPrefs.data.hitboxPos ? Std.int(FlxG.height / 4) * 3 : 0);
+	final offsetSec:Int = (ClientPrefs.data.hitboxPos ? 0 : Std.int(FlxG.height / 4));
 
 	public var buttonLeft:TouchButton = new TouchButton(0, 0, [MobileInputID.HITBOX_LEFT, MobileInputID.NOTE_LEFT]);
 	public var buttonDown:TouchButton = new TouchButton(0, 0, [MobileInputID.HITBOX_DOWN, MobileInputID.NOTE_DOWN]);
@@ -70,25 +70,25 @@ class Hitbox extends MobileInputManager implements IMobileControls
 		switch (extraMode)
 		{
 			case NONE:
-				add(buttonLeft = createHint(0, 0, Std.int(MobileScaleMode.getSafeWidth() / 4), MobileScaleMode.getSafeHeight(), 0xFFC24B99));
-				add(buttonDown = createHint(MobileScaleMode.getSafeWidth() / 4, 0, Std.int(MobileScaleMode.getSafeWidth() / 4), MobileScaleMode.getSafeHeight(), 0xFF00FFFF));
-				add(buttonUp = createHint(MobileScaleMode.getSafeWidth() / 2, 0, Std.int(MobileScaleMode.getSafeWidth() / 4), MobileScaleMode.getSafeHeight(), 0xFF12FA05));
-				add(buttonRight = createHint((MobileScaleMode.getSafeWidth() / 2) + (MobileScaleMode.getSafeWidth() / 4), 0, Std.int(MobileScaleMode.getSafeWidth() / 4), MobileScaleMode.getSafeHeight(), 0xFFF9393F));
+				add(buttonLeft = createHint(0, 0, Std.int(FlxG.width / 4), FlxG.height, 0xFFC24B99));
+				add(buttonDown = createHint(FlxG.width / 4, 0, Std.int(FlxG.width / 4), FlxG.height, 0xFF00FFFF));
+				add(buttonUp = createHint(FlxG.width / 2, 0, Std.int(FlxG.width / 4), FlxG.height, 0xFF12FA05));
+				add(buttonRight = createHint((FlxG.width / 2) + (FlxG.width / 4), 0, Std.int(FlxG.width / 4), FlxG.height, 0xFFF9393F));
 			case SINGLE:
-				add(buttonLeft = createHint(0, offsetSec, Std.int(MobileScaleMode.getSafeWidth() / 4), Std.int(MobileScaleMode.getSafeHeight() / 4) * 3, 0xFFC24B99));
-				add(buttonDown = createHint(MobileScaleMode.getSafeWidth() / 4, offsetSec, Std.int(MobileScaleMode.getSafeWidth() / 4), Std.int(MobileScaleMode.getSafeHeight() / 4) * 3, 0xFF00FFFF));
-				add(buttonUp = createHint(MobileScaleMode.getSafeWidth() / 2, offsetSec, Std.int(MobileScaleMode.getSafeWidth() / 4), Std.int(MobileScaleMode.getSafeHeight() / 4) * 3, 0xFF12FA05));
-				add(buttonRight = createHint((MobileScaleMode.getSafeWidth() / 2) + (MobileScaleMode.getSafeWidth() / 4), offsetSec, Std.int(MobileScaleMode.getSafeWidth() / 4), Std.int(MobileScaleMode.getSafeHeight() / 4) * 3,
+				add(buttonLeft = createHint(0, offsetSec, Std.int(FlxG.width / 4), Std.int(FlxG.height / 4) * 3, 0xFFC24B99));
+				add(buttonDown = createHint(FlxG.width / 4, offsetSec, Std.int(FlxG.width / 4), Std.int(FlxG.height / 4) * 3, 0xFF00FFFF));
+				add(buttonUp = createHint(FlxG.width / 2, offsetSec, Std.int(FlxG.width / 4), Std.int(FlxG.height / 4) * 3, 0xFF12FA05));
+				add(buttonRight = createHint((FlxG.width / 2) + (FlxG.width / 4), offsetSec, Std.int(FlxG.width / 4), Std.int(FlxG.height / 4) * 3,
 					0xFFF9393F));
-				add(buttonExtra = createHint(0, offsetFir, MobileScaleMode.getSafeWidth(), Std.int(MobileScaleMode.getSafeHeight() / 4), 0xFF0066FF));
+				add(buttonExtra = createHint(0, offsetFir, FlxG.width, Std.int(FlxG.height / 4), 0xFF0066FF));
 			case DOUBLE:
-				add(buttonLeft = createHint(0, offsetSec, Std.int(MobileScaleMode.getSafeWidth() / 4), Std.int(MobileScaleMode.getSafeHeight() / 4) * 3, 0xFFC24B99));
-				add(buttonDown = createHint(MobileScaleMode.getSafeWidth() / 4, offsetSec, Std.int(MobileScaleMode.getSafeWidth() / 4), Std.int(MobileScaleMode.getSafeHeight() / 4) * 3, 0xFF00FFFF));
-				add(buttonUp = createHint(MobileScaleMode.getSafeWidth() / 2, offsetSec, Std.int(MobileScaleMode.getSafeWidth() / 4), Std.int(MobileScaleMode.getSafeHeight() / 4) * 3, 0xFF12FA05));
-				add(buttonRight = createHint((MobileScaleMode.getSafeWidth() / 2) + (MobileScaleMode.getSafeWidth() / 4), offsetSec, Std.int(MobileScaleMode.getSafeWidth() / 4), Std.int(MobileScaleMode.getSafeHeight() / 4) * 3,
+				add(buttonLeft = createHint(0, offsetSec, Std.int(FlxG.width / 4), Std.int(FlxG.height / 4) * 3, 0xFFC24B99));
+				add(buttonDown = createHint(FlxG.width / 4, offsetSec, Std.int(FlxG.width / 4), Std.int(FlxG.height / 4) * 3, 0xFF00FFFF));
+				add(buttonUp = createHint(FlxG.width / 2, offsetSec, Std.int(FlxG.width / 4), Std.int(FlxG.height / 4) * 3, 0xFF12FA05));
+				add(buttonRight = createHint((FlxG.width / 2) + (FlxG.width / 4), offsetSec, Std.int(FlxG.width / 4), Std.int(FlxG.height / 4) * 3,
 					0xFFF9393F));
-				add(buttonExtra2 = createHint(Std.int(MobileScaleMode.getSafeWidth() / 2), offsetFir, Std.int(MobileScaleMode.getSafeWidth() / 2), Std.int(MobileScaleMode.getSafeHeight() / 4), 0xA6FF00));
-				add(buttonExtra = createHint(0, offsetFir, Std.int(MobileScaleMode.getSafeWidth() / 2), Std.int(MobileScaleMode.getSafeHeight() / 4), 0xFF0066FF));
+				add(buttonExtra2 = createHint(Std.int(FlxG.width / 2), offsetFir, Std.int(FlxG.width / 2), Std.int(FlxG.height / 4), 0xA6FF00));
+				add(buttonExtra = createHint(0, offsetFir, Std.int(FlxG.width / 2), Std.int(FlxG.height / 4), 0xFF0066FF));
 		}
 
 		for (button in Reflect.fields(this))
@@ -108,10 +108,8 @@ class Hitbox extends MobileInputManager implements IMobileControls
 
 	function applyWideScreenOffset():Void
 	{
-		var offsetX:Float = MobileScaleMode.getHorizontalOffset();
-		var offsetY:Float = MobileScaleMode.getVerticalOffset();
-		
-		if (offsetX == 0 && offsetY == 0) return;
+		var offset:Float = MobileScaleMode.getVerticalOffset();
+		if (offset == 0) return;
 
 		for (fieldName in Reflect.fields(this))
 		{
@@ -119,8 +117,7 @@ class Hitbox extends MobileInputManager implements IMobileControls
 			if (Std.isOfType(field, TouchButton))
 			{
 				var button:TouchButton = cast field;
-				button.x += offsetX;
-				button.y += offsetY;
+				button.y += offset;
 			}
 		}
 	}

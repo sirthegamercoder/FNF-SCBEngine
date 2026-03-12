@@ -22,8 +22,13 @@ typedef TitleData =
 {
 	var titlex:Float;
 	var titley:Float;
+	#if mobile
+	var altstartx:Float;
+	var altstarty:Float;
+	#else
 	var startx:Float;
 	var starty:Float;
+	#end
 	var gfx:Float;
 	var gfy:Float;
 	var backgroundSprite:String;
@@ -101,7 +106,7 @@ class TitleState extends MusicBeatState
 	var gfDance:FlxSprite;
 	var danceLeft:Bool = false;
 	#if mobile
-	var titleTextMobile:FlxSprite;
+	var altTitleText:FlxSprite;
 	#else
 	var titleText:FlxSprite;
 	#end
@@ -116,11 +121,7 @@ class TitleState extends MusicBeatState
 		loadJsonData();
 		Conductor.bpm = musicBPM;
 
-		#if mobile
-		logoBl = new FlxSprite(logoPosition.x + MobileScaleMode.getHorizontalOffset(), logoPosition.y + MobileScaleMode.getVerticalOffset());
-		#else
 		logoBl = new FlxSprite(logoPosition.x, logoPosition.y);
-		#end
 		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
 		logoBl.antialiasing = ClientPrefs.data.antialiasing;
 
@@ -128,11 +129,7 @@ class TitleState extends MusicBeatState
 		logoBl.animation.play('bump');
 		logoBl.updateHitbox();
 
-		#if mobile
-		gfDance = new FlxSprite(gfPosition.x + MobileScaleMode.getHorizontalOffset(), gfPosition.y + MobileScaleMode.getVerticalOffset());
-		#else
 		gfDance = new FlxSprite(gfPosition.x, gfPosition.y);
-		#end
 		gfDance.antialiasing = ClientPrefs.data.antialiasing;
 		
 		if(ClientPrefs.data.shaders)
@@ -158,8 +155,8 @@ class TitleState extends MusicBeatState
 
 		var animFrames:Array<FlxFrame> = [];
 		#if mobile
-		titleTextMobile = new FlxSprite(enterPosition.x, enterPosition.y);
-		titleTextMobile.frames = Paths.getSparrowAtlas('mobile/titleEnter');
+		altTitleText = new FlxSprite(altEnterPosition.x, altEnterPosition.y);
+		altTitleText.frames = Paths.getSparrowAtlas('mobile/titleEnter');
 		#else
 		titleText = new FlxSprite(enterPosition.x, enterPosition.y);
 		titleText.frames = Paths.getSparrowAtlas('titleEnter');
@@ -167,22 +164,22 @@ class TitleState extends MusicBeatState
 		#if mobile
 		@:privateAccess
 		{
-			titleTextMobile.animation.findByPrefix(animFrames, "ENTER IDLE");
-			titleTextMobile.animation.findByPrefix(animFrames, "ENTER FREEZE");
+			altTitleText.animation.findByPrefix(animFrames, "ENTER IDLE");
+			altTitleText.animation.findByPrefix(animFrames, "ENTER FREEZE");
 		}
 		
 		if (newTitle = animFrames.length > 0)
 		{
-			titleTextMobile.animation.addByPrefix('idle', "ENTER IDLE", 24);
-			titleTextMobile.animation.addByPrefix('press', ClientPrefs.data.flashing ? "ENTER PRESSED" : "ENTER FREEZE", 24);
+			altTitleText.animation.addByPrefix('idle', "ENTER IDLE", 24);
+			altTitleText.animation.addByPrefix('press', ClientPrefs.data.flashing ? "ENTER PRESSED" : "ENTER FREEZE", 24);
 		}
 		else
 		{
-			titleTextMobile.animation.addByPrefix('idle', "Press Enter to Begin", 24);
-			titleTextMobile.animation.addByPrefix('press', "ENTER PRESSED", 24);
+			altTitleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+			altTitleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		}
-		titleTextMobile.animation.play('idle');
-		titleTextMobile.updateHitbox();
+		altTitleText.animation.play('idle');
+		altTitleText.updateHitbox();
 		#else
 		@:privateAccess
 		{
@@ -205,11 +202,7 @@ class TitleState extends MusicBeatState
 		#end
 
 		blackScreen = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
-		#if mobile
-		blackScreen.scale.set(MobileScaleMode.getScreenWidth(), MobileScaleMode.getScreenHeight());
-		#else
 		blackScreen.scale.set(FlxG.width, FlxG.height);
-		#end
 		blackScreen.updateHitbox();
 		credGroup.add(blackScreen);
 
@@ -217,25 +210,17 @@ class TitleState extends MusicBeatState
 		credTextShit.screenCenter();
 		credTextShit.visible = false;
 
-		#if mobile
-		ngSpr = new FlxSprite(0, MobileScaleMode.getSafeHeight() * 0.52 + MobileScaleMode.getVerticalOffset()).loadGraphic(Paths.image('newgrounds_logo'));
-		#else
 		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
-		#end
 		ngSpr.visible = false;
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
 		ngSpr.updateHitbox();
-		#if mobile
-		ngSpr.x = (MobileScaleMode.getSafeWidth() - ngSpr.width) / 2 + MobileScaleMode.getHorizontalOffset();
-		#else
 		ngSpr.screenCenter(X);
-		#end
 		ngSpr.antialiasing = ClientPrefs.data.antialiasing;
 
 		add(gfDance);
 		add(logoBl); //FNF Logo
 		#if mobile
-		add(titleTextMobile);
+		add(altTitleText); // For mobile only
 		#else
 		add(titleText); //"Press Enter to Begin" text
 		#end
@@ -256,7 +241,11 @@ class TitleState extends MusicBeatState
 
 	var gfPosition:FlxPoint = FlxPoint.get(512, 40);
 	var logoPosition:FlxPoint = FlxPoint.get(-150, -100);
+	#if mobile
+	var altEnterPosition:FlxPoint = FlxPoint.get(50, 590);
+	#else
 	var enterPosition:FlxPoint = FlxPoint.get(100, 576);
+	#end
 	
 	var useIdle:Bool = false;
 	var musicBPM:Float = 102;
@@ -275,7 +264,11 @@ class TitleState extends MusicBeatState
 					var titleJSON:TitleData = tjson.TJSON.parse(titleRaw);
 					gfPosition.set(titleJSON.gfx, titleJSON.gfy);
 					logoPosition.set(titleJSON.titlex, titleJSON.titley);
+					#if mobile
+					altEnterPosition.set(titleJSON.altstartx, titleJSON.altstarty);
+					#else
 					enterPosition.set(titleJSON.startx, titleJSON.starty);
+					#end
 					musicBPM = titleJSON.bpm;
 					
 					if(titleJSON.animation != null && titleJSON.animation.length > 0) animationName = titleJSON.animation;
@@ -356,8 +349,8 @@ class TitleState extends MusicBeatState
 				timer = FlxEase.quadInOut(timer);
 				
 				#if mobile
-				titleTextMobile.color = FlxColor.interpolate(titleTextColors[0], titleTextColors[1], timer);
-				titleTextMobile.alpha = FlxMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
+				altTitleText.color = FlxColor.interpolate(titleTextColors[0], titleTextColors[1], timer);
+				altTitleText.alpha = FlxMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
 				#else
 				titleText.color = FlxColor.interpolate(titleTextColors[0], titleTextColors[1], timer);
 				titleText.alpha = FlxMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
@@ -367,10 +360,10 @@ class TitleState extends MusicBeatState
 			if(pressedEnter)
 			{
 				#if mobile
-				titleTextMobile.color = FlxColor.WHITE;
-				titleTextMobile.alpha = 1;
+				altTitleText.color = FlxColor.WHITE;
+				altTitleText.alpha = 1;
 				
-				if(titleTextMobile != null) titleTextMobile.animation.play('press');
+				if(altTitleText != null) altTitleText.animation.play('press');
 				#else
 				titleText.color = FlxColor.WHITE;
 				titleText.alpha = 1;

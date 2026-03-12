@@ -22,6 +22,7 @@
 
 package mobile.options;
 
+import mobile.backend.MobileScaleMode;
 import flixel.input.keyboard.FlxKey;
 import options.BaseOptionsMenu;
 import options.Option;
@@ -69,7 +70,7 @@ class MobileSettingsSubState extends BaseOptionsMenu
 		option = new Option('Wide Screen Mode',
 			'If checked, it will extend your screen to widescreen and the controls will automatically adjust.',
 			'wideScreen', BOOL);
-		option.onChange = () -> FlxG.scaleMode = new flixel.system.scaleModes.MobileScaleMode();
+		option.onChange = () -> FlxG.scaleMode = new MobileScaleMode();
 		addOption(option);
 		#end
 

@@ -20,13 +20,12 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-package flixel.system.scaleModes;
+package mobile.backend;
 
-import flixel.FlxG;
-import flixel.math.FlxPoint;
+import flixel.system.scaleModes.BaseScaleMode;
 
 /**
- * Mobile-optimized scale mode
+ * ...
  * @author: Karim Akra
  */
 class MobileScaleMode extends BaseScaleMode
@@ -39,94 +38,43 @@ class MobileScaleMode extends BaseScaleMode
 	static var screenWidth:Float = 0;
 	static var screenHeight:Float = 0;
 
-	public static inline function getSafeWidth():Int
-	{
-		return BASE_GAME_WIDTH;
-	}
-
-	public static inline function getSafeHeight():Int
-	{
-		return BASE_GAME_HEIGHT;
-	}
-
-	public static function getHorizontalOffset():Float
-	{
-		if (!ClientPrefs.data.wideScreen || !allowWideScreen)
-			return 0;
-		
-		var screenRatio:Float = screenWidth / screenHeight;
-		var baseRatio:Float = BASE_GAME_WIDTH / BASE_GAME_HEIGHT;
-		
-		if (screenRatio <= baseRatio)
-		{
-			return 0;
-		}
-
-		return Math.max(0, (FlxG.width - BASE_GAME_WIDTH) / 2);
-	}
-	
 	public static function getVerticalOffset():Float
 	{
 		if (!ClientPrefs.data.wideScreen || !allowWideScreen)
 			return 0;
 		
+		if (screenWidth == 0 || screenHeight == 0)
+			return 0;
+
 		var screenRatio:Float = screenWidth / screenHeight;
-		var baseRatio:Float = BASE_GAME_WIDTH / BASE_GAME_HEIGHT;
+		var targetRatio:Float = BASE_GAME_WIDTH / BASE_GAME_HEIGHT;
 		
-		if (screenRatio >= baseRatio)
+		if (screenRatio >= targetRatio)
 		{
 			return 0;
 		}
 
-		return Math.max(0, (FlxG.height - BASE_GAME_HEIGHT) / 2);
+		var scaledHeight:Float = FlxG.height;
+		var baseHeightAtCurrentScale:Float = (screenWidth / FlxG.width) * BASE_GAME_HEIGHT;
+		var extraHeight:Float = scaledHeight - baseHeightAtCurrentScale;
+		
+		return Math.max(0, extraHeight / 2);
 	}
 
-	public static inline function isWideActive():Bool
-	{
-		return ClientPrefs.data.wideScreen && allowWideScreen;
-	}
-
-	public static inline function getScreenWidth():Int
-	{
-		return FlxG.width;
-	}
-
-	public static inline function getScreenHeight():Int
-	{
-		return FlxG.height;
-	}
-
-	override function onMeasure(Width:Int, Height:Int):Void
+	override function updateGameSize(Width:Int, Height:Int):Void
 	{
 		screenWidth = Width;
 		screenHeight = Height;
 		
 		if (ClientPrefs.data.wideScreen && allowWideScreen)
 		{
-			var screenRatio:Float = Width / Height;
-			var baseRatio:Float = BASE_GAME_WIDTH / BASE_GAME_HEIGHT;
-			
-			if (screenRatio < baseRatio)
-			{
-				FlxG.width = BASE_GAME_WIDTH;
-				FlxG.height = Math.ceil(BASE_GAME_WIDTH / screenRatio);
-			}
-			else
-			{
-				FlxG.height = BASE_GAME_HEIGHT;
-				FlxG.width = Math.ceil(BASE_GAME_HEIGHT * screenRatio);
-			}
-
-			gameSize.x = Width;
-			gameSize.y = Height;
+			super.updateGameSize(Width, Height);
 		}
 		else
 		{
-			FlxG.width = BASE_GAME_WIDTH;
-			FlxG.height = BASE_GAME_HEIGHT;
-			
-			var ratio:Float = BASE_GAME_WIDTH / BASE_GAME_HEIGHT;
+			var ratio:Float = FlxG.width / FlxG.height;
 			var realRatio:Float = Width / Height;
+
 			var scaleY:Bool = realRatio < ratio;
 
 			if (scaleY)
@@ -140,10 +88,11 @@ class MobileScaleMode extends BaseScaleMode
 				gameSize.x = Math.floor(gameSize.y * ratio);
 			}
 		}
-		
-		updateDeviceSize(Width, Height);
-		updateScaleOffset();
-		updateGamePosition();
+	}
+
+	override function updateGamePosition():Void
+	{
+		super.updateGamePosition();
 	}
 
 	@:noCompletion
