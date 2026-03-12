@@ -15,10 +15,6 @@ class PsychUIDropDownMenu extends PsychUIInputText
 
 	var _curFilter:Array<String>;
 	var _itemWidth:Float = 0;
-
-	var _scrollOffset:Int = 0;
-	var _isDropdownOpen:Bool = false;
-	
 	public function new(x:Float, y:Float, list:Array<String>, callback:Int->String->Void, ?width:Float = 100)
 	{
 		super(x, y);
@@ -88,12 +84,10 @@ class PsychUIDropDownMenu extends PsychUIInputText
 
 	var _items:Array<PsychUIDropDownItem> = [];
 	public var curScroll:Int = 0;
-	
 	override function update(elapsed:Float)
 	{
 		var lastFocus = PsychUIInputText.focusOn;
 		super.update(elapsed);
-		
 		if(FlxG.mouse.justPressed)
 		{
 			if(FlxG.mouse.overlaps(button, camera))
@@ -105,40 +99,57 @@ class PsychUIDropDownMenu extends PsychUIInputText
 					PsychUIInputText.focusOn = null;
 			}
 		}
-		else if(FlxG.mouse.released && button.animation.curAnim != null && button.animation.curAnim.name != 'normal') 
-			button.animation.play('normal', true);
+		else if(FlxG.mouse.released && button.animation.curAnim != null && button.animation.curAnim.name != 'normal') button.animation.play('normal', true);
 
 		if(lastFocus != PsychUIInputText.focusOn)
 		{
 			showDropDown(PsychUIInputText.focusOn == this);
 		}
-		else if(PsychUIInputText.focusOn == this && _isDropdownOpen)
+		else if(PsychUIInputText.focusOn == this)
 		{
-			handleScrolling();
-		}
-	}
-
-	function handleScrolling()
-	{
-		var wheel:Int = 0;
-
-		if(FlxG.mouse.wheel != 0)
-			wheel = -Std.int(FlxG.mouse.wheel);
-
-		if(FlxG.keys.justPressed.UP) wheel = -1;
-		if(FlxG.keys.justPressed.DOWN) wheel = 1;
-		
-		if(wheel != 0)
-		{
-			var displayList = (_curFilter != null) ? _curFilter : list;
-			var newScroll = curScroll + wheel;
-			newScroll = Std.int(Math.max(0, Math.min(displayList.length - 1, newScroll)));
-			
-			if(newScroll != curScroll)
+			var wheel:Int = FlxG.mouse.wheel;
+			if(FlxG.keys.justPressed.UP) wheel++;
+			if(FlxG.keys.justPressed.DOWN) wheel--;
+			/*#if FLX_TOUCH
+			for (touch in FlxG.touches.list)
 			{
-				curScroll = newScroll;
-				updateDropdownPosition(displayList);
+				var moveY:Int = 0;
+				var addition:Int = 0;
+				var curY:Int = 0;
+				var prevY:Int = 0;
+
+				if (touch.pressed)
+				{
+					curY = touch.y;
+
+					// these might need to be swaped idk i can't test
+					if (curY > prevY)
+						addition++;
+					else
+						addition--;
+
+					// change the option every 10 pixels you move
+					if (addition >= 10 || addition <= 10)
+					{
+						// these here might also need to be swapped
+						if (addition >= 10)
+							moveY++
+						else
+							moveY--;
+
+						addition = 0;
+					}
+
+					prevY = curY;
+				}
+
+				wheel += moveY;
+
+				if (touch.justReleased)
+					moveY = addition = curY = prevY = 0;
 			}
+			#end*/
+			if(wheel != 0) showDropDown(true, curScroll - wheel, _curFilter);
 		}
 	}
 
@@ -154,46 +165,54 @@ class PsychUIDropDownMenu extends PsychUIInputText
 
 	public function showDropDown(vis:Bool = true, scroll:Int = 0, onlyAllowed:Array<String> = null)
 	{
-		_isDropdownOpen = vis;
-		
 		if(!vis)
 		{
 			text = selectedLabel;
 			_curFilter = null;
-			_scrollOffset = 0;
+		}
 
+		curScroll = Std.int(Math.max(0, Math.min(onlyAllowed != null ? (onlyAllowed.length - 1) : (list.length - 1), scroll)));
+		if(vis)
+		{
+			var n:Int = 0;
+			for (item in _items)
+			{
+				if(onlyAllowed != null)
+				{
+					if(onlyAllowed.contains(item.label))
+					{
+						item.active = item.visible = (n >= curScroll);
+						n++;
+					}
+					else item.active = item.visible = false;
+				}
+				else
+				{
+					item.active = item.visible = (n >= curScroll);
+					n++;
+				}
+			}
+
+			var txtY:Float = behindText.y + behindText.height + 1;
+			for (num => item in _items)
+			{
+				if(!item.visible) continue;
+				item.x = behindText.x;
+				item.y = txtY;
+				txtY += item.height;
+				item.forceNextUpdate = true;
+			}
+			bg.scale.y = txtY - behindText.y + 2;
+			bg.updateHitbox();
+		}
+		else
+		{
 			for (item in _items)
 				item.active = item.visible = false;
 
 			bg.scale.y = 20;
 			bg.updateHitbox();
-			return;
 		}
-
-		var displayList = (onlyAllowed != null) ? onlyAllowed : list;
-		curScroll = Std.int(Math.max(0, Math.min(displayList.length - 1, scroll)));
-		
-		updateDropdownPosition(displayList);
-	}
-
-	function updateDropdownPosition(displayList:Array<String>)
-	{
-		var startY:Float = behindText.y + behindText.height + 1;
-
-		for (i in 0...displayList.length)
-		{
-			var item = _items[i];
-			if(item == null) continue;
-
-			item.visible = true;
-			item.active = true;
-			item.x = behindText.x;
-			item.y = startY + ((i - curScroll) * item.height);
-			item.forceNextUpdate = true;
-		}
-
-		bg.scale.y = 20 + (displayList.length * 20);
-		bg.updateHitbox();
 	}
 
 	public var broadcastDropDownEvent:Bool = true;

@@ -4,6 +4,8 @@ import objects.Note;
 import objects.NoteSplash;
 import objects.StrumNote;
 
+import flixel.addons.ui.FlxUIDropDownMenu;
+
 import openfl.net.FileFilter;
 import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
 import flixel.input.keyboard.FlxKey;
@@ -124,7 +126,7 @@ class NoteSplashEditorState extends MusicBeatState
         super.create();
     }
 
-    var animDropDown:PsychUIDropDownMenu;
+    var animDropDown:FlxUIDropDownMenu;
     var curAnim:String;
     var addButton:PsychUIButton;
     var curAnimText = null;
@@ -160,7 +162,7 @@ class NoteSplashEditorState extends MusicBeatState
         var maxFps:PsychUINumericStepper = new PsychUINumericStepper(150, 127.5, 1, 26, 1, 120);
         UI.add(maxFps);
 
-        animDropDown = new PsychUIDropDownMenu(-155, 57, [""], function(id:Int, name:String)
+        animDropDown = new FlxUIDropDownMenu(-155, 57, [""], function(id:Int, name:String)
         {
             if (config != null && name.length > 0)
             {
@@ -396,7 +398,7 @@ class NoteSplashEditorState extends MusicBeatState
     var redShader:Array<Int> = [0, 0, 0];
     var greenShader:Array<Int> = [0, 0, 0];
     var blueShader:Array<Int> = [0, 0, 0];
-    var changeShader:PsychUIDropDownMenu;
+    var changeShader:FlxUIDropDownMenu;
     var defaultButton:PsychUICheckBox;
     function addShadersTab()
     {
@@ -462,7 +464,7 @@ class NoteSplashEditorState extends MusicBeatState
         }
 
         add(new FlxText(shaderUI.x + 20, shaderUI.y + 135, 0, "Color to Replace:"));
-        changeShader = new PsychUIDropDownMenu(shaderUI.x + 20, shaderUI.y + 150, ["Red", "Green", "Blue"], function(id:Int, name:String)
+        changeShader = new FlxUIDropDownMenu(shaderUI.x + 20, shaderUI.y + 150, ["Red", "Green", "Blue"], function(id:Int, name:String)
         {
             var shader = switch (name)
             {

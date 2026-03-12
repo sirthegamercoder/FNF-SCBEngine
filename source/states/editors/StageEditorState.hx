@@ -11,6 +11,8 @@ import flixel.addons.display.FlxGridOverlay;
 import flixel.math.FlxRect;
 import flixel.util.FlxDestroyUtil;
 
+import flixel.addons.ui.FlxUIDropDownMenu;
+
 import openfl.utils.Assets;
 
 import openfl.display.Sprite;
@@ -605,7 +607,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		addStageTab();
 	}
 
-	var directoryDropDown:PsychUIDropDownMenu;
+	var directoryDropDown:FlxUIDropDownMenu;
 	var uiInputText:PsychUIInputText;
 	var hideGirlfriendCheckbox:PsychUICheckBox;
 	var zoomStepper:PsychUINumericStepper;
@@ -637,7 +639,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		});
 		tab_group.add(saveButton);
 
-		directoryDropDown = new PsychUIDropDownMenu(objX, objY, folderList, function(sel:Int, selected:String) {
+		directoryDropDown = new FlxUIDropDownMenu(objX, objY, folderList, function(sel:Int, selected:String) {
 			stageJson.directory = selected;
 			saveObjectsToJson();
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
@@ -997,9 +999,9 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		tab_group.add(highQualityCheckbox);
 	}
 
-	var oppDropdown:PsychUIDropDownMenu;
-	var gfDropdown:PsychUIDropDownMenu;
-	var plDropdown:PsychUIDropDownMenu;
+	var oppDropdown:FlxUIDropDownMenu;
+	var gfDropdown:FlxUIDropDownMenu;
+	var plDropdown:FlxUIDropDownMenu;
 	function addMetaTab()
 	{
 		var tab_group = UI_box.getTab('Meta').menu;
@@ -1068,7 +1070,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		}
 
 		objY += 60;
-		oppDropdown = new PsychUIDropDownMenu(objX, objY, characterList, function(sel:Int, selected:String)
+		oppDropdown = new FlxUIDropDownMenu(objX, objY, characterList, function(sel:Int, selected:String)
 		{
 			if(selected == null || selected.length < 1) return;
 			dad.changeCharacter(selected);
@@ -1078,7 +1080,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		oppDropdown.selectedLabel = dad.curCharacter;
 
 		objY += 60;
-		gfDropdown = new PsychUIDropDownMenu(objX, objY, characterList, function(sel:Int, selected:String)
+		gfDropdown = new FlxUIDropDownMenu(objX, objY, characterList, function(sel:Int, selected:String)
 		{
 			if(selected == null || selected.length < 1) return;
 			gf.changeCharacter(selected);
@@ -1088,7 +1090,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		gfDropdown.selectedLabel = gf.curCharacter;
 
 		objY += 60;
-		plDropdown = new PsychUIDropDownMenu(objX, objY, characterList, function(sel:Int, selected:String)
+		plDropdown = new FlxUIDropDownMenu(objX, objY, characterList, function(sel:Int, selected:String)
 		{
 			if(selected == null || selected.length < 1) return;
 			boyfriend.changeCharacter(selected);
@@ -1106,7 +1108,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		tab_group.add(oppDropdown);
 	}
 
-	var stageDropDown:PsychUIDropDownMenu;
+	var stageDropDown:FlxUIDropDownMenu;
 	function addStageTab()
 	{
 		var tab_group = UI_stagebox.getTab('Stage').menu;
@@ -1137,7 +1139,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		dummyStage.normalStyle.bgColor = FlxColor.RED;
 		dummyStage.normalStyle.textColor = FlxColor.WHITE;
 
-		stageDropDown = new PsychUIDropDownMenu(10, 30, [''], function(sel:Int, selected:String)
+		stageDropDown = new FlxUIDropDownMenu(10, 30, [''], function(sel:Int, selected:String)
 		{
 			var characterPath:String = 'stages/$selected.json';
 			var path:String = Paths.getPath(characterPath, TEXT, null, true);
@@ -2099,7 +2101,7 @@ class StageEditorAnimationSubstate extends MusicBeatSubstate {
 		addTouchPadCamera();
 	}
 
-	var animationDropDown:PsychUIDropDownMenu;
+	var animationDropDown:FlxUIDropDownMenu;
 	var animationInputText:PsychUIInputText;
 	var animationNameInputText:PsychUIInputText;
 	var animationIndicesInputText:PsychUIInputText;
@@ -2116,7 +2118,7 @@ class StageEditorAnimationSubstate extends MusicBeatSubstate {
 		animationFramerate = new PsychUINumericStepper(animationInputText.x + 170, animationInputText.y, 1, 24, 0, 240, 0);
 		animationLoopCheckBox = new PsychUICheckBox(animationNameInputText.x + 170, animationNameInputText.y - 1, 'Should it Loop?', 100);
 
-		animationDropDown = new PsychUIDropDownMenu(15, animationInputText.y - 55, [''], function(selectedAnimation:Int, pressed:String) {
+		animationDropDown = new FlxUIDropDownMenu(15, animationInputText.y - 55, [''], function(selectedAnimation:Int, pressed:String) {
 			var anim:AnimArray = target.animations[selectedAnimation];
 			if(anim == null) return;
 
