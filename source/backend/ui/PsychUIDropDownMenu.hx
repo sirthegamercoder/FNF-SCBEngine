@@ -124,20 +124,20 @@ class PsychUIDropDownMenu extends PsychUIInputText
 
 		if(FlxG.mouse.wheel != 0)
 			wheel = -Std.int(FlxG.mouse.wheel);
-		
-		// Arrow key scrolling
+
 		if(FlxG.keys.justPressed.UP) wheel = -1;
 		if(FlxG.keys.justPressed.DOWN) wheel = 1;
 		
 		if(wheel != 0)
 		{
+			var displayList = (_curFilter != null) ? _curFilter : list;
 			var newScroll = curScroll + wheel;
-			newScroll = Std.int(Math.max(0, Math.min(listToUse.length - 1, newScroll)));
+			newScroll = Std.int(Math.max(0, Math.min(displayList.length - 1, newScroll)));
 			
 			if(newScroll != curScroll)
 			{
 				curScroll = newScroll;
-				updateDropdownPosition(listToUse);
+				updateDropdownPosition(displayList);
 			}
 		}
 	}
