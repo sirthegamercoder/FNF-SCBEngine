@@ -132,9 +132,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.1.7
 
-      - uses: krdlab/setup-haxe@v1.3.0
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.4
       
@@ -152,7 +152,7 @@ jobs:
         run: haxelib run lime build windows --app-version="${{ env.APP_VERSION }}" -D officialBuild
       
       - name: Publish Artifact
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.3.4
         with:
           name: windowsBuild
           path: export/release/windows/bin
@@ -163,9 +163,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.1.7
 
-      - uses: krdlab/setup-haxe@v1.3.0
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.4
       
@@ -182,7 +182,7 @@ jobs:
         run: haxelib run lime build mac --app-version="${{ env.APP_VERSION }}" -D officialBuild
       
       - name: Publish Artifact
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.3.4
         with:
           name: macBuild
           path: export/release/macos/bin
@@ -193,9 +193,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.1.7
 
-      - uses: krdlab/setup-haxe@v1.3.0
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.4
       
@@ -217,7 +217,7 @@ jobs:
         run: haxelib run lime build linux --app-version="${{ env.APP_VERSION }}" -D officialBuild
       
       - name: Publish Artifact
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.3.4
         with:
           name: linuxBuild
           path: export/release/linux/bin
@@ -228,20 +228,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.1.7
 
-      - uses: krdlab/setup-haxe@v1.3.0
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.4
       
       - name: Setup Java JDK 17
-        uses: actions/setup-java@v4.7.0
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
       
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3.2.2
+        uses: android-actions/setup-android@v3
       
       - name: Install Android SDK 35 and NDK r27d
         run: |
@@ -282,7 +282,7 @@ jobs:
           haxelib run lime build android --app-version="${{ env.APP_VERSION }}" -D officialBuild -D HXCPP_IGNORE_WARNINGS
       
       - name: Publish Artifact
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.3.4
         with:
           name: androidBuild
           path: export/release/android/bin/app/build/outputs/apk/release/*.apk
@@ -293,9 +293,9 @@ jobs:
     runs-on: macos-15
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.1.7
 
-      - uses: krdlab/setup-haxe@v1.3.0
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.4
       
@@ -320,7 +320,7 @@ jobs:
           rm -rf Payload
       
       - name: Publish Artifact
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.3.4
         with:
           name: iOSBuild
           path: export/release/ios/build/Release-iphoneos/*.ipa
