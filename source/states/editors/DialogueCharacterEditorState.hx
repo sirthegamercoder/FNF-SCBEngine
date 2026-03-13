@@ -7,8 +7,6 @@ import flash.net.FileFilter;
 import haxe.Json;
 import lime.system.Clipboard;
 
-import flixel.addons.ui.FlxUIDropDownMenu;
-
 import objects.TypedAlphabet;
 
 import cutscenes.DialogueBoxPsych;
@@ -203,14 +201,14 @@ class DialogueCharacterEditorState extends MusicBeatState implements PsychUIEven
 
 	var curSelectedAnim:String;
 	var animationArray:Array<String> = [];
-	var animationDropDown:FlxUIDropDownMenu;
+	var animationDropDown:PsychUIDropDownMenu;
 	var animationInputText:PsychUIInputText;
 	var loopInputText:PsychUIInputText;
 	var idleInputText:PsychUIInputText;
 	function addAnimationsUI() {
 		var tab_group = UI_mainbox.getTab('Animations').menu;
 
-		animationDropDown = new FlxUIDropDownMenu(10, 30, [''], function(id:Int, animation:String) {
+		animationDropDown = new PsychUIDropDownMenu(10, 30, [''], function(id:Int, animation:String) {
 			if(character.dialogueAnimations.exists(animation)) {
 				ghostLoop.playAnim(animation);
 				ghostIdle.playAnim(animation, true);
