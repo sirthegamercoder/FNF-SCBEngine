@@ -271,8 +271,8 @@ class PsychUIInputText extends FlxSpriteGroup
 				else
 				{
 					var lastText = text;
-					text = text.substring(0, caretIndex-1) + text.substring(caretIndex);
 					caretIndex--;
+					text = text.substring(0, caretIndex) + text.substring(caretIndex + 1);
 					if(onChange != null) onChange(lastText, text);
 					if(broadcastInputTextEvent) PsychUIEventHandler.event(CHANGE_EVENT, this);
 				}
@@ -474,6 +474,11 @@ class PsychUIInputText extends FlxSpriteGroup
 	public function updateCaret()
 	{
 		if(textObj == null || !textObj.exists) return;
+		var len:Int = (text != null) ? text.length : 0;
+		if(caretIndex < 0) caretIndex = 0;
+		if(caretIndex > len) caretIndex = len;
+		if(selectIndex < -1) selectIndex = -1;
+		if(selectIndex > len) selectIndex = len;
 
 		var textField = textObj.textField;
 		textField.setSelection(caretIndex, caretIndex);
