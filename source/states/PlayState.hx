@@ -1118,7 +1118,7 @@ class PlayState extends MusicBeatState
 								{
 									if (countdownGo != null)
 									{
-										countdownGo.angle = 90;
+										countdownGo.angle = 0;
 
 										FlxTween.tween(countdownGo, {alpha: 0}, 0.2 / playbackRate, {
 											startDelay: 0.1 / playbackRate,
@@ -2815,13 +2815,6 @@ class PlayState extends MusicBeatState
 			rating.screenCenter();
 			rating.x = placement - 40;
 			rating.y -= 60;
-
-			rating.scale.set(0.1, 0.1);
-
-			FlxTween.tween(rating.scale, {x: 1, y: 1}, 0.15 / playbackRate, {
-				ease: FlxEase.elasticOut,
-				startDelay: 0
-			});
 			
 			rating.acceleration.y = 550 * playbackRate * playbackRate;
 			rating.velocity.y -= FlxG.random.int(140, 175) * playbackRate;
@@ -2846,13 +2839,6 @@ class PlayState extends MusicBeatState
 				if (combo >= 100)
 					comboSpr.color = 0xFFFFD700;
 			}
-
-			comboSpr.scale.set(0.1, 0.1);
-
-			FlxTween.tween(comboSpr.scale, {x: 1, y: 1}, 0.15 / playbackRate, {
-				ease: FlxEase.elasticOut,
-				startDelay: 0
-			});
 			
 			comboSpr.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
 			comboSpr.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
@@ -2908,13 +2894,6 @@ class PlayState extends MusicBeatState
 				else
 					numScore.setGraphicSize(Std.int(numScore.width * daPixelZoom));
 				numScore.updateHitbox();
-
-				numScore.scale.set(0.1, 0.1);
-
-				FlxTween.tween(numScore.scale, {x: 1, y: 1}, 0.15 / playbackRate, {
-					ease: FlxEase.elasticOut,
-					startDelay: i * 0.02 / playbackRate
-				});
 
 				numScore.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
 				numScore.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
