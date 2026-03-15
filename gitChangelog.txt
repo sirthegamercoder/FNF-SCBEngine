@@ -1,0 +1,2 @@
+- Countdown intros and combo rating pop-up now having a smooth movement
+- Dropdown menu now can scroll on Mobile

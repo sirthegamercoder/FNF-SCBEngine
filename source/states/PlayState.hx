@@ -1065,14 +1065,77 @@ class PlayState extends MusicBeatState
 						tick = THREE;
 					case 1:
 						countdownReady = createCountdownSprite(introAlts[0], antialias);
+						if (countdownReady != null)
+						{
+							countdownReady.x = -countdownReady.width;
+							countdownReady.y = FlxG.height / 2 - countdownReady.height / 2;
+							FlxTween.tween(countdownReady, {x: FlxG.width + countdownReady.width}, Conductor.crochet / 1000 / playbackRate, {
+								ease: FlxEase.linear,
+								onComplete: function(twn:FlxTween)
+								{
+									if (countdownReady != null)
+									{
+										remove(countdownReady);
+										countdownReady.destroy();
+										countdownReady = null;
+									}
+								}
+							});
+						}
 						FlxG.sound.play(Paths.sound('intro2' + introSoundsSuffix), 0.6);
 						tick = TWO;
 					case 2:
 						countdownSet = createCountdownSprite(introAlts[1], antialias);
+						if (countdownSet != null)
+						{
+							countdownSet.screenCenter(X);
+							countdownSet.y = -countdownSet.height;
+							FlxTween.tween(countdownSet, {y: FlxG.height / 2 - countdownSet.height / 2}, Conductor.crochet / 1000 / playbackRate, {
+								ease: FlxEase.bounceOut,
+								onComplete: function(twn:FlxTween)
+								{
+									if (countdownSet != null)
+									{
+										remove(countdownSet);
+										countdownSet.destroy();
+										countdownSet = null;
+									}
+								}
+							});
+						}
 						FlxG.sound.play(Paths.sound('intro1' + introSoundsSuffix), 0.6);
 						tick = ONE;
 					case 3:
 						countdownGo = createCountdownSprite(introAlts[2], antialias);
+						if (countdownGo != null)
+						{
+							countdownGo.screenCenter();
+							countdownGo.angle = 0;
+
+							FlxTween.tween(countdownGo, {angle: 360}, Conductor.crochet / 1000 / playbackRate, {
+								ease: FlxEase.quadOut,
+								onComplete: function(twn:FlxTween)
+								{
+									if (countdownGo != null)
+									{
+										countdownGo.angle = 90;
+
+										FlxTween.tween(countdownGo, {alpha: 0}, 0.2 / playbackRate, {
+											startDelay: 0.1 / playbackRate,
+											onComplete: function(twn:FlxTween)
+											{
+												if (countdownGo != null)
+												{
+													remove(countdownGo);
+													countdownGo.destroy();
+													countdownGo = null;
+												}
+											}
+										});
+									}
+								}
+							});
+						}
 						FlxG.sound.play(Paths.sound('introGo' + introSoundsSuffix), 0.6);
 						tick = GO;
 					case 4:
@@ -1115,14 +1178,6 @@ class PlayState extends MusicBeatState
 		spr.screenCenter();
 		spr.antialiasing = antialias;
 		insert(members.indexOf(noteGroup), spr);
-		FlxTween.tween(spr, {/*y: spr.y + 100,*/ alpha: 0}, Conductor.crochet / 1000, {
-			ease: FlxEase.cubeInOut,
-			onComplete: function(twn:FlxTween)
-			{
-				remove(spr);
-				spr.destroy();
-			}
-		});
 		return spr;
 	}
 
@@ -2760,6 +2815,14 @@ class PlayState extends MusicBeatState
 			rating.screenCenter();
 			rating.x = placement - 40;
 			rating.y -= 60;
+
+			rating.scale.set(0.1, 0.1);
+
+			FlxTween.tween(rating.scale, {x: 1, y: 1}, 0.15 / playbackRate, {
+				ease: FlxEase.elasticOut,
+				startDelay: 0
+			});
+			
 			rating.acceleration.y = 550 * playbackRate * playbackRate;
 			rating.velocity.y -= FlxG.random.int(140, 175) * playbackRate;
 			rating.velocity.x -= FlxG.random.int(0, 10) * playbackRate;
@@ -2771,6 +2834,26 @@ class PlayState extends MusicBeatState
 			var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(uiFolder + 'combo' + uiPostfix));
 			comboSpr.screenCenter();
 			comboSpr.x = placement;
+
+			if (ClientPrefs.data.comboColoring)
+			{
+				if (combo >= 10)
+					comboSpr.color = 0xFF00FF00;
+				if (combo >= 25)
+					comboSpr.color = 0xFFFF4500;
+				if (combo >= 50)
+					comboSpr.color = 0xFFFFA500;
+				if (combo >= 100)
+					comboSpr.color = 0xFFFFD700;
+			}
+
+			comboSpr.scale.set(0.1, 0.1);
+
+			FlxTween.tween(comboSpr.scale, {x: 1, y: 1}, 0.15 / playbackRate, {
+				ease: FlxEase.elasticOut,
+				startDelay: 0
+			});
+			
 			comboSpr.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
 			comboSpr.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
 			comboSpr.visible = (!ClientPrefs.data.hideHud && showCombo);
@@ -2808,11 +2891,30 @@ class PlayState extends MusicBeatState
 				numScore.x = placement + (43 * daLoop) - 90 + ClientPrefs.data.comboOffset[2];
 				numScore.y += 80 - ClientPrefs.data.comboOffset[3];
 
+				if (ClientPrefs.data.comboColoring)
+				{
+					if (combo >= 100)
+						numScore.color = 0xFFFFD700;
+					else if (combo >= 50)
+						numScore.color = 0xFFFFA500;
+					else if (combo >= 25)
+						numScore.color = 0xFFFF4500;
+					else if (combo >= 10)
+						numScore.color = 0xFF00FF00;
+				}
+
 				if (!PlayState.isPixelStage)
 					numScore.setGraphicSize(Std.int(numScore.width * 0.5));
 				else
 					numScore.setGraphicSize(Std.int(numScore.width * daPixelZoom));
 				numScore.updateHitbox();
+
+				numScore.scale.set(0.1, 0.1);
+
+				FlxTween.tween(numScore.scale, {x: 1, y: 1}, 0.15 / playbackRate, {
+					ease: FlxEase.elasticOut,
+					startDelay: i * 0.02 / playbackRate
+				});
 
 				numScore.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
 				numScore.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
@@ -2824,12 +2926,14 @@ class PlayState extends MusicBeatState
 				if (showComboNum)
 					comboGroup.add(numScore);
 
-				FlxTween.tween(numScore, {alpha: 0}, 0.2 / playbackRate, {
+				var targetX:Float = FlxG.width + numScore.width;
+				FlxTween.tween(numScore, {x: targetX}, 0.2 / playbackRate, {
+					startDelay: 0.3 / playbackRate,
+					ease: FlxEase.circIn,
 					onComplete: function(tween:FlxTween)
 					{
 						numScore.destroy();
-					},
-					startDelay: Conductor.crochet * 0.002 / playbackRate
+					}
 				});
 
 				daLoop++;
@@ -2837,17 +2941,20 @@ class PlayState extends MusicBeatState
 					xThing = numScore.x;
 			}
 			comboSpr.x = xThing + 50;
-			FlxTween.tween(rating, {alpha: 0}, 0.2 / playbackRate, {
-				startDelay: Conductor.crochet * 0.001 / playbackRate
-			});
 
-			FlxTween.tween(comboSpr, {alpha: 0}, 0.2 / playbackRate, {
+			FlxTween.tween(rating, {x: FlxG.width + rating.width}, 0.2 / playbackRate, {
+				startDelay: 0.3 / playbackRate,
+				ease: FlxEase.circIn
+			});
+			
+			FlxTween.tween(comboSpr, {x: FlxG.width + comboSpr.width}, 0.2 / playbackRate, {
+				startDelay: 0.3 / playbackRate,
+				ease: FlxEase.circIn,
 				onComplete: function(tween:FlxTween)
 				{
 					comboSpr.destroy();
 					rating.destroy();
-				},
-				startDelay: Conductor.crochet * 0.002 / playbackRate
+				}
 			});
 		}
 	}

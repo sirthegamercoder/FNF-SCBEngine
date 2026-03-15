@@ -54,6 +54,7 @@ import states.TitleState;
 		[0xFFFF884E, 0xFFFFFAF5, 0xFF6C0000]];
 
 	public var ghostTapping:Bool = true;
+	public var comboColoring:Bool = true;
 	public var timeBarType:String = 'Time Elapsed';
 	public var scoreZoom:Bool = true;
 	public var noReset:Bool = false;

@@ -59,6 +59,12 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			BOOL);
 		addOption(option);
 
+		var option:Option = new Option('Colorful Combo',
+		    "If unchecked, the combo popups will not change color based on how many the number of combos",
+			'comboColoring',
+			BOOL);
+		addOption(option);
+
 		var option:Option = new Option('Disable Reset Button',
 			"If checked, pressing Reset won't do anything.",
 			'noReset',
