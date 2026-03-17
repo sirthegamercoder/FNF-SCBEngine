@@ -14,14 +14,20 @@ class UpdateManager
 	public static var releaseURL:String = "https://github.com/sirthegamercoder/FNF-SCBEngine/releases";
 	private static var baseDownloadURL:String = "https://github.com/sirthegamercoder/FNF-SCBEngine/releases/download";
 	private static var downloadFilenames:Map<String, String> = [
-		"windows" => "SCBEngine-Windows.zip",
-		"linux" => "SCBEngine-Linux.zip",
-		"mac" => "SCBEngine-macOS.zip",
+		"windows" => getArchiveFilename("SCBEngine-Windows"),
+		"linux" => getArchiveFilename("SCBEngine-Linux"),
+		"mac" => getArchiveFilename("SCBEngine-macOS"),
 		"android" => "SCBEngine-Android.apk",
 		"ios" => "SCBEngine-iOS.ipa"
 	];
 
 	private static var updateCheckCallback:Void->Void = null;
+
+	private static function getArchiveFilename(baseName:String):String
+	{
+		var archiveType:String = ClientPrefs.data.archiveCompressionType;
+		return baseName + "." + archiveType;
+	}
 
 	public static function checkForUpdates(?customURL:String, ?onComplete:Void->Void):String
 	{
@@ -177,8 +183,6 @@ class UpdateManager
 		return "android";
 		#elseif ios
 		return "ios";
-		#else
-		return "unknown";
 		#end
 	}
 
@@ -194,8 +198,6 @@ class UpdateManager
 		return "Android";
 		#elseif ios
 		return "iOS";
-		#else
-		return "Unknown Platform";
 		#end
 	}
 

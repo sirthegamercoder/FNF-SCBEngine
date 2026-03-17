@@ -95,6 +95,7 @@ import states.TitleState;
 	public var guitarHeroSustains:Bool = false;
 	public var iconBounceType:String = 'Default';
 	public var discordRPC:Bool = true;
+	public var archiveCompressionType:String = 'zip';
 	public var loadingScreen:Bool = true;
 	public var language:String = 'en-US';
 }
