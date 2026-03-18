@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<config:android>
+		<application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" />
+	</config:android>
+	
+	<template path="JNIExtension.kt" rename="app/src/main/java/com/sirthegamercoder/plusengine/JNIExtension.kt" />
+	<template path="NativeUI.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/NativeUI.kt" />
+	<template path="NativeCrashHandler.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/NativeCrashHandler.kt" />
+	<template path="NativeCrashActivity.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/NativeCrashActivity.kt" />
+	<template path="DropDown.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/DropDown.kt" />
+</project>

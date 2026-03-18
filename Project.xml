@@ -197,11 +197,8 @@
 	<icon path="art/icons/iconOG.png" unless="android || ios" />
 
 	<section if="android">
-		<config:android>
-			<application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" />
-		</config:android>
-
-		<assets path="art/icons/mobile/android/res" rename="app/src/main/res" type="template" />
+		<assets path="art/icons/android/res" rename="app/src/main/res" type="template" />
+		<include path="source/kotlin/Android.xml" />
 	</section>
 
 	<section if="ios">
