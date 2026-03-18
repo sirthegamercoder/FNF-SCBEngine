@@ -84,11 +84,6 @@ class PsychUIDropDownMenu extends PsychUIInputText
 
 	var _items:Array<PsychUIDropDownItem> = [];
 	public var curScroll:Int = 0;
-	#if mobile
-	var _touchScrollAccum:Float = 0;
-	var _prevMouseY:Float = 0;
-	var _touchDragDist:Float = 0;
-	#end
 	override function update(elapsed:Float)
 	{
 		var lastFocus = PsychUIInputText.focusOn;
@@ -115,39 +110,52 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			var wheel:Int = FlxG.mouse.wheel;
 			if(FlxG.keys.justPressed.UP) wheel++;
 			if(FlxG.keys.justPressed.DOWN) wheel--;
-			#if mobile
-			if (FlxG.mouse.justPressed)
+			/*#if FLX_TOUCH
+			for (touch in FlxG.touches.list)
 			{
-				_prevMouseY = FlxG.mouse.y;
-				_touchScrollAccum = 0;
-				_touchDragDist = 0;
+				var moveY:Int = 0;
+				var addition:Int = 0;
+				var curY:Int = 0;
+				var prevY:Int = 0;
+
+				if (touch.pressed)
+				{
+					curY = touch.y;
+
+					// these might need to be swaped idk i can't test
+					if (curY > prevY)
+						addition++;
+					else
+						addition--;
+
+					// change the option every 10 pixels you move
+					if (addition >= 10 || addition <= 10)
+					{
+						// these here might also need to be swapped
+						if (addition >= 10)
+							moveY++
+						else
+							moveY--;
+
+						addition = 0;
+					}
+
+					prevY = curY;
+				}
+
+				wheel += moveY;
+
+				if (touch.justReleased)
+					moveY = addition = curY = prevY = 0;
 			}
-			else if (FlxG.mouse.pressed)
-			{
-				var dy:Float = _prevMouseY - FlxG.mouse.y;
-				_touchDragDist += Math.abs(dy);
-				_touchScrollAccum += dy;
-				_prevMouseY = FlxG.mouse.y;
-				PsychUIDropDownItem.isDragging = _touchDragDist > 8;
-				while (_touchScrollAccum > 30) { wheel--; _touchScrollAccum -= 30; }
-				while (_touchScrollAccum < -30) { wheel++; _touchScrollAccum += 30; }
-			}
-			else if (FlxG.mouse.justReleased)
-			{
-				PsychUIDropDownItem.isDragging = false;
-			}
-			#end
+			#end*/
 			if(wheel != 0) showDropDown(true, curScroll - wheel, _curFilter);
 		}
 	}
 
 	private function showDropDownClickFix()
 	{
-		#if mobile
-		if(FlxG.mouse.justReleased)
-		#else
 		if(FlxG.mouse.justPressed)
-		#end
 		{
 			for (item in _items) //extra update to fix a little bug where it wouldnt click on any option if another input text was behind the drop down
 				if(item != null && item.active && item.visible)
@@ -279,11 +287,10 @@ class PsychUIDropDownItem extends FlxSpriteGroup
 
 	public var onClick:Void->Void;
 	public var forceNextUpdate:Bool = false;
-	public static var isDragging:Bool = false;
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		if(FlxG.mouse.justMoved || FlxG.mouse.justPressed || FlxG.mouse.justReleased || forceNextUpdate)
+		if(FlxG.mouse.justMoved || FlxG.mouse.justPressed || forceNextUpdate)
 		{
 			var overlapped:Bool = (FlxG.mouse.overlaps(bg, camera));
 
@@ -293,11 +300,7 @@ class PsychUIDropDownItem extends FlxSpriteGroup
 			bg.alpha = style.bgAlpha;
 			forceNextUpdate = false;
 
-			#if mobile
-			if(overlapped && FlxG.mouse.justReleased && !isDragging)
-			#else
 			if(overlapped && FlxG.mouse.justPressed)
-			#end
 				onClick();
 		}
 		
