@@ -137,6 +137,9 @@ class UpdateManager
 		if (normalized.indexOf("hotfix") != -1)
 			return "hotfix version";
 
+		if (normalized.indexOf("dev") != -1)
+			return "dev edition version";
+
 		return "stable release";
 	}
 

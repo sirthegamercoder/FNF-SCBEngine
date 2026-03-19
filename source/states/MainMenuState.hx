@@ -18,7 +18,11 @@ enum MainMenuColumn {
 class MainMenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '1.0.4'; // This is also used for Discord RPC
+	#if DEV_EDITION
+	public static var devVersion:String = '1.1 (1.1.3)';
+	#else
 	public static var scbEngineVersion:String = '1.1';
+	#end
 	public static var fnfVersion:String = '0.2.8';
 	public static var curSelected:Int = 0;
 	public static var curColumn:MainMenuColumn = CENTER;
@@ -128,10 +132,17 @@ class MainMenuState extends MusicBeatState
 			rightItem.x -= rightItem.width;
 		}
 
+		#if DEV_EDITION
+		var devVer:FlxText = new FlxText(12, FlxG.height - 66, 0, "Dev Edition v" + devVersion, 12);
+		devVer.scrollFactor.set();
+		devVer.setFormat(Paths.font("phantom.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(devVer);
+		#else
 		var scbVer:FlxText = new FlxText(12, FlxG.height - 66, 0, "SCB Engine v" + scbEngineVersion, 12);
 		scbVer.scrollFactor.set();
 		scbVer.setFormat(Paths.font("phantom.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(scbVer);
+		#end
 		var psychVer:FlxText = new FlxText(12, FlxG.height - 46, 0, "Psych Engine v" + psychEngineVersion, 12);
 		psychVer.scrollFactor.set();
 		psychVer.setFormat(Paths.font("phantom.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
