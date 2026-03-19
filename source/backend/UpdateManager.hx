@@ -134,8 +134,8 @@ class UpdateManager
 	private static function getVersionType(version:String):String
 	{
 		var normalized = version.trim().toLowerCase();
-		if (normalized.indexOf("beta") != -1)
-			return "beta version";
+		if (normalized.indexOf("hotfix") != -1)
+			return "hotfix version";
 
 		return "stable release";
 	}

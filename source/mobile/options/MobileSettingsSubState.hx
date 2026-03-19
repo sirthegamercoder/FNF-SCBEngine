@@ -43,12 +43,6 @@ class MobileSettingsSubState extends BaseOptionsMenu
 			'If checked, the phone will sleep after going inactive for few seconds.\n(The time depends on your phone\'s options)', 'screensaver', BOOL);
 		option.onChange = () -> lime.system.System.allowScreenTimeout = curOption.getValue();
 		addOption(option);
-
-		option = new Option('Wide Screen Mode',
-			'If checked, it will extend your screen to widescreen and the controls will automatically adjust.',
-			'wideScreen', BOOL);
-		option.onChange = () -> FlxG.scaleMode = new flixel.system.scaleModes.MobileScaleMode();
-		addOption(option);
 		#end
 
 		if (MobileData.mode == 3)

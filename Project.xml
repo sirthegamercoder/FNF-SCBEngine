@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin': SCB Engine" file="SCBEngine" packageName="com.sirthegamercoder.scbengine" package="com.sirthegamercoder.scbengine" main="Main" version="1.0" company="sirthegamercoder" />
+	<app title="Friday Night Funkin': SCB Engine" file="SCBEngine" packageName="com.sirthegamercoder.scbengine" package="com.sirthegamercoder.scbengine" main="Main" version="1.1" company="sirthegamercoder" />
 	<app title="FNF: SCB Engine" if="android || ios" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->

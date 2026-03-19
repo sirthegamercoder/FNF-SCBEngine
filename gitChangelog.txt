@@ -1,2 +1,6 @@
-- Countdown intros and combo rating pop-up now having a smooth movement
-- Dropdown menu now can scroll on Mobile
+- Countdown Ready now moves smoothly from left to center instead of moving smoothly from left to right
+- Dropdown are no longer scrollable on mobile
+- Added native dropdown menu (Only Android)
+- Removed Wide Screen Mode
+- Removed license of Mobile Porting Team due it's no longer exist and small changed at CreditsState
+- You can now choose compression archive types of zip and 7z when the update has exist (Only Desktop)

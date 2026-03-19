@@ -1069,15 +1069,28 @@ class PlayState extends MusicBeatState
 						{
 							countdownReady.x = -countdownReady.width;
 							countdownReady.y = FlxG.height / 2 - countdownReady.height / 2;
-							FlxTween.tween(countdownReady, {x: FlxG.width + countdownReady.width}, Conductor.crochet / 1000 / playbackRate, {
-								ease: FlxEase.linear,
+
+							var centerX:Float = (FlxG.width / 2) - (countdownReady.width / 2);
+							
+							FlxTween.tween(countdownReady, {x: centerX}, Conductor.crochet / 1000 / playbackRate, {
+								ease: FlxEase.quadOut,
 								onComplete: function(twn:FlxTween)
 								{
 									if (countdownReady != null)
 									{
-										remove(countdownReady);
-										countdownReady.destroy();
-										countdownReady = null;
+										FlxTween.tween(countdownReady, {x: FlxG.width + countdownReady.width}, Conductor.crochet / 1000 / playbackRate, {
+											ease: FlxEase.quadIn,
+											startDelay: 0.1 / playbackRate,
+											onComplete: function(twn:FlxTween)
+											{
+												if (countdownReady != null)
+												{
+													remove(countdownReady);
+													countdownReady.destroy();
+													countdownReady = null;
+												}
+											}
+										});
 									}
 								}
 							});
