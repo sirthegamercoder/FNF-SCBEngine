@@ -13,6 +13,9 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 
 </div>
 
+>[!IMPORTANT]
+>This is the main branch of this engine, intended for stable releases. It follows a set of rules designed to ensure that no one else makes changes to this branch—only I can make changes here.
+
 # Features
 * Multiple storage types on Mobile.
 * Restored FPS Counter with `OS` below `RAM` (Mobile only).
