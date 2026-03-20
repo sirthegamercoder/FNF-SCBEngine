@@ -19,7 +19,7 @@ class MainMenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '1.0.4'; // This is also used for Discord RPC
 	#if DEV_EDITION
-	public static var devVersion:String = '1.1 (1.1.3)';
+	public static var devVersion:String = '1.1-dev';
 	#else
 	public static var scbEngineVersion:String = '1.1';
 	#end
