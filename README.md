@@ -14,7 +14,7 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 </div>
 
 >[!IMPORTANT]
->This is the dev branch for this engine, intended for dev edition version (where contributors can test the engine), and it has no set of rules, so anyone can make changes to this branch (except on the main branch).
+>This is the dev branch for this engine, intended for testing the engine, and it has no set of rules, so anyone can make changes to this branch (except on the main branch).
 
 # Features
 * Multiple storage types on Mobile.
