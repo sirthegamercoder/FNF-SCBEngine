@@ -83,6 +83,7 @@ import states.TitleState;
 		'healthloss' => 1.0,
 		'instakill' => false,
 		'practice' => false,
+		'luigiassistant' => false,
 		'botplay' => false
 	];
 
