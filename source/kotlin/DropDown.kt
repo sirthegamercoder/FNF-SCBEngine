@@ -27,8 +27,7 @@ object DropDown {
     private val pendingSelection: AtomicInteger = AtomicInteger(NO_SELECTION)
     private val dialogVisible: AtomicBoolean = AtomicBoolean(false)
     private val isScrolling: AtomicBoolean = AtomicBoolean(false)
-
-	private val scrollState: AtomicInteger = AtomicInteger(0)
+    private val scrollState: AtomicInteger = AtomicInteger(0)
 
     @JvmStatic
     fun showDropDown(title: String?, itemsJson: String, selectedIndex: Int): Boolean {
@@ -51,50 +50,56 @@ object DropDown {
                     choiceMode = ListView.CHOICE_MODE_SINGLE
 
                     setOnTouchListener { v, event ->
-					when (event.action) {
-						MotionEvent.ACTION_DOWN -> {
-							v.parent.requestDisallowInterceptTouchEvent(true)
-							isScrolling.set(false)
-							scrollState.set(0)
-						}
-						MotionEvent.ACTION_MOVE -> {
-							if (Math.abs(event.getY() - (v as ListView).getChildAt(0)?.top ?: 0f) > 10) {
-								isScrolling.set(true)
-								scrollState.set(1)
-							}
-						}
-						MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-							v.parent.requestDisallowInterceptTouchEvent(false)
-							v.postDelayed({
-								isScrolling.set(false)
-								scrollState.set(0)
-							}, 100)
-						}
-					}
-					false
-				}
+                        when (event.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                v.parent.requestDisallowInterceptTouchEvent(true)
+                                isScrolling.set(false)
+                                scrollState.set(0)
+                            }
+                            MotionEvent.ACTION_MOVE -> {
+                                val child = (v as ListView).getChildAt(0)
+                                if (child != null && Math.abs(event.y - child.top) > 10) {
+                                    isScrolling.set(true)
+                                    scrollState.set(1)
+                                }
+                            }
+                            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                                v.parent.requestDisallowInterceptTouchEvent(false)
+                                v.postDelayed({
+                                    isScrolling.set(false)
+                                    scrollState.set(0)
+                                }, 100)
+                            }
+                        }
+                        false
+                    }
+                }
 
                 val adapter = ArrayAdapter(activity, android.R.layout.simple_list_item_single_choice, filteredItems)
                 listView.adapter = adapter
 
-				listView.setOnScrollListener(object : AbsListView.OnScrollListener {
-					override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
-						when (scrollState) {
-							AbsListView.OnScrollListener.SCROLL_STATE_IDLE -> {
-								this@DropDown.scrollState.set(0)
-								isScrolling.set(false)
-							}
-							AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL -> {
-								this@DropDown.scrollState.set(1)
-								isScrolling.set(true)
-							}
-							AbsListView.OnScrollListener.SCROLL_STATE_FLING -> {
-								this@DropDown.scrollState.set(2)
-								isScrolling.set(true)
-							}
-						}
-					}
-				}
+                listView.setOnScrollListener(object : AbsListView.OnScrollListener {
+                    override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
+                        when (scrollState) {
+                            AbsListView.OnScrollListener.SCROLL_STATE_IDLE -> {
+                                this@DropDown.scrollState.set(0)
+                                isScrolling.set(false)
+                            }
+                            AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL -> {
+                                this@DropDown.scrollState.set(1)
+                                isScrolling.set(true)
+                            }
+                            AbsListView.OnScrollListener.SCROLL_STATE_FLING -> {
+                                this@DropDown.scrollState.set(2)
+                                isScrolling.set(true)
+                            }
+                        }
+                    }
+
+                    override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
+                        // Not needed but must be implemented
+                    }
+                })
 
                 val searchInput = TextInputEditText(activity)
                 val searchLayout = TextInputLayout(activity).apply {
@@ -107,7 +112,7 @@ object DropDown {
 
                 val container = LinearLayout(activity).apply {
                     orientation = LinearLayout.VERTICAL
-                    setPadding(dp(20), dp(8), dp(20), dp(0))
+                    setPadding(dp(20), dp(8), dp(20), 0)
                     addView(searchLayout, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                     addView(
                         listView,
@@ -214,14 +219,13 @@ object DropDown {
         return (value * activity.resources.displayMetrics.density).toInt()
     }
 
-	@JvmStatic
-	fun isScrolling(): Boolean {
-		return isScrolling.get()
-	}
+    @JvmStatic
+    fun isScrolling(): Boolean {
+        return isScrolling.get()
+    }
 
-	@JvmStatic
-	fun getScrollState(): Int {
-		return scrollState.get()
-	}
-}
+    @JvmStatic
+    fun getScrollState(): Int {
+        return scrollState.get()
+    }
 }
