@@ -313,7 +313,6 @@ class PlayState extends MusicBeatState
 		healthLoss = ClientPrefs.getGameplaySetting('healthloss');
 		instakillOnMiss = ClientPrefs.getGameplaySetting('instakill');
 		practiceMode = ClientPrefs.getGameplaySetting('practice');
-		luigiAssistant = ClientPrefs.getGameplaySetting('luigiassistant');
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay');
 		guitarHeroSustains = ClientPrefs.data.guitarHeroSustains;
 
@@ -1955,18 +1954,6 @@ class PlayState extends MusicBeatState
 							var strum:StrumNote = strumGroup.members[daNote.noteData];
 							daNote.followStrumNote(strum, fakeCrochet, songSpeed / playbackRate);
 
-							if (luigiAssistant) {
-								if(!daNote.blockHit && !daNote.ignoreNote && daNote.mustPress && !cpuControlled && daNote.canBeHit) {
-									if(daNote.isSustainNote) {
-										if(daNote.canBeHit) {
-											goodNoteHit(daNote);
-										}
-									} else if(daNote.strumTime <= Conductor.songPosition || daNote.isSustainNote) {
-										goodNoteHit(daNote);
-									}
-								}
-							}
-
 							if(daNote.mustPress)
 							{
 								if(cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
@@ -3337,10 +3324,6 @@ class PlayState extends MusicBeatState
 
 		if (note.hitsoundVolume > 0 && !note.hitsoundDisabled)
 			FlxG.sound.play(Paths.sound(note.hitsound), note.hitsoundVolume);
-
-		if (luigiAssistant) {
-			playerStrums.members[note.noteData].resetAnim = notes.members[i].animation.curAnim.name.endsWith("hold") ? 0.20 : 0.05;
-		}
 
 		if(!note.hitCausesMiss) //Common notes
 		{
