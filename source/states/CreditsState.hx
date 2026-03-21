@@ -39,7 +39,7 @@ class CreditsState extends MusicBeatState
 
 		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
 			['SCB Engine'],
-			['sirthegamercoder',    "sir",              'Head of SCB Engine',           '','FF0000'],
+			['sirthegamercoder',    "sir",              'Head of SCB Engine',           'https://bsky.app/profile/stgmd.bsky.social','FF0000'],
 			['Mobile Porting Team'],
 			['HomuHomu833',			'homura',             'Head Porter of Psych Engine and Author',                       'https://youtube.com/@HomuHomu833',		'FFE7C0'],
 			['Karim Akra',			'karim',			'Second Porter of Psych Engine',						'https://youtube.com/@Karim-Akra',		'FFB4F0'],
