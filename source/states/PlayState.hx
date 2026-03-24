@@ -2844,9 +2844,9 @@ class PlayState extends MusicBeatState
 		rateSpr.y -= ClientPrefs.data.comboOffset[1];
 		if (!PlayState.isPixelStage)
 		{
-			rateSpr.setGraphicSize(Std.int(rateSpr_S.width * 0.7));            
+			rateSpr.setGraphicSize(Std.int(rateSpr.width * 0.7));            
 		}else{
-			rateSpr.setGraphicSize(Std.int(rateSpr_S.width * daPixelZoom * 0.85));            
+			rateSpr.setGraphicSize(Std.int(rateSpr.width * daPixelZoom * 0.85));            
 		}
 		rateSpr.updateHitbox();
 		rateSpr.x += rateSpr.width / 2;
@@ -2943,7 +2943,7 @@ class PlayState extends MusicBeatState
 			antialias = !isPixelStage;
 		}
 		
-		rateSpr.visible = ClientPrefs.data.showRating && showRating;
+		rateSpr.visible = showRating;
 		rateSpr.loadGraphic(Paths.image(uiPrefix + daRating.image + uiSuffix));
 		rateSpr.antialiasing = antialias;        
 			
