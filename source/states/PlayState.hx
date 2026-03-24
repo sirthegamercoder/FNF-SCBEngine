@@ -3472,7 +3472,7 @@ class PlayState extends MusicBeatState
 			{
 				combo++;
 				if(combo > 9999) combo = 9999;
-				popUpScore(note, time);
+				popUpScore(note, ?time);
 			}
 			var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
 			if (guitarHeroSustains && note.isSustainNote) gainHealth = false;
