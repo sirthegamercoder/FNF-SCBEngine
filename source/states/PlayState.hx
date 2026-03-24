@@ -2899,7 +2899,7 @@ class PlayState extends MusicBeatState
 
 	private function popUpScore(note:Note = null, ?time:Float = -999999):Void
 	{
-		var noteDiff:Float = note.strumTime - time + ClientPrefs.data.ratingOffset : note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset;
+		var noteDiff:Float = note.strumTime - time + ClientPrefs.data.ratingOffset ; note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset;
 		
 		if (cpuControlled) noteDiff = 0;
 		
