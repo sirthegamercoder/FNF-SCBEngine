@@ -2899,7 +2899,7 @@ class PlayState extends MusicBeatState
 
 	private function popUpScore(note:Note = null, ?time:Float = -999999):Void
 	{
-		var noteDiff:Float = note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset;
+		var noteDiff:Float = note.strumTime - time + ClientPrefs.data.ratingOffset : note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset;
 		
 		if (cpuControlled) noteDiff = 0;
 		
@@ -3472,7 +3472,7 @@ class PlayState extends MusicBeatState
 			{
 				combo++;
 				if(combo > 9999) combo = 9999;
-				popUpScore(note, ?time);
+				popUpScore(note, time);
 			}
 			var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
 			if (guitarHeroSustains && note.isSustainNote) gainHealth = false;
