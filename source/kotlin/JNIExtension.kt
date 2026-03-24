@@ -4,6 +4,11 @@ import android.content.Intent
 import org.haxe.extension.Extension
 
 class JNIExtension : Extension() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        NativeCrashHandler.install()
+    }
     
     companion object {
         @JvmStatic

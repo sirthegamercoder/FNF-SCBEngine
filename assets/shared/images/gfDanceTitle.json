@@ -3,8 +3,6 @@
 	"titley": -100,
 	"startx": 100,
 	"starty": 576,
-	"mobilestartx": 50,
-	"mobilestarty": 590,
 	"gfx": 512,
 	"gfy": 40,
 	"backgroundSprite": "",
