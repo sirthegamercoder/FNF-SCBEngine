@@ -2784,19 +2784,6 @@ class PlayState extends MusicBeatState
 
 	var numItems:FlxTypedGroup<FlxSprite>;
 
-	var comboOffsetFix:Array<Array<Int>> = [
-		[0, 0],
-		[-2, -1],
-		[-6, 6],
-		[-4, 6],
-		[-2, 9],
-		[-12, 12],
-		[-11, 8],
-		[1, -2],
-		[2, -2],
-		[1, -1]
-	];
-
 	private function cachePopUpScore()
 	{
 		var uiPrefix:String = '';
@@ -2834,7 +2821,7 @@ class PlayState extends MusicBeatState
 		}
 		
 		var placement:Float = FlxG.width * 0.35;
-		
+
 		rateSpr = new FlxSprite().loadGraphic(Paths.image(uiPrefix + ratingsData[0].image + uiSuffix));
 		rateSpr.cameras = [camHUD];
 		rateSpr.screenCenter();
@@ -2856,13 +2843,18 @@ class PlayState extends MusicBeatState
 		rateSpr.alpha = 0.000001;
 		rateSpr.visible = showRating;
 		comboGroup.add(rateSpr);
-				
+
 		comboSpr = new FlxSprite().loadGraphic(Paths.image(uiPrefix + 'combo' + uiSuffix));
 		comboSpr.cameras = [camHUD];
 		comboSpr.screenCenter();
-		comboSpr.x = placement;
+
+		var rateBottomY:Float = rateSpr.y + rateSpr.height / 2;
+		var newComboY:Float = rateBottomY + 15;
+		
+		comboSpr.x = placement - 20;
 		comboSpr.x += ClientPrefs.data.comboOffset[0];
-		comboSpr.y -= ClientPrefs.data.comboOffset[1];
+		comboSpr.y = newComboY - ClientPrefs.data.comboOffset[1];
+		
 		comboSpr.antialiasing = antialias;
 		comboSpr.y += 60;
 		comboSpr.alpha = 0.000001;
@@ -3010,9 +3002,6 @@ class PlayState extends MusicBeatState
 			if (comboNumTweenScaleY[comboNum] != null) comboNumTweenScaleY[comboNum].cancel();
 			numScore.scale.y = numScale + 0.07;                        
 			comboNumTweenScaleY[comboNum] = FlxTween.tween(numScore.scale, {y: numScale}, 0.2 / playbackRate);
-
-			numScore.offset.x -= comboOffsetFix[seperatedScore[comboNum]][0] * 0.5;
-			numScore.offset.y += comboOffsetFix[seperatedScore[comboNum]][1] * 0.5;
 		}
 		
 		if (rateTween != null) rateTween.cancel();
