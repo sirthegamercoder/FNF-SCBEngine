@@ -156,7 +156,7 @@ jobs:
         uses: actions/upload-artifact@v7.0.0
         with:
           name: windowsBuild
-          path: export/release/windows/bin
+          path: export/release/windows/bin/*
 
   Mac:
     if: needs.targets.outputs.mac == 'true'
@@ -186,7 +186,7 @@ jobs:
         uses: actions/upload-artifact@v7.0.0
         with:
           name: macBuild
-          path: export/release/macos/bin
+          path: export/release/macos/bin/*
 
   Linux:
     if: needs.targets.outputs.linux == 'true'
@@ -221,7 +221,7 @@ jobs:
         uses: actions/upload-artifact@v7.0.0
         with:
           name: linuxBuild
-          path: export/release/linux/bin
+          path: export/release/linux/bin/*
 
   Android:
     if: needs.targets.outputs.android == 'true'
