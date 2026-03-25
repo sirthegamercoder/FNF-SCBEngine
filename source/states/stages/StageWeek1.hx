@@ -9,15 +9,12 @@ class StageWeek1 extends BaseStage
 	var dadbattleLight:BGSprite;
 	var dadbattleFog:DadBattleFog;
 
-	// Used to fix bug Girlfriend position floating?
+	// Used to fix bug Girlfriend position floating
 	var fixed_GF_X:Float = 480;
 	var fixed_GF_Y:Float = 280;
+	
 	override function create()
 	{
-		if(PlayState.SONG.song == 'Tutorial') {
-			dad.setPosition(fixed_GF_X, fixed_GF_Y);
-		}
-
 		var bg:BGSprite = new BGSprite('stageback', -600, -200, 0.9, 0.9);
 		add(bg);
 
@@ -42,6 +39,14 @@ class StageWeek1 extends BaseStage
 			add(stageCurtains);
 		}
 	}
+
+	override function createPost()
+	{
+		if(PlayState.SONG.song == 'Tutorial') {
+			if(dad != null) dad.setPosition(fixed_GF_X, fixed_GF_Y);
+		}
+	}
+	
 	override function eventPushed(event:objects.Note.EventNote)
 	{
 		switch(event.event)
