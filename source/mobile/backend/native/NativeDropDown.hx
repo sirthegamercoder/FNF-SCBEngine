@@ -9,16 +9,10 @@ class NativeDropDown
 	public static inline var NO_SELECTION:Int = -1;
 	public static inline var CANCELED:Int = -2;
 
-	public static inline var SCROLL_STATE_IDLE:Int = 0;
-	public static inline var SCROLL_STATE_TOUCH_SCROLL:Int = 1;
-	public static inline var SCROLL_STATE_FLING:Int = 2;
-
 	@:noCompletion private static var _initialized:Bool = false;
 	@:noCompletion private static var _showDropDown_jni:Dynamic = null;
 	@:noCompletion private static var _pollSelection_jni:Dynamic = null;
 	@:noCompletion private static var _isDialogVisible_jni:Dynamic = null;
-	@:noCompletion private static var _isScrolling_jni:Dynamic = null;
-    @:noCompletion private static var _getScrollState_jni:Dynamic = null;
 
 	@:noCompletion
 	private static function ensureInit():Bool
@@ -45,18 +39,6 @@ class NativeDropDown
 				'com/sirthegamercoder/scbengine/DropDown',
 				'isDialogVisible',
 				'()Z'
-			);
-
-			_isScrolling_jni = JNI.createStaticMethod(
-				'com/sirthegamercoder/scbengine/DropDown',
-				'isScrolling',
-				'()Z'
-			);
-			
-			_getScrollState_jni = JNI.createStaticMethod(
-				'com/sirthegamercoder/scbengine/DropDown',
-				'getScrollState',
-				'()I'
 			);
 		}
 		catch (e:Dynamic)
@@ -102,40 +84,6 @@ class NativeDropDown
 		}
 
 		return NO_SELECTION;
-	}
-
-	public static function isScrolling():Bool
-	{
-		if (!ensureInit())
-			return false;
-
-		try
-		{
-			return _isScrolling_jni();
-		}
-		catch (e:Dynamic)
-		{
-			trace('isScrolling failed: ' + e);
-		}
-
-		return false;
-	}
-
-	public static function getScrollState():Int
-	{
-		if (!ensureInit())
-			return SCROLL_STATE_IDLE;
-
-		try
-		{
-			return _getScrollState_jni();
-		}
-		catch (e:Dynamic)
-		{
-			trace('getScrollState failed: ' + e);
-		}
-
-		return SCROLL_STATE_IDLE;
 	}
 
 	public static function isDialogVisible():Bool

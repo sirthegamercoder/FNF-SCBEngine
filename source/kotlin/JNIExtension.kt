@@ -1,6 +1,7 @@
 package com.sirthegamercoder.scbengine
 
 import android.content.Intent
+import android.os.Bundle
 import org.haxe.extension.Extension
 
 class JNIExtension : Extension() {
