@@ -2991,7 +2991,7 @@ class PlayState extends MusicBeatState
 		var digits:Array<String> = comboStr.split("");
 
 		var totalDigits:Int = digits.length;
-=
+
 		for (digit in digits) {
 			seperatedScore.push(Std.parseInt(digit));
 		}
