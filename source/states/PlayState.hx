@@ -2959,12 +2959,12 @@ class PlayState extends MusicBeatState
 		
 		rateSpr.visible = showRating;
 		rateSpr.loadGraphic(Paths.image(uiPrefix + daRating.image + uiSuffix));
-		rateSpr.antialiasing = antialias;        
-			
+		rateSpr.antialiasing = antialias;		
+		
 		comboSpr.visible = showCombo;
 		comboSpr.loadGraphic(Paths.image(uiPrefix + 'combo' + uiSuffix));
-		comboSpr.antialiasing = antialias;        
-			
+		comboSpr.antialiasing = antialias;		
+		
 		var scale:Float = 0;
 		var numScale:Float = 0;
 		if (!PlayState.isPixelStage)
@@ -2991,6 +2991,10 @@ class PlayState extends MusicBeatState
 		var digits:Array<String> = comboStr.split("");
 
 		var totalDigits:Int = digits.length;
+=
+		for (digit in digits) {
+			seperatedScore.push(Std.parseInt(digit));
+		}
 
 		for (i in 0...numItems.length)
 		{
@@ -3000,7 +3004,7 @@ class PlayState extends MusicBeatState
 			if (digitIndex >= 0 && digitIndex < totalDigits)
 			{
 				numScore.visible = showComboNum;
-				var digit:Int = Std.parseInt(digits[digitIndex]);
+				var digit:Int = seperatedScore[digitIndex];
 				numScore.loadGraphic(Paths.image(uiPrefix + 'num' + digit + uiSuffix));
 				if (ClientPrefs.data.comboColoring) numScore.color = daRating.color;
 				else numScore.color = FlxColor.WHITE;
@@ -3023,9 +3027,11 @@ class PlayState extends MusicBeatState
 				if (comboNumTweenScaleY[i] != null) comboNumTweenScaleY[i].cancel();
 				numScore.scale.y = numScale + 0.07;
 				comboNumTweenScaleY[i] = FlxTween.tween(numScore.scale, {y: numScale}, 0.2 / playbackRate);
-
-				numScore.offset.x -= comboOffsetFix[seperatedScore[numItems]][0] * 0.5;
-		        numScore.offset.y += comboOffsetFix[seperatedScore[numItems]][1] * 0.5;
+=
+				if (digit < comboOffsetFix.length) {
+					numScore.offset.x -= comboOffsetFix[digit][0] * 0.5;
+					numScore.offset.y += comboOffsetFix[digit][1] * 0.5;
+				}
 			}
 			else
 			{
