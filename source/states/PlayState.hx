@@ -2985,6 +2985,8 @@ class PlayState extends MusicBeatState
 		comboSpr.updateHitbox();
 		rateSpr.updateHitbox();
 
+		var seperatedScore:Array<Int> = [];
+
 		var comboStr:String = Std.string(combo);
 		var digits:Array<String> = comboStr.split("");
 
@@ -3021,6 +3023,9 @@ class PlayState extends MusicBeatState
 				if (comboNumTweenScaleY[i] != null) comboNumTweenScaleY[i].cancel();
 				numScore.scale.y = numScale + 0.07;
 				comboNumTweenScaleY[i] = FlxTween.tween(numScore.scale, {y: numScale}, 0.2 / playbackRate);
+
+				numScore.offset.x -= comboOffsetFix[seperatedScore[comboNum]][0] * 0.5;
+		        numScore.offset.y += comboOffsetFix[seperatedScore[comboNum]][1] * 0.5;
 			}
 			else
 			{
@@ -3059,9 +3064,6 @@ class PlayState extends MusicBeatState
 		
 		rateSpr.offset.x += rateSpr.width / 2;
 		rateSpr.offset.y += rateSpr.height / 2;
-
-		numScore.offset.x -= comboOffsetFix[numItems[comboNum]][0] * 0.5;
-		numScore.offset.y += comboOffsetFix[numItems[comboNum]][1] * 0.5;
 	}
 
 	public var strumsBlocked:Array<Bool> = [];
