@@ -2784,6 +2784,19 @@ class PlayState extends MusicBeatState
 
 	var numItems:FlxTypedGroup<FlxSprite>;
 
+	var comboOffsetFix:Array<Array<Int>> = [
+        [0, 0],
+        [-2, -1],
+        [-6, 6],
+        [-4, 6],
+        [-2, 9],
+        [-12, 12],
+        [-11, 8],
+        [1, -2],
+        [2, -2],
+        [1, -1]
+    ];
+
 	private function cachePopUpScore()
 	{
 		var uiPrefix:String = '';
@@ -3046,6 +3059,9 @@ class PlayState extends MusicBeatState
 		
 		rateSpr.offset.x += rateSpr.width / 2;
 		rateSpr.offset.y += rateSpr.height / 2;
+
+		numScore.offset.x -= comboOffsetFix[numItems[comboNum]][0] * 0.5;
+		numScore.offset.y += comboOffsetFix[numItems[comboNum]][1] * 0.5;
 	}
 
 	public var strumsBlocked:Array<Bool> = [];
