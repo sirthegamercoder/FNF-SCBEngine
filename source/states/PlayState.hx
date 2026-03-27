@@ -2963,6 +2963,8 @@ class PlayState extends MusicBeatState
 		
 		comboSpr.visible = showCombo;
 		comboSpr.loadGraphic(Paths.image(uiPrefix + 'combo' + uiSuffix));
+		if (ClientPrefs.data.comboColoring) comboSpr.color = daRating.color;
+		else comboSpr.color = FlxColor.WHITE;
 		comboSpr.antialiasing = antialias;		
 		
 		var scale:Float = 0;

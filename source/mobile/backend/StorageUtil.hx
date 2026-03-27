@@ -3,6 +3,7 @@ package mobile.backend;
 import lime.system.System as LimeSystem;
 import haxe.io.Path;
 import haxe.Exception;
+import haxe.Timer;
 
 /**
  * A storage class for mobile.
@@ -96,11 +97,15 @@ class StorageUtil
 	#if android
 	public static function requestPermissions():Void
 	{
+		var permissionsToRequest:Array<String> = [];
+		
 		if (AndroidVersion.SDK_INT >= AndroidVersionCode.TIRAMISU)
-			AndroidPermissions.requestPermissions(['READ_MEDIA_IMAGES', 'READ_MEDIA_VIDEO', 'READ_MEDIA_AUDIO']);
+			permissionsToRequest = ['READ_MEDIA_IMAGES', 'READ_MEDIA_VIDEO', 'READ_MEDIA_AUDIO'];
 		else
-			AndroidPermissions.requestPermissions(['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE']);
+			permissionsToRequest = ['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE'];
 
+		AndroidPermissions.requestPermissions(permissionsToRequest);
+		
 		if (!AndroidEnvironment.isExternalStorageManager())
 		{
 			if (AndroidVersion.SDK_INT >= AndroidVersionCode.S)
@@ -108,21 +113,43 @@ class StorageUtil
 			AndroidSettings.requestSetting('MANAGE_APP_ALL_FILES_ACCESS_PERMISSION');
 		}
 
-		if ((AndroidVersion.SDK_INT >= AndroidVersionCode.TIRAMISU
-			&& !AndroidPermissions.getGrantedPermissions().contains('android.permission.READ_MEDIA_IMAGES'))
-			|| (AndroidVersion.SDK_INT < AndroidVersionCode.TIRAMISU
-				&& !AndroidPermissions.getGrantedPermissions().contains('android.permission.READ_EXTERNAL_STORAGE')))
-			CoolUtil.showPopUp(Language.getPhrase('permissions_message', 'If you accepted the permissions you are all good!\nIf you didn\'t then expect a crash\nPress OK to see what happens'),
-				Language.getPhrase('mobile_notice', "Notice!"));
+		haxe.Timer.delay(function() {
+			checkPermissionsAndSetup();
+		}, 500);
+	}
+
+	public static function checkPermissionsAndSetup():Void
+	{
+		var hasStoragePermission:Bool = false;
+		
+		if (AndroidVersion.SDK_INT >= AndroidVersionCode.TIRAMISU)
+			hasStoragePermission = AndroidPermissions.getGrantedPermissions().contains('android.permission.READ_MEDIA_IMAGES');
+		else
+			hasStoragePermission = AndroidPermissions.getGrantedPermissions().contains('android.permission.READ_EXTERNAL_STORAGE');
+		
+		if (!hasStoragePermission)
+		{
+			CoolUtil.showPopUp(
+				Language.getPhrase('permissions_message', 'If you accepted the permissions you are all good!\nIf you didn\'t then expect a crash\nPress OK to see what happens'),
+				Language.getPhrase('mobile_notice', "Notice!")
+			);
+			return;
+		}
 
 		try
 		{
-			if (!FileSystem.exists(StorageUtil.getStorageDirectory()))
-				createDirectories(StorageUtil.getStorageDirectory());
+			var storageDir = StorageUtil.getStorageDirectory();
+			if (!FileSystem.exists(storageDir))
+				createDirectories(storageDir);
+			
+			Sys.setCwd(storageDir);
 		}
 		catch (e:Dynamic)
 		{
-			CoolUtil.showPopUp(Language.getPhrase('create_directory_error', 'Please create directory to\n{1}\nPress OK to close the game', [StorageUtil.getStorageDirectory()]), Language.getPhrase('mobile_error', "Error!"));
+			CoolUtil.showPopUp(
+				Language.getPhrase('create_directory_error', 'Please create directory to\n{1}\nPress OK to close the game', [StorageUtil.getStorageDirectory()]),
+				Language.getPhrase('mobile_error', "Error!")
+			);
 			LimeSystem.exit(1);
 		}
 	}
