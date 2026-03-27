@@ -1,6 +1,5 @@
-- Countdown Ready now moves smoothly from left to center instead of moving smoothly from left to right
-- Dropdown are no longer scrollable on mobile
-- Added native dropdown menu (Only Android)
-- Removed Wide Screen Mode
-- Removed license of Mobile Porting Team due it's no longer exist and small changed at CreditsState
-- You can now choose compression archive types of zip and 7z when the update has exist (Only Desktop)
+- The fade-out effect for countdown intros and combo ratings has now been re-added
+- The combo rating animations will now fade out in place instead of moving to the right side of the screen
+- The mobile version of the title text no longer uses mobilestartx and mobilestarty got replaced with ePMx and ePMy
+- Fixed a bug where the GF's position was floating in Tutorial
+- Improved Combo Coloring logic
