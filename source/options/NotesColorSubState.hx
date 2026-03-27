@@ -172,9 +172,7 @@ class NotesColorSubState extends MusicBeatSubstate
 		controllerPointer.alpha = 0.6;
 		add(controllerPointer);
 		
-		FlxG.mouse.visible = !controls.controllerMode;
-		controllerPointer.visible = controls.controllerMode;
-		_lastControllerMode = controls.controllerMode;
+		if (!controls.controllerMode) Cursor.show(); else Cursor.hide();
 
 		addTouchPad('NONE', 'B_C');
 		controls.isInSubstate = true;
@@ -200,7 +198,7 @@ class NotesColorSubState extends MusicBeatSubstate
 
 	override function update(elapsed:Float) {
 		if (controls.BACK) {
-			FlxG.mouse.visible = false;
+			Cursor.hide();
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			controls.isInSubstate = false;
 			close();
@@ -218,10 +216,10 @@ class NotesColorSubState extends MusicBeatSubstate
 		if(controls.controllerMode != _lastControllerMode)
 		{
 			//trace('changed controller mode');
-			FlxG.mouse.visible = !controls.controllerMode;
-			controllerPointer.visible = controls.controllerMode;
-
-			// changed to controller mid state
+			if (!controls.controllerMode)
+				Cursor.show();
+			else
+				Cursor.hide();
 			if(controls.controllerMode)
 			{
 				controllerPointer.x = FlxG.mouse.x;

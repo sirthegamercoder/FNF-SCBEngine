@@ -118,7 +118,7 @@ class MasterEditorMenu extends MusicBeatState
 		changeDirectory();
 		#end
 		
-		FlxG.mouse.visible = false;
+		Cursor.hide();
 
 		addTouchPad('LEFT_FULL', 'A_B');
 
