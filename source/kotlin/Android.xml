@@ -4,9 +4,18 @@
 		<application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" />
 	</config:android>
 	
-	<template path="JNIExtension.kt" rename="app/src/main/java/com/sirthegamercoder/plusengine/JNIExtension.kt" />
+	<template path="JNIExtension.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/JNIExtension.kt" />
 	<template path="NativeUI.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/NativeUI.kt" />
 	<template path="NativeCrashHandler.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/NativeCrashHandler.kt" />
 	<template path="NativeCrashActivity.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/NativeCrashActivity.kt" />
 	<template path="DropDown.kt" rename="app/src/main/java/com/sirthegamercoder/scbengine/DropDown.kt" />
+
+	<android target-sdk-version="36" minimum-sdk-version="23" build-tools-version="36.0.0" />
+
+	<config:android gradle-version="8.12" />
+	<config:android gradle-plugin="8.8.0" />
+	<config:android useAndroidX="true" />
+	<config:android enableJetifier="true" />
+
+	<setenv name="ANDROID_NDK_VERSION" value="27.2.12479018" />
 </project>

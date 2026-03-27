@@ -18,7 +18,7 @@ enum MainMenuColumn {
 class MainMenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '1.0.4'; // This is also used for Discord RPC
-	public static var scbEngineVersion:String = '1.1';
+	public static var scbEngineVersion:String = '1.1.3';
 	public static var fnfVersion:String = '0.2.8';
 	public static var curSelected:Int = 0;
 	public static var curColumn:MainMenuColumn = CENTER;
@@ -127,7 +127,7 @@ class MainMenuState extends MusicBeatState
 			rightItem = createMenuItem(rightOption, FlxG.width - 60, 490);
 			rightItem.x -= rightItem.width;
 		}
-		
+    
 		var scbVer:FlxText = new FlxText(12, FlxG.height - 66, 0, "SCB Engine v" + scbEngineVersion, 12);
 		scbVer.scrollFactor.set();
 		scbVer.setFormat(Paths.font("phantom.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);

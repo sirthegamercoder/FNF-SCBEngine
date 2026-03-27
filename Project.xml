@@ -48,7 +48,7 @@
 	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
 
 	<!--Mobile-specific-->
-	<window if="mobile" orientation="landscape" fullscreen="true" resizable="false" allow-shaders="true" require-shaders="true" />
+	<window if="mobile" orientation="landscape" fullscreen="true" resizable="false" vsync="true" allow-shaders="true" require-shaders="true" />
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
@@ -111,6 +111,16 @@
 	<haxedef name="DISCORD_DISABLE_IO_THREAD" if="hxdiscord_rpc" />
 	<haxedef name="NO_PRECOMPILED_HEADERS" if="linux" />
 
+	<!-- Suppress warnings for Android compilation -->
+	<haxedef name="HXCPP_CFLAGS" value="-Wno-all -w" if="android" />
+
+	<!-- Force C99 standard for macOS/iOS to fix zlib compilation with Xcode 16.4 -->
+	<haxedef name="HXCPP_CFLAGS" value="-std=c99 -Wno-error=deprecated-non-prototype -Wno-deprecated-declarations -Wno-unused-command-line-argument -Wno-macro-redefined" if="macos || ios" />
+	<haxeflag name="-D" value="no-deprecation-warnings"/>
+
+	<!-- Android deprecation flags :v -->
+	<haxedef name="HXCPP_CFLAGS" value="-Wno-error=deprecated-non-prototype" if="android" />
+
 	<!-- Enables a terminal log prompt on debug builds -->
 	<haxelib name="hxcpp-debug-server" if="debug"/>
 	<haxedef name="HXC_LIBVLC_LOGGING" if="VIDEOS_ALLOWED debug" />
@@ -152,6 +162,8 @@
 
 	<!--Enable this for Nape release builds for a serious peformance improvement-->
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
+
+	<haxeflag name="-D" value="HXCPP_GC_BIG_BLOCKS" />
 	
 	<!--Used for crash handler-->
 	<section if="cpp">

@@ -22,13 +22,8 @@ typedef TitleData =
 {
 	var titlex:Float;
 	var titley:Float;
-	#if mobile
-	var mobilestartx:Float;
-	var mobilestarty:Float;
-	#else
 	var startx:Float;
 	var starty:Float;
-	#end
 	var gfx:Float;
 	var gfy:Float;
 	var backgroundSprite:String;
@@ -155,7 +150,10 @@ class TitleState extends MusicBeatState
 
 		var animFrames:Array<FlxFrame> = [];
 		#if mobile
-		titleTextMobile = new FlxSprite(enterPositionMobile.x, enterPositionMobile.y);
+		var ePMx = 50;
+		var ePMy = 590;
+
+		titleTextMobile = new FlxSprite(ePMx, ePMy);
 		titleTextMobile.frames = Paths.getSparrowAtlas('mobile/titleEnter');
 		#else
 		titleText = new FlxSprite(enterPosition.x, enterPosition.y);
@@ -241,11 +239,7 @@ class TitleState extends MusicBeatState
 
 	var gfPosition:FlxPoint = FlxPoint.get(512, 40);
 	var logoPosition:FlxPoint = FlxPoint.get(-150, -100);
-	#if mobile
-	var enterPositionMobile:FlxPoint = FlxPoint.get(50, 590);
-	#else
 	var enterPosition:FlxPoint = FlxPoint.get(100, 576);
-	#end
 	
 	var useIdle:Bool = false;
 	var musicBPM:Float = 102;
@@ -264,11 +258,7 @@ class TitleState extends MusicBeatState
 					var titleJSON:TitleData = tjson.TJSON.parse(titleRaw);
 					gfPosition.set(titleJSON.gfx, titleJSON.gfy);
 					logoPosition.set(titleJSON.titlex, titleJSON.titley);
-					#if mobile
-					enterPositionMobile.set(titleJSON.mobilestartx, titleJSON.mobilestarty);
-					#else
 					enterPosition.set(titleJSON.startx, titleJSON.starty);
-					#end
 					musicBPM = titleJSON.bpm;
 					
 					if(titleJSON.animation != null && titleJSON.animation.length > 0) animationName = titleJSON.animation;

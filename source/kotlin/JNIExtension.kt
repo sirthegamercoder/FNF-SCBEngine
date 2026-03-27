@@ -1,9 +1,15 @@
 package com.sirthegamercoder.scbengine
 
 import android.content.Intent
+import android.os.Bundle
 import org.haxe.extension.Extension
 
 class JNIExtension : Extension() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        NativeCrashHandler.install()
+    }
     
     companion object {
         @JvmStatic
