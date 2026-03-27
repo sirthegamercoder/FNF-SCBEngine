@@ -127,6 +127,7 @@ class MainMenuState extends MusicBeatState
 			rightItem = createMenuItem(rightOption, FlxG.width - 60, 490);
 			rightItem.x -= rightItem.width;
 		}
+    
 		var scbVer:FlxText = new FlxText(12, FlxG.height - 66, 0, "SCB Engine v" + scbEngineVersion, 12);
 		scbVer.scrollFactor.set();
 		scbVer.setFormat(Paths.font("phantom.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
