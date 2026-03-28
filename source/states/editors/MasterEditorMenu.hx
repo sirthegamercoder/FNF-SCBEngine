@@ -92,7 +92,19 @@ class MasterEditorMenu extends MusicBeatState
 			grpItems.add(itemGroup);
 		}
 
-		repositionMenuItems();
+		var totalWidth:Float = (grpItems.length * itemWidth) + ((grpItems.length - 1) * itemSpacing);
+		var startX:Float = (FlxG.width - totalWidth) / 2;
+		var centerY:Float = (FlxG.height - itemHeight) / 2;
+		
+		for (i in 0...grpItems.length)
+		{
+			var item = grpItems.members[i];
+			if (item != null)
+			{
+				item.x = startX + (i * (itemWidth + itemSpacing));
+				item.y = centerY;
+			}
+		}
 
 		for (i in 0...grpItems.length)
 		{
@@ -280,23 +292,6 @@ class MasterEditorMenu extends MusicBeatState
 				{
 					text.alpha = 0.6;
 				}
-			}
-		}
-	}
-
-	private function repositionMenuItems():Void
-	{
-		var totalWidth:Float = (grpItems.length * itemWidth) + ((grpItems.length - 1) * itemSpacing);
-		var startX:Float = (FlxG.width - totalWidth) / 2;
-		var centerY:Float = (FlxG.height - itemHeight) / 2;
-		
-		for (i in 0...grpItems.length)
-		{
-			var item = grpItems.members[i];
-			if (item != null)
-			{
-				item.x = startX + (i * (itemWidth + itemSpacing));
-				item.y = centerY;
 			}
 		}
 	}
