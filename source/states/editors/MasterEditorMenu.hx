@@ -57,15 +57,10 @@ class MasterEditorMenu extends MusicBeatState
 		grpItems = new FlxTypedGroup<FlxSpriteGroup>();
 		add(grpItems);
 
-		var centerX:Float = (FlxG.width - itemWidth) / 2;
-		var centerY:Float = (FlxG.height - itemHeight) / 2;
-
 		for (i in 0...options.length)
 		{
 			var itemGroup:FlxSpriteGroup = new FlxSpriteGroup();
-			itemGroup.x = centerX;
-			itemGroup.y = centerY;
-
+			
 			var iconBg:FlxSprite = new FlxSprite().makeGraphic(150, 150, FlxColor.WHITE);
 			iconBg.setGraphicSize(120, 120);
 			iconBg.updateHitbox();
@@ -92,15 +87,18 @@ class MasterEditorMenu extends MusicBeatState
 			itemGroup.add(leText);
 			
 			grpItems.add(itemGroup);
-			itemGroup.visible = false;
 		}
 
 		repositionMenuItems();
 
+		for (i in 0...grpItems.length)
+		{
+			grpItems.members[i].visible = (i == curSelected);
+		}
+
 		if (grpItems.length > 0) 
 		{
-			grpItems.members[0].visible = true;
-			highlightSelectedItem(grpItems.members[0], true);
+			highlightSelectedItem(grpItems.members[curSelected], true);
 		}
 
 		#if MODS_ALLOWED
