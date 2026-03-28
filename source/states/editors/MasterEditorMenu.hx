@@ -3,7 +3,6 @@ package states.editors;
 import backend.WeekData;
 
 import objects.Character;
-import flixel.FlxObject;
 
 import states.MainMenuState;
 import states.FreeplayState;
@@ -96,7 +95,13 @@ class MasterEditorMenu extends MusicBeatState
 			itemGroup.visible = false;
 		}
 
-		if (grpItems.length > 0) grpItems.members[0].visible = true;
+		repositionMenuItems();
+
+		if (grpItems.length > 0) 
+		{
+			grpItems.members[0].visible = true;
+			highlightSelectedItem(grpItems.members[0], true);
+		}
 
 		#if MODS_ALLOWED
 		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 42).makeGraphic(FlxG.width, 42, 0xFF000000);
@@ -184,12 +189,75 @@ class MasterEditorMenu extends MusicBeatState
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		if (grpItems.members[curSelected] != null)
+		{
 			grpItems.members[curSelected].visible = false;
+			highlightSelectedItem(grpItems.members[curSelected], false);
+		}
 
 		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
 
 		if (grpItems.members[curSelected] != null)
+		{
 			grpItems.members[curSelected].visible = true;
+			highlightSelectedItem(grpItems.members[curSelected], true);
+
+			var selectedGroup = grpItems.members[curSelected];
+			selectedGroup.scale.set(1.05, 1.05);
+			FlxTween.tween(selectedGroup.scale, {x: 1, y: 1}, 0.1, {ease: FlxEase.backOut});
+		}
+	}
+
+	private function highlightSelectedItem(group:FlxSpriteGroup, selected:Bool):Void
+	{
+		for (member in group.members)
+		{
+			if (Std.is(member, FlxSprite) && member.graphic != null && member.width == 120 && member.height == 120)
+			{
+				var iconBg:FlxSprite = cast member;
+				if (selected)
+				{
+					iconBg.alpha = 0.4;
+					iconBg.color = FlxColor.YELLOW;
+					FlxTween.tween(iconBg, {alpha: 0.6}, 0.2, {type: PINGPONG});
+				}
+				else
+				{
+					iconBg.alpha = 0.2;
+					iconBg.color = FlxColor.WHITE;
+					FlxTween.cancelTweensOf(iconBg);
+				}
+			}
+
+			if (Std.is(member, Alphabet))
+			{
+				var text:Alphabet = cast member;
+				if (selected)
+				{
+					text.alpha = 1;
+				}
+				else
+				{
+					text.alpha = 0.6;
+				}
+			}
+		}
+	}
+
+	private function repositionMenuItems():Void
+	{
+		var totalWidth:Float = (grpItems.length * itemWidth) + ((grpItems.length - 1) * itemSpacing);
+		var startX:Float = (FlxG.width - totalWidth) / 2;
+		var centerY:Float = (FlxG.height - itemHeight) / 2;
+		
+		for (i in 0...grpItems.length)
+		{
+			var item = grpItems.members[i];
+			if (item != null)
+			{
+				item.x = startX + (i * (itemWidth + itemSpacing));
+				item.y = centerY;
+			}
+		}
 	}
 
 	#if MODS_ALLOWED
@@ -215,4 +283,42 @@ class MasterEditorMenu extends MusicBeatState
 		directoryTxt.text = directoryTxt.text.toUpperCase();
 	}
 	#end
+
+	override function destroy():Void
+	{
+		if (grpItems != null)
+		{
+			for (item in grpItems.members)
+			{
+				if (item != null)
+				{
+					FlxTween.cancelTweensOf(item);
+					FlxTween.cancelTweensOf(item.scale);
+
+					for (member in item.members)
+					{
+						if (member != null)
+						{
+							FlxTween.cancelTweensOf(member);
+							member.destroy();
+						}
+					}
+					item.destroy();
+				}
+			}
+			grpItems = null;
+		}
+
+		if (directoryTxt != null)
+		{
+			directoryTxt.destroy();
+			directoryTxt = null;
+		}
+
+		options = null;
+		iconNames = null;
+		directories = null;
+		
+		super.destroy();
+	}
 }

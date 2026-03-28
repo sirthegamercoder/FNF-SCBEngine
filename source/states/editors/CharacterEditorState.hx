@@ -58,7 +58,6 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	var selectedFormat:FlxTextFormat = new FlxTextFormat(FlxColor.LIME);
 
 	var cameraPosition:Point = new Point();
-	var isDragging:Bool = false;
 
 	public function new(char:String = null, goToPlayState:Bool = true)
 	{
