@@ -41,6 +41,9 @@ class MasterEditorMenu extends MusicBeatState
 	private var itemWidth:Float = 250;
 	private var itemHeight:Float = 180;
 	private var itemSpacing:Float = 20;
+	
+	private var isAnimating:Bool = false;
+	private var slideDuration:Float = 0.3;
 
 	override function create()
 	{
@@ -93,7 +96,20 @@ class MasterEditorMenu extends MusicBeatState
 
 		for (i in 0...grpItems.length)
 		{
-			grpItems.members[i].visible = (i == curSelected);
+			if (i == curSelected)
+			{
+				grpItems.members[i].visible = true;
+				grpItems.members[i].alpha = 1;
+			}
+			else
+			{
+				grpItems.members[i].visible = true;
+				grpItems.members[i].alpha = 0;
+				if (i < curSelected)
+					grpItems.members[i].x -= FlxG.width;
+				else
+					grpItems.members[i].x += FlxG.width;
+			}
 		}
 
 		if (grpItems.length > 0) 
@@ -130,32 +146,35 @@ class MasterEditorMenu extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (controls.UI_LEFT_P)
+		if (!isAnimating)
 		{
-			changeSelection(-1);
-		}
-		if (controls.UI_RIGHT_P)
-		{
-			changeSelection(1);
+			if (controls.UI_LEFT_P)
+			{
+				changeSelection(-1);
+			}
+			if (controls.UI_RIGHT_P)
+			{
+				changeSelection(1);
+			}
 		}
 
 		#if MODS_ALLOWED
-		if(controls.UI_UP_P)
+		if(controls.UI_UP_P && !isAnimating)
 		{
 			changeDirectory(-1);
 		}
-		if(controls.UI_DOWN_P)
+		if(controls.UI_DOWN_P && !isAnimating)
 		{
 			changeDirectory(1);
 		}
 		#end
 
-		if (controls.BACK)
+		if (controls.BACK && !isAnimating)
 		{
 			MusicBeatState.switchState(new MainMenuState());
 		}
 
-		if (controls.ACCEPT)
+		if (controls.ACCEPT && !isAnimating)
 		{
 			switch(options[curSelected]) {
 				case 'Chart Editor':
@@ -184,25 +203,49 @@ class MasterEditorMenu extends MusicBeatState
 
 	function changeSelection(change:Int = 0)
 	{
+		if (isAnimating) return;
+		
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
-		if (grpItems.members[curSelected] != null)
-		{
-			grpItems.members[curSelected].visible = false;
-			highlightSelectedItem(grpItems.members[curSelected], false);
-		}
+		var oldSelected = curSelected;
+		var newSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
 
-		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
+		var direction:Int = (newSelected > oldSelected) ? 1 : -1;
+		
+		isAnimating = true;
 
-		if (grpItems.members[curSelected] != null)
-		{
-			grpItems.members[curSelected].visible = true;
-			highlightSelectedItem(grpItems.members[curSelected], true);
+		var oldItem = grpItems.members[oldSelected];
+		var targetX_old = oldItem.x + (direction * FlxG.width);
+		
+		FlxTween.tween(oldItem, {x: targetX_old, alpha: 0}, slideDuration, {
+			ease: FlxEase.cubeOut,
+			onComplete: function(_) {
+				oldItem.visible = false;
+			}
+		});
+		
+		var newItem = grpItems.members[newSelected];
+		newItem.visible = true;
+		newItem.alpha = 0;
 
-			var selectedGroup = grpItems.members[curSelected];
-			selectedGroup.scale.set(1.05, 1.05);
-			FlxTween.tween(selectedGroup.scale, {x: 1, y: 1}, 0.1, {ease: FlxEase.backOut});
-		}
+		if (direction == 1)
+			newItem.x = oldItem.x - FlxG.width;
+		else
+			newItem.x = oldItem.x + FlxG.width;
+
+		FlxTween.tween(newItem, {x: oldItem.x, alpha: 1}, slideDuration, {
+			ease: FlxEase.cubeOut,
+			onComplete: function(_) {
+				highlightSelectedItem(oldItem, false);
+				curSelected = newSelected;
+				highlightSelectedItem(newItem, true);
+
+				newItem.scale.set(1.05, 1.05);
+				FlxTween.tween(newItem.scale, {x: 1, y: 1}, 0.1, {ease: FlxEase.backOut});
+				
+				isAnimating = false;
+			}
+		});
 	}
 
 	private function highlightSelectedItem(group:FlxSpriteGroup, selected:Bool):Void
