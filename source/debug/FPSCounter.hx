@@ -66,80 +66,76 @@ class FPSCounter extends TextField
 	@:noCompletion private var prevTime:Int;
 
 	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
-	   {
+    {
+        super();
+        
+        instance = this;
+        
+        positionFPS(x, y);
+        
+        currentFPS = 0;
 
-	    super();
-
-		instance = this;
-
-		positionFPS(x, y);
-
-		currentFPS = 0;
-
-		textDisplay = new TextField();
-		textDisplay.selectable = false;
-		textDisplay.mouseEnabled = false;
-		textDisplay.defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, color);
-		textDisplay.antiAliasType = openfl.text.AntiAliasType.NORMAL;
-		textDisplay.sharpness = 100;
-		textDisplay.width = 350;
-		textDisplay.height = 550;
-		textDisplay.x = 2;
-		textDisplay.y = 1;
-		textDisplay.multiline = true;
-		textDisplay.text = "FPS";
-		textDisplay.wordWrap = false;
-		textDisplay.autoSize = openfl.text.TextFieldAutoSize.LEFT;
-		addChild(textDisplay);
-
-		times = [];
-		lastFramerateUpdateTime = Timer.stamp();
-		prevTime = Lib.getTimer();
-		updateTime = prevTime + 500;
-
-		lastFrameTime = Timer.stamp();
-		frameTimesArray = [];
-	}
-
-	public dynamic function updateText():Void // so people can override it in hscript
-	{
-		var currentMemory = memoryMegas;
-
-		if (currentMemory > memoryPeak) {
-			memoryPeak = currentMemory;
-		}
-
-		if (displayedMemory == 0) {
-			displayedMemory = currentMemory;
-			displayedMemoryPeak = memoryPeak;
-		} else {
-			displayedMemory += (currentMemory - displayedMemory) * memoryLerpSpeed;
-			displayedMemoryPeak += (memoryPeak - displayedMemoryPeak) * memoryLerpSpeed;
-		}
-
-		var currentMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemory);
-		var peakMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemoryPeak);
-
-		var targetFPS = #if (ClientPrefs && ClientPrefs.data && ClientPrefs.data.framerate) ClientPrefs.data.framerate #else FlxG.stage.window.frameRate #end;
-		var halfFPS = targetFPS * 0.5;
-		var textColorValue:Int;
-
-		if (currentFPS >= halfFPS) {
-			textColorValue = 0xFFFFFF;
-		} else {
-			textColorValue = 0xFF0000;
-		}
-		textDisplay.defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, textColorValue);
-		textDisplay.setTextFormat(textDisplay.defaultTextFormat);
-
-		var displayText:String = "";
-
-		displayText = '' + Std.string(currentFPS) + ' FPS';
-		displayText += '\n' + formatFloat(frameTimeMs, 1) + ' / ' + formatFloat(avgFrameTimeMs, 1) + ' ms';
-		displayText += '\n' + currentMemoryStr + ' / ' + peakMemoryStr;
-
-		textDisplay.text = displayText;
-	}
+        selectable = false;
+        mouseEnabled = false;
+        defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, color);
+        antiAliasType = openfl.text.AntiAliasType.NORMAL;
+        sharpness = 100;
+        width = 350;
+        height = 550;
+        x = X;
+        y = Y;
+        multiline = true;
+        text = "FPS";
+        wordWrap = false;
+        autoSize = openfl.text.TextFieldAutoSize.LEFT;
+        
+        times = [];
+        lastFramerateUpdateTime = Timer.stamp();
+        prevTime = Lib.getTimer();
+        updateTime = prevTime + 500;
+        
+        lastFrameTime = Timer.stamp();
+        frameTimesArray = [];
+    }
+    
+    public dynamic function updateText():Void
+    {
+        var currentMemory = memoryMegas;
+        
+        if (currentMemory > memoryPeak) {
+            memoryPeak = currentMemory;
+        }
+        
+        if (displayedMemory == 0) {
+            displayedMemory = currentMemory;
+            displayedMemoryPeak = memoryPeak;
+        } else {
+            displayedMemory += (currentMemory - displayedMemory) * memoryLerpSpeed;
+            displayedMemoryPeak += (memoryPeak - displayedMemoryPeak) * memoryLerpSpeed;
+        }
+        
+        var currentMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemory);
+        var peakMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemoryPeak);
+        
+        var targetFPS = #if (ClientPrefs && ClientPrefs.data && ClientPrefs.data.framerate) ClientPrefs.data.framerate #else FlxG.stage.window.frameRate #end;
+        var halfFPS = targetFPS * 0.5;
+        var textColorValue:Int;
+        
+        if (currentFPS >= halfFPS) {
+            textColorValue = 0xFFFFFF;
+        } else {
+            textColorValue = 0xFF0000;
+        }
+        defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, textColorValue);
+        setTextFormat(defaultTextFormat);
+        
+        var displayText:String = "";
+        displayText = '' + Std.string(currentFPS) + ' FPS';
+        displayText += '\n' + formatFloat(frameTimeMs, 1) + ' / ' + formatFloat(avgFrameTimeMs, 1) + ' ms';
+        displayText += '\n' + currentMemoryStr + ' / ' + peakMemoryStr;
+        
+        text = displayText;
+    }
 
 	var deltaTimeout:Float = 0.0;
 	private override function __enterFrame(deltaTime:Float):Void
