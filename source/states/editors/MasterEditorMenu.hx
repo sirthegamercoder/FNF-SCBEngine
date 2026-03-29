@@ -19,36 +19,18 @@ class MasterEditorMenu extends MusicBeatState
 		'Dialogue Portrait Editor',
 		'Note Splash Editor'
 	];
-
-	var iconNames:Array<String> = [
-		'chart',
-		'character',
-		'stage',
-		'week',
-		'menuChar',
-		'dialogue',
-		'portrait',
-		'noteSplash'
-	];
-	
-	private var grpItems:FlxTypedGroup<FlxSpriteGroup>;
+	private var grpTexts:FlxTypedGroup<Alphabet>;
 	private var directories:Array<String> = [null];
 
 	private var curSelected = 0;
 	private var curDirectory = 0;
 	private var directoryTxt:FlxText;
-	
-	private var itemWidth:Float = 250;
-	private var itemHeight:Float = 180;
-	private var itemSpacing:Float = 20;
-	
-	private var isAnimating:Bool = false;
-	private var slideDuration:Float = 0.3;
 
 	override function create()
 	{
 		FlxG.camera.bgColor = FlxColor.BLACK;
 		#if DISCORD_ALLOWED
+		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Editors Main Menu", null);
 		#end
 
@@ -57,85 +39,25 @@ class MasterEditorMenu extends MusicBeatState
 		bg.color = 0xFF353535;
 		add(bg);
 
-		grpItems = new FlxTypedGroup<FlxSpriteGroup>();
-		add(grpItems);
+		grpTexts = new FlxTypedGroup<Alphabet>();
+		add(grpTexts);
 
 		for (i in 0...options.length)
 		{
-			var itemGroup:FlxSpriteGroup = new FlxSpriteGroup();
-			
-			var iconBg:FlxSprite = new FlxSprite().makeGraphic(150, 150, FlxColor.WHITE);
-			iconBg.setGraphicSize(120, 120);
-			iconBg.updateHitbox();
-			iconBg.screenCenter(XY);
-			iconBg.x = (itemWidth / 2) - (iconBg.width / 2);
-			iconBg.y = -30;
-			iconBg.alpha = 0.2;
-			iconBg.antialiasing = ClientPrefs.data.antialiasing;
-			itemGroup.add(iconBg);
-
-			var icon:FlxSprite = new FlxSprite().loadGraphic(Paths.image('editors/menuIcons/' + iconNames[i]));
-			icon.setGraphicSize(100, 100);
-			icon.updateHitbox();
-			icon.screenCenter(XY);
-			icon.x = (itemWidth / 2) - (icon.width / 2);
-			icon.y = -20;
-			icon.antialiasing = ClientPrefs.data.antialiasing;
-			itemGroup.add(icon);
-
-			var leText:Alphabet = new Alphabet(0, 70, options[i], true);
-			leText.screenCenter(X);
-			leText.x = (itemWidth / 2) - (leText.width / 2);
-			leText.alpha = 0.6;
-			itemGroup.add(leText);
-			
-			grpItems.add(itemGroup);
+			var leText:Alphabet = new Alphabet(90, 320, options[i], true);
+			leText.isMenuItem = true;
+			leText.targetY = i;
+			grpTexts.add(leText);
+			leText.snapToPosition();
 		}
-
-		var totalWidth:Float = (grpItems.length * itemWidth) + ((grpItems.length - 1) * itemSpacing);
-		var startX:Float = (FlxG.width - totalWidth) / 2;
-		var centerY:Float = (FlxG.height - itemHeight) / 2;
 		
-		for (i in 0...grpItems.length)
-		{
-			var item = grpItems.members[i];
-			if (item != null)
-			{
-				item.x = startX + (i * (itemWidth + itemSpacing));
-				item.y = centerY;
-			}
-		}
-
-		for (i in 0...grpItems.length)
-		{
-			if (i == curSelected)
-			{
-				grpItems.members[i].visible = true;
-				grpItems.members[i].alpha = 1;
-			}
-			else
-			{
-				grpItems.members[i].visible = true;
-				grpItems.members[i].alpha = 0;
-				if (i < curSelected)
-					grpItems.members[i].x -= FlxG.width;
-				else
-					grpItems.members[i].x += FlxG.width;
-			}
-		}
-
-		if (grpItems.length > 0) 
-		{
-			highlightSelectedItem(grpItems.members[curSelected], true);
-		}
-
 		#if MODS_ALLOWED
 		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 42).makeGraphic(FlxG.width, 42, 0xFF000000);
 		textBG.alpha = 0.6;
 		add(textBG);
 
 		directoryTxt = new FlxText(textBG.x, textBG.y + 4, FlxG.width, '', 32);
-		directoryTxt.setFormat(Paths.font("phantom.ttf"), 32, FlxColor.WHITE, CENTER);
+		directoryTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER);
 		directoryTxt.scrollFactor.set();
 		add(directoryTxt);
 		
@@ -148,48 +70,45 @@ class MasterEditorMenu extends MusicBeatState
 		if(found > -1) curDirectory = found;
 		changeDirectory();
 		#end
-		
+		changeSelection();
+
 		Cursor.hide();
 
-		addTouchPad('LEFT_FULL', 'A_B');
+		addTouchPad(#if MODS_ALLOWED 'LEFT_FULL' #else 'UP_DOWN' #end, 'A_B');
 
 		super.create();
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (!isAnimating)
+		if (controls.UI_UP_P)
 		{
-			if (controls.UI_LEFT_P)
-			{
-				changeSelection(-1);
-			}
-			if (controls.UI_RIGHT_P)
-			{
-				changeSelection(1);
-			}
+			changeSelection(-1);
 		}
-
+		if (controls.UI_DOWN_P)
+		{
+			changeSelection(1);
+		}
 		#if MODS_ALLOWED
-		if(controls.UI_UP_P && !isAnimating)
+		if(controls.UI_LEFT_P)
 		{
 			changeDirectory(-1);
 		}
-		if(controls.UI_DOWN_P && !isAnimating)
+		if(controls.UI_RIGHT_P)
 		{
 			changeDirectory(1);
 		}
 		#end
 
-		if (controls.BACK && !isAnimating)
+		if (controls.BACK)
 		{
 			MusicBeatState.switchState(new MainMenuState());
 		}
 
-		if (controls.ACCEPT && !isAnimating)
+		if (controls.ACCEPT)
 		{
 			switch(options[curSelected]) {
-				case 'Chart Editor':
+				case 'Chart Editor'://felt it would be cool maybe
 					LoadingState.loadAndSwitchState(new ChartingState(), false);
 				case 'Character Editor':
 					LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
@@ -210,90 +129,20 @@ class MasterEditorMenu extends MusicBeatState
 			FreeplayState.destroyFreeplayVocals();
 		}
 		
+		for (num => item in grpTexts.members)
+		{
+			item.targetY = num - curSelected;
+			item.alpha = 0.6;
+			if (item.targetY == 0)
+				item.alpha = 1;
+		}
 		super.update(elapsed);
 	}
 
 	function changeSelection(change:Int = 0)
 	{
-		if (isAnimating) return;
-		
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-
-		var oldSelected = curSelected;
-		var newSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
-
-		var direction:Int = (newSelected > oldSelected) ? 1 : -1;
-		
-		isAnimating = true;
-
-		var oldItem = grpItems.members[oldSelected];
-		var targetX_old = oldItem.x + (direction * FlxG.width);
-		
-		FlxTween.tween(oldItem, {x: targetX_old, alpha: 0}, slideDuration, {
-			ease: FlxEase.cubeOut,
-			onComplete: function(_) {
-				oldItem.visible = false;
-			}
-		});
-		
-		var newItem = grpItems.members[newSelected];
-		newItem.visible = true;
-		newItem.alpha = 0;
-
-		if (direction == 1)
-			newItem.x = oldItem.x - FlxG.width;
-		else
-			newItem.x = oldItem.x + FlxG.width;
-
-		FlxTween.tween(newItem, {x: oldItem.x, alpha: 1}, slideDuration, {
-			ease: FlxEase.cubeOut,
-			onComplete: function(_) {
-				highlightSelectedItem(oldItem, false);
-				curSelected = newSelected;
-				highlightSelectedItem(newItem, true);
-
-				newItem.scale.set(1.05, 1.05);
-				FlxTween.tween(newItem.scale, {x: 1, y: 1}, 0.1, {ease: FlxEase.backOut});
-				
-				isAnimating = false;
-			}
-		});
-	}
-
-	private function highlightSelectedItem(group:FlxSpriteGroup, selected:Bool):Void
-	{
-		for (member in group.members)
-		{
-			if (Std.is(member, FlxSprite) && member.graphic != null && member.width == 120 && member.height == 120)
-			{
-				var iconBg:FlxSprite = cast member;
-				if (selected)
-				{
-					iconBg.alpha = 0.4;
-					iconBg.color = FlxColor.YELLOW;
-					FlxTween.tween(iconBg, {alpha: 0.6}, 0.2, {type: PINGPONG});
-				}
-				else
-				{
-					iconBg.alpha = 0.2;
-					iconBg.color = FlxColor.WHITE;
-					FlxTween.cancelTweensOf(iconBg);
-				}
-			}
-
-			if (Std.is(member, Alphabet))
-			{
-				var text:Alphabet = cast member;
-				if (selected)
-				{
-					text.alpha = 1;
-				}
-				else
-				{
-					text.alpha = 0.6;
-				}
-			}
-		}
+		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
 	}
 
 	#if MODS_ALLOWED
@@ -319,42 +168,4 @@ class MasterEditorMenu extends MusicBeatState
 		directoryTxt.text = directoryTxt.text.toUpperCase();
 	}
 	#end
-
-	override function destroy():Void
-	{
-		if (grpItems != null)
-		{
-			for (item in grpItems.members)
-			{
-				if (item != null)
-				{
-					FlxTween.cancelTweensOf(item);
-					FlxTween.cancelTweensOf(item.scale);
-
-					for (member in item.members)
-					{
-						if (member != null)
-						{
-							FlxTween.cancelTweensOf(member);
-							member.destroy();
-						}
-					}
-					item.destroy();
-				}
-			}
-			grpItems = null;
-		}
-
-		if (directoryTxt != null)
-		{
-			directoryTxt.destroy();
-			directoryTxt = null;
-		}
-
-		options = null;
-		iconNames = null;
-		directories = null;
-		
-		super.destroy();
-	}
 }
