@@ -21,123 +21,144 @@ import lime.system.System as LimeSystem;
 @:headerInclude('sys/utsname.h')
 #end
 #end
+
 class FPSCounter extends TextField
 {
 	/**
 		The current frame rate, expressed using frames-per-second
 	**/
 	public var currentFPS(default, null):Int;
-	
-	/**
-		The smoothed frame rate for stable display
-	**/
-	public var smoothedFPS(default, null):Int;
 
 	/**
 		The current memory usage (WARNING: this is NOT your total program memory usage, rather it shows the garbage collector memory)
 	**/
+
 	public var memoryMegas(get, never):Float;
+
+	/**
+		Peak memory usage tracking
+	**/
+	public var memoryPeak(default, null):Float = 0;
 	
 	/**
-		Peak memory usage tracked during gameplay
+		Smooth memory display (interpolated for smooth animation)
 	**/
-	public var peakMemoryMegas(default, null):Float;
+	private var displayedMemory:Float = 0;
+	private var displayedMemoryPeak:Float = 0;
+	private var memoryLerpSpeed:Float = 0.1;
+	
+	/**
+		Text display field
+	**/
+	private var textDisplay:TextField;
+
+	public static var instance:FPSCounter;
+
+	private var lastFrameTime:Float = 0.0;
+	private var frameTimeMs:Float = 0.0;
+	private var frameTimesArray:Array<Float> = [];
+	private var avgFrameTimeMs:Float = 0.0;
 
 	@:noCompletion private var times:Array<Float>;
 	@:noCompletion private var lastFramerateUpdateTime:Float;
 	@:noCompletion private var updateTime:Int;
 	@:noCompletion private var framesCount:Int;
 	@:noCompletion private var prevTime:Int;
-	
-	@:noCompletion private var smoothedFPSValue:Float;
-	@:noCompletion private var smoothingFactor:Float;
-
-	public var os:String = '';
 
 	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
-	{
-		super();
+	   {
 
-		if (LimeSystem.platformName == LimeSystem.platformVersion || LimeSystem.platformVersion == null)
-			os = '\nOS: ${LimeSystem.platformName}' #if cpp + ' ${getArch() != 'Unknown' ? getArch() : ''}' #end;
-		else
-			os = '\nOS: ${LimeSystem.platformName}' #if cpp + ' ${getArch() != 'Unknown' ? getArch() : ''}' #end + ' - ${LimeSystem.platformVersion}';
+	    super();
+
+		instance = this;
 
 		positionFPS(x, y);
 
 		currentFPS = 0;
-		smoothedFPS = 0;
-		smoothedFPSValue = 0;
-		smoothingFactor = 0.3;
-		peakMemoryMegas = 0;
-		
-		selectable = false;
-		mouseEnabled = false;
-		defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, color);
-		width = FlxG.width;
-		multiline = true;
-		text = "FPS: ";
+
+		textDisplay = new TextField();
+		textDisplay.selectable = false;
+		textDisplay.mouseEnabled = false;
+		textDisplay.defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, color);
+		textDisplay.antiAliasType = openfl.text.AntiAliasType.NORMAL;
+		textDisplay.sharpness = 100;
+		textDisplay.width = 350;
+		textDisplay.height = 550;
+		textDisplay.x = 2;
+		textDisplay.y = 1;
+		textDisplay.multiline = true;
+		textDisplay.text = "FPS";
+		textDisplay.wordWrap = false;
+		textDisplay.autoSize = openfl.text.TextFieldAutoSize.LEFT;
+		addChild(textDisplay);
 
 		times = [];
 		lastFramerateUpdateTime = Timer.stamp();
 		prevTime = Lib.getTimer();
 		updateTime = prevTime + 500;
-	}
-	
-	private function updateSmoothedFPS():Void
-	{
-		if (smoothedFPSValue == 0) {
-			smoothedFPSValue = currentFPS;
-		} else {
-			smoothedFPSValue = (smoothedFPSValue * (1 - smoothingFactor)) + (currentFPS * smoothingFactor);
-		}
-		smoothedFPS = Math.round(smoothedFPSValue);
-	}
-	
-	private function updatePeakMemory():Void
-	{
-		if (memoryMegas > peakMemoryMegas) {
-			peakMemoryMegas = memoryMegas;
-		}
-	}
-	
-	private function getFPSColor():Int
-	{
-		var targetFPS = ClientPrefs.data.framerate;
-		if (targetFPS <= 0) targetFPS = 60;
-		
-		var ratio = smoothedFPS / targetFPS;
-		
-		if (ratio >= 0.9) return 0xFF00FF00;
-		if (ratio >= 0.7) return 0xFFFFFF00;
-		if (ratio >= 0.5) return 0xFFFFA500;
-		return 0xFFFF0000;
-	}
-	
-	private function formatBytes(bytes:Float):String
-	{
-		return flixel.util.FlxStringUtil.formatBytes(bytes);
+
+		lastFrameTime = Timer.stamp();
+		frameTimesArray = [];
 	}
 
 	public dynamic function updateText():Void // so people can override it in hscript
 	{
-		updatePeakMemory();
-		
-		var memoryStr = formatBytes(memoryMegas);
-		var peakStr = formatBytes(peakMemoryMegas);
-		var fpsToShow = smoothedFPS;
+		var currentMemory = memoryMegas;
 
-		text = 
-		'FPS: $fpsToShow' + 
-		'\nMemory: $memoryStr / $peakStr' +
-		os;
+		if (currentMemory > memoryPeak) {
+			memoryPeak = currentMemory;
+		}
 
-		textColor = getFPSColor();
+		if (displayedMemory == 0) {
+			displayedMemory = currentMemory;
+			displayedMemoryPeak = memoryPeak;
+		} else {
+			displayedMemory += (currentMemory - displayedMemory) * memoryLerpSpeed;
+			displayedMemoryPeak += (memoryPeak - displayedMemoryPeak) * memoryLerpSpeed;
+		}
+
+		var currentMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemory);
+		var peakMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemoryPeak);
+
+		var targetFPS = #if (ClientPrefs && ClientPrefs.data && ClientPrefs.data.framerate) ClientPrefs.data.framerate #else FlxG.stage.window.frameRate #end;
+		var halfFPS = targetFPS * 0.5;
+		var textColorValue:Int;
+
+		if (currentFPS >= halfFPS) {
+			textColorValue = 0xFFFFFF;
+		} else {
+			textColorValue = 0xFF0000;
+		}
+		textDisplay.defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, textColorValue);
+		textDisplay.setTextFormat(textDisplay.defaultTextFormat);
+
+		var displayText:String = "";
+
+		displayText = '' + Std.string(currentFPS) + ' FPS';
+		displayText += '\n' + formatFloat(frameTimeMs, 1) + ' / ' + formatFloat(avgFrameTimeMs, 1) + ' ms';
+		displayText += '\n' + currentMemoryStr + ' / ' + peakMemoryStr;
+
+		textDisplay.text = displayText;
 	}
 
 	var deltaTimeout:Float = 0.0;
 	private override function __enterFrame(deltaTime:Float):Void
 	{
+		var currentFrameTime = Timer.stamp();
+		frameTimeMs = (currentFrameTime - lastFrameTime) * 1000.0;
+		lastFrameTime = currentFrameTime;
+
+		frameTimesArray.push(frameTimeMs);
+		if (frameTimesArray.length > 10) {
+			frameTimesArray.shift();
+		}
+		
+		var sum:Float = 0.0;
+		for (time in frameTimesArray) {
+			sum += time;
+		}
+		avgFrameTimeMs = sum / frameTimesArray.length;
+		
 		if (ClientPrefs.data.fpsRework)
 		{
 			// Flixel keeps reseting this to 60 on focus gained
@@ -150,12 +171,10 @@ class FPSCounter extends TextField
 			if (currentTime >= updateTime)
 			{
 				var elapsed = currentTime - prevTime;
-				currentFPS = Math.ceil((framesCount * 1000) / elapsed);
+				currentFPS = Math.round((framesCount * 1000) / elapsed);
 				framesCount = 0;
 				prevTime = currentTime;
 				updateTime = currentTime + 500;
-
-				updateSmoothedFPS();
 			}
 
 			// Set Update and Draw framerate to the current FPS every 1.5 second to prevent "slowness" issue
@@ -173,39 +192,64 @@ class FPSCounter extends TextField
 			times.push(now);
 			while (times[0] < now - 1000)
 				times.shift();
-			// prevents the overlay from updating every frame, why would you need to anyways @crowplexus
-			if (deltaTimeout < 50)
+
+			if (deltaTimeout < 33)
 			{
 				deltaTimeout += deltaTime;
 				return;
 			}
 
-			currentFPS = times.length < FlxG.updateFramerate ? times.length : FlxG.updateFramerate;
+			currentFPS = times.length;
 			deltaTimeout = 0.0;
-
-			updateSmoothedFPS();
 		}
 
 		updateText();
+	}
+
+	private function formatFloat(value:Float, decimals:Int):String {
+		var multiplier = Math.pow(10, decimals);
+		var rounded = Math.round(value * multiplier) / multiplier;
+		var str = Std.string(rounded);
+
+		if (str.indexOf('.') == -1) {
+			str += '.';
+		}
+		
+		var parts = str.split('.');
+		if (parts.length > 1) {
+			while (parts[1].length < decimals) {
+				parts[1] += '0';
+			}
+			return parts[0] + '.' + parts[1];
+		}
+		
+		return str + StringTools.lpad('', '0', decimals);
+	}
+
+	private function getGCStats():String {
+		#if cpp
+		try {
+			var totalMem = cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_RESERVED);
+			var usedMem = cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
+			var freeMem = totalMem - usedMem;
+			
+			var freePercentage = Math.round((freeMem / totalMem) * 100);
+			return '${freePercentage}% free';
+		} catch (e:Dynamic) {
+			return 'N/A';
+		}
+		#else
+		return 'N/A';
+		#end
 	}
 
 	inline function get_memoryMegas():Float
 		return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
 
 	public inline function positionFPS(X:Float, Y:Float, ?scale:Float = 1){
-		scaleX = scaleY = #if android (scale > 1 ? scale : 1) #else (scale < 1 ? scale : 1) #end;
-		x = FlxG.game.x + X;
-		y = FlxG.game.y + Y;
-	}
-
-	public inline function resetPeakMemory():Void
-	{
-		peakMemoryMegas = memoryMegas;
-	}
-
-	public inline function setSmoothingFactor(factor:Float):Void
-	{
-		smoothingFactor = Math.max(0.05, Math.min(0.95, factor));
+		scaleX = scaleY = 1.0;
+		x = X;
+		y = Y;
 	}
 
 	#if cpp
