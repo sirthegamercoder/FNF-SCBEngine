@@ -65,7 +65,7 @@ class FPSCounter extends TextField
 	@:noCompletion private var framesCount:Int;
 	@:noCompletion private var prevTime:Int;
 
-	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
+	public function new(x:Float = 45, y:Float = 30, color:Int = 0x000000)
     {
         super();
         
@@ -82,8 +82,8 @@ class FPSCounter extends TextField
         sharpness = 100;
         width = 350;
         height = 550;
-        x = 2;
-        y = 1;
+        x = X;
+        y = Y;
         multiline = true;
         text = "FPS";
         wordWrap = false;
