@@ -82,8 +82,8 @@ class FPSCounter extends TextField
         sharpness = 100;
         width = 350;
         height = 550;
-        x = X;
-        y = Y;
+        x = 2;
+        y = 1;
         multiline = true;
         text = "FPS";
         wordWrap = false;
