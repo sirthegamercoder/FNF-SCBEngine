@@ -59,7 +59,7 @@ class FPSCounter extends Sprite
 	private var textDisplay:TextField;
 
 	/**
-		Instancia singleton para acceso global
+		Singleton instance for global access
 	**/
 	public static var instance:FPSCounter;
 
@@ -81,7 +81,6 @@ class FPSCounter extends Sprite
 		super();
 
 		instance = this;
-
 
 		positionFPS(x, y);
 
@@ -227,14 +226,10 @@ class FPSCounter extends Sprite
 
 		var g:Graphics = bgShape.graphics;
 		g.clear();
-
-		var lines = 1.8;
-
-		var wd = 8;
 			
 		final INNER_DIFF:Int = 3;
-		var bgWidth = wd * 18 + 20;
-		var bgHeight = lines * 18 + 20;
+		var bgWidth = 8 * 18 + 20;
+		var bgHeight = 1.8 * 18 + 20;
 
 		g.beginFill(0x3d3f41, 0.5);
 		g.drawRect(0, 0, bgWidth + (INNER_DIFF * 2), bgHeight + (INNER_DIFF * 2));
