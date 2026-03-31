@@ -1,5 +1,3 @@
-- The fade-out effect for countdown intros and combo ratings has now been re-added
-- The combo rating animations will now fade out in place instead of moving to the right side of the screen
-- The mobile version of the title text no longer uses mobilestartx and mobilestarty got replaced with ePMx and ePMy
-- Fixed a bug where the GF's position was floating in Tutorial
-- Improved Combo Coloring logic
+- The cursor now has its own custom style
+- FPS Counter now has a new look
+- Master Editor is now back to normal

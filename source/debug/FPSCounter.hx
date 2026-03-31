@@ -7,6 +7,9 @@ import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.system.System as OpenFlSystem;
 import lime.system.System as LimeSystem;
+import openfl.display.Graphics;
+import openfl.display.Shape;
+import openfl.display.Sprite;
 
 /**
 	The FPS class provides an easy-to-use monitor to display
@@ -21,8 +24,7 @@ import lime.system.System as LimeSystem;
 @:headerInclude('sys/utsname.h')
 #end
 #end
-
-class FPSCounter extends TextField
+class FPSCounter extends Sprite
 {
 	/**
 		The current frame rate, expressed using frames-per-second
@@ -32,7 +34,6 @@ class FPSCounter extends TextField
 	/**
 		The current memory usage (WARNING: this is NOT your total program memory usage, rather it shows the garbage collector memory)
 	**/
-
 	public var memoryMegas(get, never):Float;
 
 	/**
@@ -45,13 +46,21 @@ class FPSCounter extends TextField
 	**/
 	private var displayedMemory:Float = 0;
 	private var displayedMemoryPeak:Float = 0;
-	private var memoryLerpSpeed:Float = 0.1;
+	private var memoryLerpSpeed:Float = 0.1; // Speed of memory interpolation (0.1 = smooth, 1.0 = instant)
+
+	/**
+		Background shape for debug mode
+	**/
+	private var bgShape:Shape;
 	
 	/**
 		Text display field
 	**/
 	private var textDisplay:TextField;
 
+	/**
+		Instancia singleton para acceso global
+	**/
 	public static var instance:FPSCounter;
 
 	private var lastFrameTime:Float = 0.0;
@@ -65,77 +74,88 @@ class FPSCounter extends TextField
 	@:noCompletion private var framesCount:Int;
 	@:noCompletion private var prevTime:Int;
 
-	public function new(x:Float = 45, y:Float = 30, color:Int = 0x000000)
-    {
-        super();
-        
-        instance = this;
-        
-        positionFPS(x, y);
-        
-        currentFPS = 0;
 
-        selectable = false;
-        mouseEnabled = false;
-        defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, color);
-        antiAliasType = openfl.text.AntiAliasType.NORMAL;
-        sharpness = 100;
-        width = 350;
-        height = 550;
-        x = X;
-        y = Y;
-        multiline = true;
-        text = "FPS";
-        wordWrap = false;
-        autoSize = openfl.text.TextFieldAutoSize.LEFT;
-        
-        times = [];
-        lastFramerateUpdateTime = Timer.stamp();
-        prevTime = Lib.getTimer();
-        updateTime = prevTime + 500;
-        
-        lastFrameTime = Timer.stamp();
-        frameTimesArray = [];
-    }
-    
-    public dynamic function updateText():Void
-    {
-        var currentMemory = memoryMegas;
-        
-        if (currentMemory > memoryPeak) {
-            memoryPeak = currentMemory;
-        }
-        
-        if (displayedMemory == 0) {
-            displayedMemory = currentMemory;
-            displayedMemoryPeak = memoryPeak;
-        } else {
-            displayedMemory += (currentMemory - displayedMemory) * memoryLerpSpeed;
-            displayedMemoryPeak += (memoryPeak - displayedMemoryPeak) * memoryLerpSpeed;
-        }
-        
-        var currentMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemory);
-        var peakMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemoryPeak);
-        
-        var targetFPS = #if (ClientPrefs && ClientPrefs.data && ClientPrefs.data.framerate) ClientPrefs.data.framerate #else FlxG.stage.window.frameRate #end;
-        var halfFPS = targetFPS * 0.5;
-        var textColorValue:Int;
-        
-        if (currentFPS >= halfFPS) {
-            textColorValue = 0xFFFFFF;
-        } else {
-            textColorValue = 0xFF0000;
-        }
-        defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, textColorValue);
-        setTextFormat(defaultTextFormat);
-        
-        var displayText:String = "";
-        displayText = '' + Std.string(currentFPS) + ' FPS';
-        displayText += '\n' + formatFloat(frameTimeMs, 1) + ' / ' + formatFloat(avgFrameTimeMs, 1) + ' ms';
-        displayText += '\n' + currentMemoryStr + ' / ' + peakMemoryStr;
-        
-        text = displayText;
-    }
+	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
+	   {
+
+		super();
+
+		instance = this;
+
+
+		positionFPS(x, y);
+
+		currentFPS = 0;
+
+		textDisplay = new TextField();
+		textDisplay.selectable = false;
+		textDisplay.mouseEnabled = false;
+		textDisplay.defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, color);
+		textDisplay.antiAliasType = openfl.text.AntiAliasType.NORMAL;
+		textDisplay.sharpness = 100;
+		textDisplay.width = 350;
+		textDisplay.height = 550;
+		textDisplay.x = 2;
+		textDisplay.y = 1;
+		textDisplay.multiline = true;
+		textDisplay.text = "FPS";
+		textDisplay.wordWrap = false;
+		textDisplay.autoSize = openfl.text.TextFieldAutoSize.LEFT;
+		addChild(textDisplay);
+
+		times = [];
+		lastFramerateUpdateTime = Timer.stamp();
+		prevTime = Lib.getTimer();
+		updateTime = prevTime + 500;
+
+		lastFrameTime = Timer.stamp();
+		frameTimesArray = [];
+
+		bgShape = new Shape();
+		addChildAt(bgShape, 0);
+	}
+
+	public dynamic function updateText():Void // so people can override it in hscript
+	{
+		var currentMemory = memoryMegas;
+
+		if (currentMemory > memoryPeak) {
+			memoryPeak = currentMemory;
+		}
+
+		if (displayedMemory == 0) {
+			displayedMemory = currentMemory;
+			displayedMemoryPeak = memoryPeak;
+		} else {
+			displayedMemory += (currentMemory - displayedMemory) * memoryLerpSpeed;
+			displayedMemoryPeak += (memoryPeak - displayedMemoryPeak) * memoryLerpSpeed;
+		}
+
+		var currentMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemory);
+		var peakMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemoryPeak);
+
+		var targetFPS = #if (ClientPrefs && ClientPrefs.data && ClientPrefs.data.framerate) ClientPrefs.data.framerate #else FlxG.stage.window.frameRate #end;
+		var halfFPS = targetFPS * 0.5;
+		var textColorValue:Int;
+
+		if (currentFPS >= halfFPS) {
+			textColorValue = 0xFFFFFF;
+		} else {
+			textColorValue = 0xFF0000;
+		}
+		textDisplay.defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, textColorValue);
+		textDisplay.setTextFormat(textDisplay.defaultTextFormat);
+
+		var displayText:String = "";
+
+		displayText = '' + Std.string(currentFPS) + ' FPS';
+		displayText += '\n' + formatFloat(frameTimeMs, 1) + ' / ' + formatFloat(avgFrameTimeMs, 1) + ' ms';
+		displayText += '\n' + currentMemoryStr + ' / ' + peakMemoryStr;
+
+		textDisplay.text = displayText;
+
+		updateBackground();
+	}
 
 	var deltaTimeout:Float = 0.0;
 	private override function __enterFrame(deltaTime:Float):Void
@@ -148,7 +168,7 @@ class FPSCounter extends TextField
 		if (frameTimesArray.length > 10) {
 			frameTimesArray.shift();
 		}
-		
+
 		var sum:Float = 0.0;
 		for (time in frameTimesArray) {
 			sum += time;
@@ -202,6 +222,31 @@ class FPSCounter extends TextField
 		updateText();
 	}
 
+	private function updateBackground():Void {
+		if (bgShape == null) return;
+
+		var g:Graphics = bgShape.graphics;
+		g.clear();
+
+		var lines = 1.8;
+
+		var wd = 8;
+			
+		final INNER_DIFF:Int = 3;
+		var bgWidth = wd * 18 + 20;
+		var bgHeight = lines * 18 + 20;
+
+		g.beginFill(0x3d3f41, 0.5);
+		g.drawRect(0, 0, bgWidth + (INNER_DIFF * 2), bgHeight + (INNER_DIFF * 2));
+		g.endFill();
+
+		g.beginFill(0x2c2f30, 0.5);
+		g.drawRect(INNER_DIFF, INNER_DIFF, bgWidth, bgHeight);
+		g.endFill();
+
+		bgShape.visible = true;
+	}
+
 	private function formatFloat(value:Float, decimals:Int):String {
 		var multiplier = Math.pow(10, decimals);
 		var rounded = Math.round(value * multiplier) / multiplier;
@@ -220,6 +265,10 @@ class FPSCounter extends TextField
 		}
 		
 		return str + StringTools.lpad('', '0', decimals);
+	}
+
+	private function getDrawCalls():Int {
+		return FlxG.state.members.length * 2;
 	}
 
 	private function getGCStats():String {
@@ -244,8 +293,21 @@ class FPSCounter extends TextField
 
 	public inline function positionFPS(X:Float, Y:Float, ?scale:Float = 1){
 		scaleX = scaleY = 1.0;
+
 		x = X;
 		y = Y;
+
+		updateBackground();
+	}
+
+	public function destroy():Void {
+		if (bgShape != null && bgShape.parent != null) {
+			removeChild(bgShape);
+		}
+		
+		if (textDisplay != null && textDisplay.parent != null) {
+			removeChild(textDisplay);
+		}
 	}
 
 	#if cpp
