@@ -14,6 +14,7 @@ import psychlua.HScript.HScriptInfos;
 #end
 import openfl.events.KeyboardEvent;
 import lime.system.System as LimeSystem;
+import backend.Cursor;
 
 #if (linux || mac)
 import lime.graphics.Image;
@@ -159,6 +160,8 @@ class Main extends Sprite
 		var icon = Image.fromFile("icon.png");
 		Lib.current.stage.window.setIcon(icon);
 		#end
+
+		Cursor.hide();
 
 		FlxG.fixedTimestep = false;
 		FlxG.game.focusLostFramerate = #if mobile 30 #else 60 #end;

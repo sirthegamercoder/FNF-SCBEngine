@@ -3,7 +3,6 @@ package states.editors;
 import backend.WeekData;
 
 import objects.Character;
-import flixel.FlxObject;
 
 import states.MainMenuState;
 import states.FreeplayState;
@@ -20,33 +19,18 @@ class MasterEditorMenu extends MusicBeatState
 		'Dialogue Portrait Editor',
 		'Note Splash Editor'
 	];
-
-	var iconNames:Array<String> = [
-		'chart',
-		'character',
-		'stage',
-		'week',
-		'menuChar',
-		'dialogue',
-		'portrait',
-		'noteSplash'
-	];
-	
-	private var grpItems:FlxTypedGroup<FlxSpriteGroup>;
+	private var grpTexts:FlxTypedGroup<Alphabet>;
 	private var directories:Array<String> = [null];
 
 	private var curSelected = 0;
 	private var curDirectory = 0;
 	private var directoryTxt:FlxText;
-	
-	private var itemWidth:Float = 250;
-	private var itemHeight:Float = 180;
-	private var itemSpacing:Float = 20;
 
 	override function create()
 	{
 		FlxG.camera.bgColor = FlxColor.BLACK;
 		#if DISCORD_ALLOWED
+		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Editors Main Menu", null);
 		#end
 
@@ -55,49 +39,18 @@ class MasterEditorMenu extends MusicBeatState
 		bg.color = 0xFF353535;
 		add(bg);
 
-		grpItems = new FlxTypedGroup<FlxSpriteGroup>();
-		add(grpItems);
-
-		var centerX:Float = (FlxG.width - itemWidth) / 2;
-		var centerY:Float = (FlxG.height - itemHeight) / 2;
+		grpTexts = new FlxTypedGroup<Alphabet>();
+		add(grpTexts);
 
 		for (i in 0...options.length)
 		{
-			var itemGroup:FlxSpriteGroup = new FlxSpriteGroup();
-			itemGroup.x = centerX;
-			itemGroup.y = centerY;
-
-			var iconBg:FlxSprite = new FlxSprite().makeGraphic(150, 150, FlxColor.WHITE);
-			iconBg.setGraphicSize(120, 120);
-			iconBg.updateHitbox();
-			iconBg.screenCenter(XY);
-			iconBg.x = (itemWidth / 2) - (iconBg.width / 2);
-			iconBg.y = -30;
-			iconBg.alpha = 0.2;
-			iconBg.antialiasing = ClientPrefs.data.antialiasing;
-			itemGroup.add(iconBg);
-
-			var icon:FlxSprite = new FlxSprite().loadGraphic(Paths.image('editors/menuIcons/' + iconNames[i]));
-			icon.setGraphicSize(100, 100);
-			icon.updateHitbox();
-			icon.screenCenter(XY);
-			icon.x = (itemWidth / 2) - (icon.width / 2);
-			icon.y = -20;
-			icon.antialiasing = ClientPrefs.data.antialiasing;
-			itemGroup.add(icon);
-
-			var leText:Alphabet = new Alphabet(0, 70, options[i], true);
-			leText.screenCenter(X);
-			leText.x = (itemWidth / 2) - (leText.width / 2);
-			leText.alpha = 0.6;
-			itemGroup.add(leText);
-			
-			grpItems.add(itemGroup);
-			itemGroup.visible = false;
+			var leText:Alphabet = new Alphabet(90, 320, options[i], true);
+			leText.isMenuItem = true;
+			leText.targetY = i;
+			grpTexts.add(leText);
+			leText.snapToPosition();
 		}
-
-		if (grpItems.length > 0) grpItems.members[0].visible = true;
-
+		
 		#if MODS_ALLOWED
 		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 42).makeGraphic(FlxG.width, 42, 0xFF000000);
 		textBG.alpha = 0.6;
@@ -117,31 +70,31 @@ class MasterEditorMenu extends MusicBeatState
 		if(found > -1) curDirectory = found;
 		changeDirectory();
 		#end
-		
-		FlxG.mouse.visible = false;
+		changeSelection();
 
-		addTouchPad('LEFT_FULL', 'A_B');
+		Cursor.hide();
+
+		addTouchPad(#if MODS_ALLOWED 'LEFT_FULL' #else 'UP_DOWN' #end, 'A_B');
 
 		super.create();
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (controls.UI_LEFT_P)
+		if (controls.UI_UP_P)
 		{
 			changeSelection(-1);
 		}
-		if (controls.UI_RIGHT_P)
+		if (controls.UI_DOWN_P)
 		{
 			changeSelection(1);
 		}
-
 		#if MODS_ALLOWED
-		if(controls.UI_UP_P)
+		if(controls.UI_LEFT_P)
 		{
 			changeDirectory(-1);
 		}
-		if(controls.UI_DOWN_P)
+		if(controls.UI_RIGHT_P)
 		{
 			changeDirectory(1);
 		}
@@ -176,20 +129,20 @@ class MasterEditorMenu extends MusicBeatState
 			FreeplayState.destroyFreeplayVocals();
 		}
 		
+		for (num => item in grpTexts.members)
+		{
+			item.targetY = num - curSelected;
+			item.alpha = 0.6;
+			if (item.targetY == 0)
+				item.alpha = 1;
+		}
 		super.update(elapsed);
 	}
 
 	function changeSelection(change:Int = 0)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-
-		if (grpItems.members[curSelected] != null)
-			grpItems.members[curSelected].visible = false;
-
 		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
-
-		if (grpItems.members[curSelected] != null)
-			grpItems.members[curSelected].visible = true;
 	}
 
 	#if MODS_ALLOWED

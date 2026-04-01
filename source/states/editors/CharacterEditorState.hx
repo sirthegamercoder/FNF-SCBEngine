@@ -58,7 +58,6 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	var selectedFormat:FlxTextFormat = new FlxTextFormat(FlxColor.LIME);
 
 	var cameraPosition:Point = new Point();
-	var isDragging:Bool = false;
 
 	public function new(char:String = null, goToPlayState:Bool = true)
 	{
@@ -156,7 +155,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		add(frameAdvanceText);
 
 		addHelpScreen();
-		FlxG.mouse.visible = true;
+		Cursor.show();
 		FlxG.camera.zoom = 1;
 
 		makeUIMenu();
@@ -1098,7 +1097,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			}
 			else
 			{
-				FlxG.mouse.visible = false;
+				Cursor.hide();
 				MusicBeatState.switchState(new PlayState());
 			}
 			return;

@@ -7,6 +7,9 @@ import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.system.System as OpenFlSystem;
 import lime.system.System as LimeSystem;
+import openfl.display.Graphics;
+import openfl.display.Shape;
+import openfl.display.Sprite;
 
 /**
 	The FPS class provides an easy-to-use monitor to display
@@ -21,7 +24,7 @@ import lime.system.System as LimeSystem;
 @:headerInclude('sys/utsname.h')
 #end
 #end
-class FPSCounter extends TextField
+class FPSCounter extends Sprite
 {
 	/**
 		The current frame rate, expressed using frames-per-second
@@ -33,64 +36,144 @@ class FPSCounter extends TextField
 	**/
 	public var memoryMegas(get, never):Float;
 
+	/**
+		Peak memory usage tracking
+	**/
+	public var memoryPeak(default, null):Float = 0;
+	
+	/**
+		Smooth memory display (interpolated for smooth animation)
+	**/
+	private var displayedMemory:Float = 0;
+	private var displayedMemoryPeak:Float = 0;
+	private var memoryLerpSpeed:Float = 0.1; // Speed of memory interpolation (0.1 = smooth, 1.0 = instant)
+
+	/**
+		Background shape for debug mode
+	**/
+	private var bgShape:Shape;
+	
+	/**
+		Text display field
+	**/
+	private var textDisplay:TextField;
+
+	/**
+		Singleton instance for global access
+	**/
+	public static var instance:FPSCounter;
+
+	private var lastFrameTime:Float = 0.0;
+	private var frameTimeMs:Float = 0.0;
+	private var frameTimesArray:Array<Float> = [];
+	private var avgFrameTimeMs:Float = 0.0;
+
 	@:noCompletion private var times:Array<Float>;
 	@:noCompletion private var lastFramerateUpdateTime:Float;
 	@:noCompletion private var updateTime:Int;
 	@:noCompletion private var framesCount:Int;
 	@:noCompletion private var prevTime:Int;
 
-	#if mobile
-	public var os:String = '';
-	#end
 
 	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
-	{
+	   {
+
 		super();
 
-		#if mobile
-		if (LimeSystem.platformName == LimeSystem.platformVersion || LimeSystem.platformVersion == null)
-			os = '\nOS: ${LimeSystem.platformName}' #if cpp + ' ${getArch() != 'Unknown' ? getArch() : ''}' #end;
-		else
-			os = '\nOS: ${LimeSystem.platformName}' #if cpp + ' ${getArch() != 'Unknown' ? getArch() : ''}' #end + ' - ${LimeSystem.platformVersion}';
-		#end
+		instance = this;
 
 		positionFPS(x, y);
 
 		currentFPS = 0;
-		selectable = false;
-		mouseEnabled = false;
-		defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, color);
-		width = FlxG.width;
-		multiline = true;
-		text = "FPS: ";
+
+		textDisplay = new TextField();
+		textDisplay.selectable = false;
+		textDisplay.mouseEnabled = false;
+		textDisplay.defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, color);
+		textDisplay.antiAliasType = openfl.text.AntiAliasType.NORMAL;
+		textDisplay.sharpness = 100;
+		textDisplay.width = 350;
+		textDisplay.height = 550;
+		textDisplay.x = 2;
+		textDisplay.y = 1;
+		textDisplay.multiline = true;
+		textDisplay.text = "FPS";
+		textDisplay.wordWrap = false;
+		textDisplay.autoSize = openfl.text.TextFieldAutoSize.LEFT;
+		addChild(textDisplay);
 
 		times = [];
 		lastFramerateUpdateTime = Timer.stamp();
 		prevTime = Lib.getTimer();
 		updateTime = prevTime + 500;
+
+		lastFrameTime = Timer.stamp();
+		frameTimesArray = [];
+
+		bgShape = new Shape();
+		addChildAt(bgShape, 0);
 	}
 
 	public dynamic function updateText():Void // so people can override it in hscript
 	{
-		#if mobile
-		text = 
-		'FPS: $currentFPS' + 
-		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}' +
-		os;
-		#else
-		text =
-		'FPS: $currentFPS' + 
-		'\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
-		#end
+		var currentMemory = memoryMegas;
 
-		textColor = 0xFFFFFFFF;
-		if (currentFPS < FlxG.stage.window.frameRate * 0.5)
-			textColor = 0xFFFF0000;
+		if (currentMemory > memoryPeak) {
+			memoryPeak = currentMemory;
+		}
+
+		if (displayedMemory == 0) {
+			displayedMemory = currentMemory;
+			displayedMemoryPeak = memoryPeak;
+		} else {
+			displayedMemory += (currentMemory - displayedMemory) * memoryLerpSpeed;
+			displayedMemoryPeak += (memoryPeak - displayedMemoryPeak) * memoryLerpSpeed;
+		}
+
+		var currentMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemory);
+		var peakMemoryStr = flixel.util.FlxStringUtil.formatBytes(displayedMemoryPeak);
+
+		var targetFPS = #if (ClientPrefs && ClientPrefs.data && ClientPrefs.data.framerate) ClientPrefs.data.framerate #else FlxG.stage.window.frameRate #end;
+		var halfFPS = targetFPS * 0.5;
+		var textColorValue:Int;
+
+		if (currentFPS >= halfFPS) {
+			textColorValue = 0xFFFFFF;
+		} else {
+			textColorValue = 0xFF0000;
+		}
+		textDisplay.defaultTextFormat = new TextFormat(Paths.font("phantom.ttf"), 14, textColorValue);
+		textDisplay.setTextFormat(textDisplay.defaultTextFormat);
+
+		var displayText:String = "";
+
+		displayText = '' + Std.string(currentFPS) + ' FPS';
+		displayText += '\n' + formatFloat(frameTimeMs, 1) + ' / ' + formatFloat(avgFrameTimeMs, 1) + ' ms';
+		displayText += '\n' + currentMemoryStr + ' / ' + peakMemoryStr;
+
+		textDisplay.text = displayText;
+
+		updateBackground();
 	}
 
 	var deltaTimeout:Float = 0.0;
 	private override function __enterFrame(deltaTime:Float):Void
 	{
+		var currentFrameTime = Timer.stamp();
+		frameTimeMs = (currentFrameTime - lastFrameTime) * 1000.0;
+		lastFrameTime = currentFrameTime;
+
+		frameTimesArray.push(frameTimeMs);
+		if (frameTimesArray.length > 10) {
+			frameTimesArray.shift();
+		}
+
+		var sum:Float = 0.0;
+		for (time in frameTimesArray) {
+			sum += time;
+		}
+		avgFrameTimeMs = sum / frameTimesArray.length;
+		
 		if (ClientPrefs.data.fpsRework)
 		{
 			// Flixel keeps reseting this to 60 on focus gained
@@ -103,7 +186,7 @@ class FPSCounter extends TextField
 			if (currentTime >= updateTime)
 			{
 				var elapsed = currentTime - prevTime;
-				currentFPS = Math.ceil((framesCount * 1000) / elapsed);
+				currentFPS = Math.round((framesCount * 1000) / elapsed);
 				framesCount = 0;
 				prevTime = currentTime;
 				updateTime = currentTime + 500;
@@ -124,27 +207,102 @@ class FPSCounter extends TextField
 			times.push(now);
 			while (times[0] < now - 1000)
 				times.shift();
-			// prevents the overlay from updating every frame, why would you need to anyways @crowplexus
-			if (deltaTimeout < 50)
+
+			if (deltaTimeout < 33)
 			{
 				deltaTimeout += deltaTime;
 				return;
 			}
 
-			currentFPS = times.length < FlxG.updateFramerate ? times.length : FlxG.updateFramerate;
+			currentFPS = times.length;
 			deltaTimeout = 0.0;
 		}
 
 		updateText();
 	}
 
+	private function updateBackground():Void {
+		if (bgShape == null) return;
+
+		var g:Graphics = bgShape.graphics;
+		g.clear();
+			
+		final INNER_DIFF:Int = 3;
+		var bgWidth = 8 * 18 + 20;
+		var bgHeight = 1.8 * 18 + 20;
+
+		g.beginFill(0x3d3f41, 0.5);
+		g.drawRect(0, 0, bgWidth + (INNER_DIFF * 2), bgHeight + (INNER_DIFF * 2));
+		g.endFill();
+
+		g.beginFill(0x2c2f30, 0.5);
+		g.drawRect(INNER_DIFF, INNER_DIFF, bgWidth, bgHeight);
+		g.endFill();
+
+		bgShape.visible = true;
+	}
+
+	private function formatFloat(value:Float, decimals:Int):String {
+		var multiplier = Math.pow(10, decimals);
+		var rounded = Math.round(value * multiplier) / multiplier;
+		var str = Std.string(rounded);
+
+		if (str.indexOf('.') == -1) {
+			str += '.';
+		}
+		
+		var parts = str.split('.');
+		if (parts.length > 1) {
+			while (parts[1].length < decimals) {
+				parts[1] += '0';
+			}
+			return parts[0] + '.' + parts[1];
+		}
+		
+		return str + StringTools.lpad('', '0', decimals);
+	}
+
+	private function getDrawCalls():Int {
+		return FlxG.state.members.length * 2;
+	}
+
+	private function getGCStats():String {
+		#if cpp
+		try {
+			var totalMem = cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_RESERVED);
+			var usedMem = cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
+			var freeMem = totalMem - usedMem;
+			
+			var freePercentage = Math.round((freeMem / totalMem) * 100);
+			return '${freePercentage}% free';
+		} catch (e:Dynamic) {
+			return 'N/A';
+		}
+		#else
+		return 'N/A';
+		#end
+	}
+
 	inline function get_memoryMegas():Float
 		return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
 
 	public inline function positionFPS(X:Float, Y:Float, ?scale:Float = 1){
-		scaleX = scaleY = #if android (scale > 1 ? scale : 1) #else (scale < 1 ? scale : 1) #end;
-		x = FlxG.game.x + X;
-		y = FlxG.game.y + Y;
+		scaleX = scaleY = 1.0;
+
+		x = X;
+		y = Y;
+
+		updateBackground();
+	}
+
+	public function destroy():Void {
+		if (bgShape != null && bgShape.parent != null) {
+			removeChild(bgShape);
+		}
+		
+		if (textDisplay != null && textDisplay.parent != null) {
+			removeChild(textDisplay);
+		}
 	}
 
 	#if cpp

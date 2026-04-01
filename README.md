@@ -15,14 +15,11 @@ A engine based on Psych 1.0.4 with assets optimized for low-end devices.
 
 # Features
 * Multiple storage types on Mobile.
-* Restored FPS Counter with `OS` below `RAM` (Mobile only).
 * Reimplemented of Combo.
 * Win icon support.
 * Convert V-Slice to Psych character.
 * Audio Visualizer (Only main menu).
 * Video Lua.
-* Rework MasterEditorMenu.hx
-![Rework Master Editor Menu](docs/img/ReworkMasterEditorMenu.gif)
 * Better countdown intros and combo rating pop-up.
 
 ## Developer Credit:

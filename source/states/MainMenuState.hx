@@ -18,7 +18,7 @@ enum MainMenuColumn {
 class MainMenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '1.0.4'; // This is also used for Discord RPC
-	public static var scbEngineVersion:String = '1.1.3';
+	public static var scbEngineVersion:String = '1.1.5';
 	public static var fnfVersion:String = '0.2.8';
 	public static var curSelected:Int = 0;
 	public static var curColumn:MainMenuColumn = CENTER;
@@ -244,7 +244,7 @@ class MainMenuState extends MusicBeatState
 			if (allowMouse && ((FlxG.mouse.deltaScreenX != 0 && FlxG.mouse.deltaScreenY != 0) || FlxG.mouse.justPressed)) //FlxG.mouse.deltaScreenX/Y checks is more accurate than FlxG.mouse.justMoved
 			{
 				allowMouse = false;
-				FlxG.mouse.visible = true;
+				Cursor.show();
 				timeNotMoving = 0;
 
 				var selectedItem:FlxSprite;
@@ -306,7 +306,7 @@ class MainMenuState extends MusicBeatState
 			else
 			{
 				timeNotMoving += elapsed;
-				if(timeNotMoving > 2) FlxG.mouse.visible = false;
+				if(timeNotMoving > 2) Cursor.hide();
 			}
 
 			switch(curColumn)
@@ -341,7 +341,7 @@ class MainMenuState extends MusicBeatState
 			if (controls.BACK)
 			{
 				selectedSomethin = true;
-				FlxG.mouse.visible = false;
+				Cursor.hide();
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				MusicBeatState.switchState(new TitleState());
 			}
@@ -350,7 +350,7 @@ class MainMenuState extends MusicBeatState
 			{
 				FlxG.sound.play(Paths.sound('confirmMenu'));
 				selectedSomethin = true;
-				FlxG.mouse.visible = false;
+				Cursor.hide();
 
 				if (ClientPrefs.data.flashing)
 					FlxFlicker.flicker(magenta, 1.1, 0.15, false);
@@ -420,7 +420,7 @@ class MainMenuState extends MusicBeatState
 			else if (controls.justPressed('debug_1') || touchPad.buttonE.justPressed)
 			{
 				selectedSomethin = true;
-				FlxG.mouse.visible = false;
+				Cursor.hide();
 				MusicBeatState.switchState(new MasterEditorMenu());
 			}
 		}
